@@ -1,11 +1,45 @@
 <template>
   <div id="app">
     <div>
+        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+          <el-submenu index="1">
+            <template slot="title">7dpa</template>
+              <el-menu-item index="1-1">0.5</el-menu-item>
+              <el-menu-item index="1-2">0.8</el-menu-item>
+              <el-menu-item index="1-3">1.2</el-menu-item>
+              <el-menu-item index="1-4">1.8</el-menu-item>
+          </el-submenu>
+          <el-submenu index="2">
+            <template slot="title">14dpa</template>
+              <el-menu-item index="2-1" @click.native="show_14_r05">0.5</el-menu-item>
+              <el-menu-item index="2-2" @click.native="show_14_r08">0.8</el-menu-item>
+              <el-menu-item index="2-3">1.2</el-menu-item>
+              <el-menu-item index="2-4">1.8</el-menu-item>
+          </el-submenu>
+          <el-submenu index="3">
+            <template slot="title">wt</template>
+              <el-menu-item index="3-1">0.5</el-menu-item>
+              <el-menu-item index="3-2" @click.native="show_wt_r08">0.8</el-menu-item>
+              <el-menu-item index="3-3">1.2</el-menu-item>
+              <el-menu-item index="3-4">1.8</el-menu-item>
+          </el-submenu>
+          <el-submenu index="4">
+            <template slot="title">0hpa</template>
+              <el-menu-item index="4-1">0.5</el-menu-item>
+              <el-menu-item index="4-2">0.8</el-menu-item>
+              <el-menu-item index="4-3">1.2</el-menu-item>
+              <el-menu-item index="4-4">1.8</el-menu-item>
+          </el-submenu>
+        </el-menu>
+    </div>
+    <div>
       <el-button @click="show_5">Show top 5 cell Type</el-button>
       <el-button @click="show_8">Show top 8 cell Type</el-button>
       <el-button @click="show_10">Show top 10 cell Type</el-button>
     </div>
-    <v-chart class="chart" :option="option" style="width:1600px;height:600px" />
+    <div>
+      <v-chart class="chart" :option="option" style="width:100%;height:600px" />
+    </div>
   </div>
 </template>
 
@@ -15,6 +49,9 @@
   import 'echarts-gl';
   import VChart, { THEME_KEY } from "vue-echarts";
   // the dateset url
+  var dpa2_14_r05_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/14dpa2_r0.5.json"
+  var dpa2_14_r08_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/14dpa2_r0.8.json"
+  var wt_r08_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/wt_r0.8.json"
   var bin50_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin50.json'
   var bin20_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin20.json'
   var bin14_r05_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin14_r0.5.json'
@@ -69,6 +106,41 @@
       }; // end of data return
     },
     methods: {
+      handleSelect(key, keyPath) {
+        console.log(key);
+        console.log(keyPath);
+        if ( key == "2-1" )
+        {
+            console.log("this is 2-1");
+            //this.selected = "CellAtlas";
+        }
+        else if ( key == "3-2")
+        {
+            //this.selected = "Home";
+            show_wt_r08();
+        }
+    },
+      show_14_r05(){
+        var self = this;
+        $.getJSON(dpa2_14_r05_url,function(_data) {
+        self.setJsonData(_data);
+        console.log('14dpa2_r05 json loaded');
+        self.option = self.getOption();});
+    },
+      show_14_r08(){
+        var self = this;
+        $.getJSON(dpa2_14_r08_url,function(_data) {
+        self.setJsonData(_data);
+        console.log('14dpa2_r08 json loaded');
+        self.option = self.getOption();});
+    },
+      show_wt_r08(){
+        var self = this;
+        $.getJSON(wt_r08_url,function(_data) {
+        self.setJsonData(_data);
+        console.log('wt_r08 json loaded');
+        self.option = self.getOption();});
+    },
       show_5() {
         this.showd_clusters=[1,1,1,1,1,0,0,0,0,0]
         this.option = this.getOption();
