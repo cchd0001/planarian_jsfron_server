@@ -40,6 +40,27 @@
     <div>
       <v-chart class="chart" :option="option" style="width:100%;height:600px" />
     </div>
+    <div>
+      <el-table
+      ref="multipleTable"
+      :data="tableData"
+      style="width: 50%"
+      @selection-change="handleSelectionChange">
+      <el-table-column
+        type="selection"
+        width="55">
+      </el-table-column>
+      <el-table-column
+        property="Celltype"
+        label="Celltype"
+        width="80">
+      </el-table-column>
+    </el-table>
+    <div style="margin-top: 20px">
+      <el-button @click="applyStatus">Apply</el-button>
+    </div>
+  </div>
+    </div>
   </div>
 </template>
 
@@ -66,6 +87,30 @@
     },
     data(){
       return {
+        tableData: [{
+          ID: '0',
+          Celltype: 'Cluster1',
+        }, {
+          ID: '1',
+          Celltype: 'Cluster2',
+        }, {
+          ID: '2',
+          Celltype: 'Cluster3',
+        }, {
+          ID: '3',
+          Celltype: 'Cluster4',
+        }, {
+          ID: '4',
+          Celltype: 'Cluster5',
+        }, {
+          ID: '5',
+          Celltype: 'Cluster6',
+        }, {
+          ID: '6',
+          Celltype: 'Cluster7',
+        }],
+        multipleSelection: [],
+        saved_clusters:[],
         jsondata : null,
         COLOR_ALL : [
           '#37A2DA',
@@ -106,17 +151,32 @@
       }; // end of data return
     },
     methods: {
+      applyStatus(){
+        var self = this;
+        console.log("change cluster showing option");
+        this.showd_clusters=this.saved_clusters;
+        self.option=self.getOption();
+      },
+
+      handleSelectionChange(val) {
+        this.multipleSelection = val;
+        var tmp_clusters=[0,0,0,0,0,0,0,0,0,0];
+        for( var i = 0 ; i < val.length ; i++)
+        {tmp_clusters[val[i].ID]=1;}
+        this.saved_clusters=tmp_clusters;
+        console.log("saved clusters");
+        console.log(this.saved_clusters);
+      },
+
       handleSelect(key, keyPath) {
         console.log(key);
         console.log(keyPath);
         if ( key == "2-1" )
-        {
-            console.log("this is 2-1");
+        {   console.log("this is 2-1");
             //this.selected = "CellAtlas";
         }
         else if ( key == "3-2")
-        {
-            //this.selected = "Home";
+        {   //this.selected = "Home";
             show_wt_r08();
         }
     },
@@ -200,7 +260,7 @@
           for( var i = 0 ; i<this.showd_clusters.length; i++ )
           {
             var curr_cluster = this.all_clusters[i];
-            legend_list.push("celltype_"+curr_cluster);
+            legend_list.push("Celltype"+curr_cluster);
             if(this.showd_clusters[i] == 1)
             {
               curr_color = this.COLOR_ALL[i];
