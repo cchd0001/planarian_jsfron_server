@@ -33,11 +33,6 @@
         </el-menu>
     </div>
     <div>
-      <el-button @click="show_5">Show top 5 cell Type</el-button>
-      <el-button @click="show_8">Show top 8 cell Type</el-button>
-      <el-button @click="show_10">Show top 10 cell Type</el-button>
-    </div>
-    <div>
       <v-chart class="chart" :option="option" style="width:100%;height:600px" />
     </div>
     <div>
@@ -201,18 +196,6 @@
         console.log('wt_r08 json loaded');
         self.option = self.getOption();});
     },
-      show_5() {
-        this.showd_clusters=[1,1,1,1,1,0,0,0,0,0]
-        this.option = this.getOption();
-      },
-      show_8() {
-        this.showd_clusters=[1,1,1,1,1,1,1,1,0,0];
-        this.option = this.getOption();
-      },
-      show_10() {
-        this.showd_clusters=[1,1,1,1,1,1,1,1,1,1];
-        this.option = this.getOption();
-      },
       setJsonData(_data){
         console.log('knowing json loaded');
         var curr_draw_datas= [];
