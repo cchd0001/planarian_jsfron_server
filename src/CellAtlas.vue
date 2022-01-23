@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+
     <div>
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
           <el-submenu index="1">
@@ -32,30 +33,30 @@
           </el-submenu>
         </el-menu>
     </div>
-    <div>
-      <v-chart class="chart" :option="option" style="width:100%;height:600px" />
-    </div>
-    <div>
+
+    <div class="window">
+      <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
       <el-table
+      class="table"
       ref="multipleTable"
       :data="tableData"
-      style="width: 50%"
+      style="width:20%;"
       @selection-change="handleSelectionChange">
-      <el-table-column
-        type="selection"
-        width="55">
-      </el-table-column>
-      <el-table-column
-        property="Celltype"
-        label="Celltype"
-        width="80">
-      </el-table-column>
-    </el-table>
-    <div style="margin-top: 20px">
-      <el-button @click="applyStatus">Apply</el-button>
+        <el-table-column
+          type="selection"
+          width="55">
+        </el-table-column>
+        <el-table-column
+          property="Celltype"
+          label="Celltype"
+          width="80">
+        </el-table-column>
+      </el-table>
+      <div style="margin-left:3%;width:20px">
+        <el-button @click="applyStatus">Apply</el-button>
+      </div>
     </div>
-  </div>
-    </div>
+
   </div>
 </template>
 
@@ -84,25 +85,25 @@
       return {
         tableData: [{
           ID: '0',
-          Celltype: 'Cluster1',
+          Celltype: 'Cluster0',
         }, {
           ID: '1',
-          Celltype: 'Cluster2',
+          Celltype: 'Cluster1',
         }, {
           ID: '2',
-          Celltype: 'Cluster3',
+          Celltype: 'Cluster2',
         }, {
           ID: '3',
-          Celltype: 'Cluster4',
+          Celltype: 'Cluster3',
         }, {
           ID: '4',
-          Celltype: 'Cluster5',
+          Celltype: 'Cluster4',
         }, {
           ID: '5',
-          Celltype: 'Cluster6',
+          Celltype: 'Cluster5',
         }, {
           ID: '6',
-          Celltype: 'Cluster7',
+          Celltype: 'Cluster6',
         }],
         multipleSelection: [],
         saved_clusters:[],
@@ -165,15 +166,7 @@
 
       handleSelect(key, keyPath) {
         console.log(key);
-        console.log(keyPath);
-        if ( key == "2-1" )
-        {   console.log("this is 2-1");
-            //this.selected = "CellAtlas";
-        }
-        else if ( key == "3-2")
-        {   //this.selected = "Home";
-            show_wt_r08();
-        }
+        console.log(keyPath); 
     },
       show_14_r05(){
         var self = this;
@@ -367,7 +360,7 @@
   text-align: center;
 }
 .chart {
-  width: 800px;
-  height: 600px;
+  width: 100%;
+  height: 800px;
 }
 </style>
