@@ -8,9 +8,10 @@
             <el-menu-item index="2-1">Cell Type Atlas</el-menu-item>
             <el-menu-item index="2-2" disabled>Gene Expression Atlas</el-menu-item>
         </el-submenu>
-        <el-menu-item index="3" disabled>Data analysis</el-menu-item>
-        <el-menu-item index="4"><a href="https://en.wikipedia.org/wiki/Planarian" target="_blank">Planarian wiki</a></el-menu-item>
-        <el-menu-item index="4" disabled>About us</a></el-menu-item>
+        <el-menu-item index="3"> Single Cell Atlas</el-menu-item>
+        <el-menu-item index="4" disabled>Data analysis</el-menu-item>
+        <el-menu-item index="5"><a href="https://en.wikipedia.org/wiki/Planarian" target="_blank">Planarian wiki</a></el-menu-item>
+        <el-menu-item index="5" disabled>About us</a></el-menu-item>
       </el-menu>
       <div class="line"></div>
     </header>
@@ -31,6 +32,7 @@
 
 import Home from "./Home.vue";
 import CellAtlas from "./CellAtlas.vue";
+import SingleCell from "./SingleCell.vue";
 
 export default {
   data() {
@@ -42,6 +44,7 @@ export default {
   components:{
      Home,
      CellAtlas,
+     SingleCell,
   },
   methods: {
     handleSelect(key, keyPath) {
@@ -50,6 +53,9 @@ export default {
         if ( key == "2-1" )
         {
             this.selected = "CellAtlas";
+        }else if (key == "3")
+        {
+            this.selected = 'SingleCell';
         }
         else if ( key == "1")
         {
