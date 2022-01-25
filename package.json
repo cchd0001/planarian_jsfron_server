@@ -12,8 +12,9 @@
     "echarts-gl": "^2.0.8",
     "element-ui": "^2.3.4",
     "jquery": "^3.6.0",
-    "vue": "^2.5.16",
-    "vue-echarts": "^6.0.2"
+    "vue": "^2.6.14",
+    "vue-echarts": "^6.0.2",
+    "yarn": "^1.22.17"
   },
   "engines": {
     "node": ">=6"
@@ -32,7 +33,7 @@
     "style-loader": "^0.13.2",
     "url-loader": "^0.5.8",
     "vue-loader": "^13.3.0",
-    "vue-template-compiler": "^2.5.16",
+    "vue-template-compiler": "^2.6.14",
     "webpack": "^2.4.1",
     "webpack-dev-server": "^2.4.2"
   }

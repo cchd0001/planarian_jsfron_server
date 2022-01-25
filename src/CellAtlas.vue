@@ -253,8 +253,8 @@
              }
            ]
         },
-        all_clusters:[0,1,2,3,4,5,6,7,8,9],
-        showd_clusters:[1,1,1,1,1,0,0,0,0,0]
+        all_clusters:[0,1,2,3,4,5,6,7],
+        showd_clusters:[1,1,1,1,1,1,1,1]
       }; // end of data return
     },
     methods: {
@@ -270,7 +270,7 @@
 
       handleSelectionChange(val) {
         this.multipleSelection = val;
-        var tmp_clusters=[0,0,0,0,0,0,0,0,0,0];
+        var tmp_clusters=[0,0,0,0,0,0,0,0];
         for( var i = 0 ; i < val.length ; i++) {
           if ( i < 11){
             tmp_clusters[val[i].ID]=1;
@@ -362,7 +362,7 @@
             }
             else
             {
-              curr_color = this.COLOR_ALL[7];
+              curr_color = this.COLOR_ALL[this.COLOR_ALL.length-1];
             }
             legend_color.push(curr_color);
             var the_data = curr_draw_datas[i];
@@ -386,7 +386,7 @@
             series_list.push(one_series);
           } // end of for showd_clusters.length
           legend_list.push("others");
-          curr_color = this.COLOR_ALL[7];
+          curr_color = this.COLOR_ALL[this.COLOR_ALL.length-1];
           legend_color.push(curr_color);
           var left_index = this.showd_clusters.length;
           var left_data =  curr_draw_datas[left_index];
@@ -407,7 +407,7 @@
             //},
             //emphasis: {
             //  itemStyle: {
-            //    color: this.COLOR_ALL[7]
+            //    color: this.COLOR_ALL[this.COLOR_ALL.length-1]
             //  }
             //}
           };
