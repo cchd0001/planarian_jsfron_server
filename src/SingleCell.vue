@@ -3,34 +3,9 @@
 
     <div style="margin-left:40%;" align="center">
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-          <el-submenu index="1">
-            <template slot="title">7dpa</template>
-              <el-menu-item index="1-1" disabled>0.5</el-menu-item>
-              <el-menu-item index="1-2" disabled>0.8</el-menu-item>
-              <el-menu-item index="1-3" disabled>1.2</el-menu-item>
-              <el-menu-item index="1-4" disabled>1.8</el-menu-item>
-          </el-submenu>
-          <el-submenu index="2">
-            <template slot="title">14dpa</template>
-              <el-menu-item index="2-1" @click.native="show_14_r05">0.5</el-menu-item>
-              <el-menu-item index="2-2" @click.native="show_14_r08">0.8</el-menu-item>
-              <el-menu-item index="2-3" disabled>1.2</el-menu-item>
-              <el-menu-item index="2-4" disabled>1.8</el-menu-item>
-          </el-submenu>
-          <el-submenu index="3">
-            <template slot="title">wt</template>
-              <el-menu-item index="3-1" disabled>0.5</el-menu-item>
-              <el-menu-item index="3-2" @click.native="show_wt_r08">0.8</el-menu-item>
-              <el-menu-item index="3-3" disabled>1.2</el-menu-item>
-              <el-menu-item index="3-4" disabled>1.8</el-menu-item>
-          </el-submenu>
-          <el-submenu index="4">
-            <template slot="title">0hpa</template>
-              <el-menu-item index="4-1" disabled>0.5</el-menu-item>
-              <el-menu-item index="4-2" disabled>0.8</el-menu-item>
-              <el-menu-item index="4-3" disabled>1.2</el-menu-item>
-              <el-menu-item index="4-4" disabled>1.8</el-menu-item>
-          </el-submenu>
+          <el-menu-item index="1">14dpa1</el-menu-item>
+          <el-menu-item index="2">14dpa2</el-menu-item>
+          <el-menu-item index="3"@click.native="show_wt_label" >WT</el-menu-item>
         </el-menu>
     </div>
 
@@ -103,6 +78,7 @@
   var dpa2_14_r05_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/14dpa2_r0.5.json"
   var dpa2_14_r08_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/14dpa2_r0.8.json"
   var wt_r08_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/wt_r0.8.json"
+  var wt_label_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/label.json"
   var bin50_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin50.json'
   var bin20_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin20.json'
   var bin14_r05_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin14_r0.5.json'
@@ -144,39 +120,132 @@
         }],
         multipleSelection: [],
         saved_clusters:[],
-        tableData:[{
-           ID: '0',
-          Celltype: 'Cluster0',
-        }, {
-          ID: '1',
-          Celltype: 'Cluster1',
-        }, {
-          ID: '2',
-          Celltype: 'Cluster2',
-        }, {
-          ID: '3',
-          Celltype: 'Cluster3',
-        }, {
-          ID: '4',
-          Celltype: 'Cluster4',
-        }, {
-          ID: '5',
-          Celltype: 'Cluster5',
-        }, {
-          ID: '6',
-          Celltype: 'Cluster6',
-
-        }],
+        name_id_map: {
+           'cathe+-cells':0,
+           'Epidermal':1,
+           'Gut':2,
+           'Muscle':3,
+           'Neural':4,
+           'Parenchymal':5,
+           'Pharynx':6,
+           'Protonephridia':7,
+           'tgs1+-Neoblast':8
+        },
+        tableData:[
+          {
+             ID: '0',
+            Celltype: 'cathe+-cells',
+          }, {
+            ID: '1',
+            Celltype: 'Epidermal',
+          }, {
+            ID: '2',
+            Celltype: 'Gut',
+          }, {
+            ID: '3',
+            Celltype: 'Muscle',
+          }, {
+            ID: '4',
+            Celltype: 'Neural',
+          }, {
+            ID: '5',
+            Celltype: 'Parenchymal',
+          }, {
+            ID: '6',
+            Celltype: 'Pharynx',
+          }, {
+            ID: '7',
+            Celltype: 'Protonephridia',
+          }, {
+            ID: '8',
+            Celltype: 'tgs1+-Neoblast',
+          }
+        ],
         jsondata : null,
         COLOR_ALL : [
-          '#37A2DA',
-          '#e06343',
-          '#37a354',
-          '#b55dba',
-          '#b5bd48',
-          '#8378EA',
-          '#96BFFF',
-          '#555555',
+            '#604E97',
+            '#F6A600',
+            '#B3446C',
+            '#DCD300',
+            '#882D17',
+            '#8DB600',
+            '#654522',
+            '#E25822',
+            '#2B3D26',
+            '#191970',
+            '#000080',
+            '#6495ED',
+            '#1E90FF',
+            '#00BFFF',
+            '#00FFFF',
+            '#FF1493',
+            '#FF00FF',
+            '#A020F0',
+            '#63B8FF',
+            '#008B8B',
+            '#54FF9F',
+            '#00FF00',
+            '#76EE00',
+            '#FFF68F',
+            'Yellow1',
+            'Gold1'  ,
+            'DarkGoldenrod4',
+            '#FF6A6A',
+            '#FFFF00',
+            '#1CE6FF',
+            '#FF34FF',
+            '#FF4A46',
+            '#008941',
+            '#006FA6',
+            '#A30059',
+            '#FFE4E1',
+            '#0000A6',
+            '#63FFAC',
+            '#B79762',
+            '#004D43',
+            '#8FB0FF',
+            '#997D87',
+            '#5A0007',
+            '#809693',
+            '#1B4400',
+            '#4FC601',
+            '#3B5DFF',
+            '#FF2F80',
+            '#BA0900',
+            '#6B7900',
+            '#00C2A0',
+            '#FFAA92',
+            '#FF90C9',
+            '#B903AA',
+            '#DDEFFF',
+            '#7B4F4B',
+            '#A1C299',
+            '#0AA6D8',
+            '#00A087',
+            '#4DBBD5',
+            '#E64B35',
+            '#3C5488',
+            '#F38400',
+            '#A1CAF1',
+            '#C2B280',
+            '#848482',
+            '#E68FAC',
+            '#0067A5',
+            '#F99379',
+            '#FF8247',
+            '#FFA54F',
+            '#FF7F24',
+            '#FF3030',
+            '#FFA500',
+            '#FF7F00',
+            '#FF7256',
+            '#FF6347',
+            '#FF4500',
+            '#FF1493',
+            '#FF6EB4',
+            '#EE30A7',
+            '#8B008B',
+            '#888888',
         ],
         option: {
            tooltip: {
@@ -202,8 +271,8 @@
              }
            ]
         },
-        all_clusters:[0,1,2,3,4,5,6,7,8,9],
-        showd_clusters:[1,1,1,1,1,0,0,0,0,0]
+        all_clusters:[0,1,2,3,4,5,6,7,8],
+        showd_clusters:[1,1,1,1,1,1,1,1,1]
       }; // end of data return
     },
     methods: {
@@ -219,12 +288,12 @@
 
       handleSelectionChange(val) {
         this.multipleSelection = val;
-        var tmp_clusters=[0,0,0,0,0,0,0,0,0,0];
+        var tmp_clusters=[0,0,0,0,0,0,0,0,0];
         for( var i = 0 ; i < val.length ; i++) {
           if ( i < 11){
             tmp_clusters[val[i].ID]=1;
           } else if (i==11){
-            
+
           }
         }
         this.saved_clusters=tmp_clusters;
@@ -233,9 +302,7 @@
       },
 
       handleSelect(key, keyPath) {
-        console.log(key);
-        console.log(keyPath); 
-    },
+      },
       show_14_r05(){
         var self = this;
         $.getJSON(dpa2_14_r05_url,function(_data) {
@@ -250,9 +317,9 @@
         console.log('14dpa2_r08 json loaded');
         self.option = self.getOption();});
     },
-      show_wt_r08(){
+      show_wt_label(){
         var self = this;
-        $.getJSON(wt_r08_url,function(_data) {
+        $.getJSON(wt_label_url,function(_data) {
         self.setJsonData(_data);
         console.log('wt_r08 json loaded');
         self.option = self.getOption();});
@@ -260,30 +327,23 @@
       setJsonData(_data){
         console.log('knowing json loaded');
         var curr_draw_datas= [];
-        for(var i = 0; i<=this.all_clusters.length; i++ )
+        for(var i = 0; i<Object.keys(this.name_id_map).length ; i++ )
         {
             curr_draw_datas.push([['x','y','z']]);
         }
-        var left_index = this.all_clusters.length;
-        console.log(_data.length);
+        //console.log(_data.length);
         for(var j=0 ; j< _data.length; j++)
         {
           var curr_item = _data[j];
-          var found=0;
-          for(var i = 0; i< this.all_clusters.length; i++ )
-          {
-            var curr_cluster = this.all_clusters[i];
-            if( curr_item[3] == curr_cluster )
-            {
-                curr_draw_datas[i].push([curr_item[0],curr_item[1],curr_item[2]]);
-                found=1;
-                break;
-            }
-          }
-          if( found == 0 )
-          {
-            curr_draw_datas[left_index].push([curr_item[0],curr_item[1],curr_item[2]]);
-          }
+          //console.log(curr_item);
+          var type_name = curr_item[3];
+          //console.log(type_name);
+          var type_id = this.name_id_map[type_name];
+          //console.log(type_id);
+          //var curr_cluster = curr_draw_datas[type_id];
+          //console.log('current cluster is '+ curr_cluster);
+          //console.log(type_id);
+          curr_draw_datas[type_id].push([curr_item[0],curr_item[1],curr_item[2]]);
         } // end of for _data
         this.jsondata = curr_draw_datas;
       },
@@ -301,20 +361,24 @@
           var legend_color = [];
           var curr_color ;
           console.log('start series');
+          // set legend color
           for( var i = 0 ; i<this.showd_clusters.length; i++ )
           {
             var curr_cluster = this.all_clusters[i];
-            legend_list.push("Celltype"+curr_cluster);
+            var curr_legend = this.tableData[i].Celltype;
+            legend_list.push(curr_legend);
             if(this.showd_clusters[i] == 1)
             {
               curr_color = this.COLOR_ALL[i];
             }
             else
             {
-              curr_color = this.COLOR_ALL[7];
+              curr_color = this.COLOR_ALL[this.COLOR_ALL.length-1];
             }
             legend_color.push(curr_color);
             var the_data = curr_draw_datas[i];
+            //console.log('the data length');
+            console.log(the_data.length);
             var one_series = {
                 name : legend_list[i],
                 type : 'scatter3D',
@@ -332,36 +396,9 @@
                 //  }
                 //}
             };
+            
             series_list.push(one_series);
           } // end of for showd_clusters.length
-          legend_list.push("others");
-          curr_color = this.COLOR_ALL[7];
-          legend_color.push(curr_color);
-          var left_index = this.showd_clusters.length;
-          var left_data =  curr_draw_datas[left_index];
-          var left_series = {
-            name : legend_list[left_index],
-            type : 'scatter3D',
-            dimensions: [ 'x','y','z' ],
-            data: left_data,
-            symbolSize: 2,
-            itemStyle: {
-              borderWidth: 1,
-              borderColor: curr_color,
-              color: curr_color
-            },
-            //itemStyle: {
-            //  borderWidth: 1,
-            //  borderColor: 'rgba(255,255,255,1)'
-            //},
-            //emphasis: {
-            //  itemStyle: {
-            //    color: this.COLOR_ALL[7]
-            //  }
-            //}
-          };
-          series_list.push(left_series);
-          console.log('end series');
           var opt={
             tooltip: {},
             xAxis3D: {
@@ -413,7 +450,7 @@
       // load the 3D basic dataset here
         var self = this;
         console.log('start json loading');
-        $.getJSON(bin14_r05_url,function(_data) {
+        $.getJSON(wt_label_url,function(_data) {
           self.setJsonData(_data);
           console.log('json loaded');
           //self.option = self.getOption();
