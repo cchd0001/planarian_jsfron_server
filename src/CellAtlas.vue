@@ -1,61 +1,145 @@
 <template>
   <div id="app">
 
-    <div>
+    <div style="margin-left:40%;" align="center">
         <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
           <el-submenu index="1">
             <template slot="title">7dpa</template>
-              <el-menu-item index="1-1">0.5</el-menu-item>
-              <el-menu-item index="1-2">0.8</el-menu-item>
-              <el-menu-item index="1-3">1.2</el-menu-item>
-              <el-menu-item index="1-4">1.8</el-menu-item>
+              <el-menu-item index="1-1" disabled>0.5</el-menu-item>
+              <el-menu-item index="1-2" disabled>0.8</el-menu-item>
+              <el-menu-item index="1-3" disabled>1.2</el-menu-item>
+              <el-menu-item index="1-4" disabled>1.8</el-menu-item>
           </el-submenu>
           <el-submenu index="2">
             <template slot="title">14dpa</template>
               <el-menu-item index="2-1" @click.native="show_14_r05">0.5</el-menu-item>
               <el-menu-item index="2-2" @click.native="show_14_r08">0.8</el-menu-item>
-              <el-menu-item index="2-3">1.2</el-menu-item>
-              <el-menu-item index="2-4">1.8</el-menu-item>
+              <el-menu-item index="2-3" disabled>1.2</el-menu-item>
+              <el-menu-item index="2-4" disabled>1.8</el-menu-item>
           </el-submenu>
           <el-submenu index="3">
             <template slot="title">wt</template>
-              <el-menu-item index="3-1">0.5</el-menu-item>
+              <el-menu-item index="3-1" disabled>0.5</el-menu-item>
               <el-menu-item index="3-2" @click.native="show_wt_r08">0.8</el-menu-item>
-              <el-menu-item index="3-3">1.2</el-menu-item>
-              <el-menu-item index="3-4">1.8</el-menu-item>
+              <el-menu-item index="3-3" disabled>1.2</el-menu-item>
+              <el-menu-item index="3-4" disabled>1.8</el-menu-item>
           </el-submenu>
           <el-submenu index="4">
             <template slot="title">0hpa</template>
-              <el-menu-item index="4-1">0.5</el-menu-item>
-              <el-menu-item index="4-2">0.8</el-menu-item>
-              <el-menu-item index="4-3">1.2</el-menu-item>
-              <el-menu-item index="4-4">1.8</el-menu-item>
+              <el-menu-item index="4-1" disabled>0.5</el-menu-item>
+              <el-menu-item index="4-2" disabled>0.8</el-menu-item>
+              <el-menu-item index="4-3" disabled>1.2</el-menu-item>
+              <el-menu-item index="4-4" disabled>1.8</el-menu-item>
           </el-submenu>
         </el-menu>
     </div>
 
-    <div class="window">
       <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
-      <el-table
-      class="table"
-      ref="multipleTable"
-      :data="tableData"
-      style="width:20%;"
-      @selection-change="handleSelectionChange">
-        <el-table-column
-          type="selection"
-          width="55">
-        </el-table-column>
-        <el-table-column
-          property="Celltype"
-          label="Celltype"
-          width="80">
-        </el-table-column>
-      </el-table>
-      <div style="margin-left:3%;width:20px">
-        <el-button @click="applyStatus">Apply</el-button>
-      </div>
+    <div class="window" style='background-color:blue;width:800px;height:300px;'>
+      <el-tabs style='width:800px;height:200px;' @tab-click="handleClick">
+        <el-tab-pane style='width:160;' label='Cell' name='first'>
+          <el-table
+            class="table"
+            ref="multipleTable"
+            style="width:160;height:200px;"
+            :show-header='false'
+            :highlight-current-row='true'
+            :data="tableData"
+            @selection-change="handleSelectionChange">
+              <el-table-column
+                type="selection"
+                width="55">
+              </el-table-column>
+              <el-table-column
+                property="Celltype"
+                label="Celltype"
+                width="80">
+              </el-table-column>
+          </el-table>
+          <div style="margin-left:3%;width:20px">
+            <el-button @click="applyStatus">Apply</el-button>
+          </div>    
+        </el-tab-pane>
+        <el-tab-pane label='Gene' name='second'>
+          <el-table
+            class="table"
+            ref="multipleTable"
+            style="width:160;height:200px;"
+            :data="tableDataGenes"
+            :show-header='false'
+            @selection-change="handleSelectionChange">
+              <el-table-column
+                type="selection"
+                width="55">
+              </el-table-column>
+              <el-table-column
+                property="Genes"
+                label="Genes"
+                width="80">
+              </el-table-column>
+          </el-table>
+          <div style="margin-left:3%;width:20px">
+            <el-button @click="applyStatus">Apply</el-button>
+          </div> 
+        </el-tab-pane>
+      </el-tabs>
     </div>
+ <el-container style="height: 800px; border: 1px solid #eee">
+      <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
+        <p> Gene Expression </p>
+      <el-tabs style='width:800px;height:200px;' @tab-click="handleClick">
+        <el-tab-pane style='width:160;' label='Cell' name='first'>
+          <el-table
+            class="table"
+            ref="multipleTable"
+            style="width:160;"
+            :data="tableData"
+            :show-header='false'
+            @selection-change="handleSelectionChange">
+              <el-table-column
+                type="selection"
+                width="55">
+              </el-table-column>
+              <el-table-column
+                show-header='false'
+                property="Celltype"
+                label="Celltype"
+                width="80">
+              </el-table-column>
+          </el-table>
+          <div style="margin-left:3%;width:20px">
+            <el-button @click="applyStatus">Apply</el-button>
+          </div>    
+        </el-tab-pane>
+        <el-tab-pane label='Gene' name='second'>
+          <el-table
+            class="table"
+            ref="multipleTable"
+            style="width:160;"
+            :data="tableDataGenes"
+            :show-header='false'
+            @selection-change="handleSelectionChange">
+              <el-table-column
+                type="selection"
+                width="55">
+              </el-table-column>
+              <el-table-column
+                property="Genes"
+                label="Genes"
+                width="80">
+              </el-table-column>
+          </el-table>
+          <div style="margin-left:3%;width:20px">
+            <el-button @click="applyStatus">Apply</el-button>
+          </div> 
+        </el-tab-pane>
+      </el-tabs>
+      </el-aside>
+
+      <el-main>
+        <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
+      </el-main>
+    </el-container>
 
   </div>
 </template>
@@ -83,8 +167,35 @@
     },
     data(){
       return {
-        tableData: [{
+        activeIndex: '1',
+        pagesize: 10,
+        currentPage:1,
+        tableDataGenes: [{
           ID: '0',
+          Genes: 'SMED30036034',
+        }, {
+          ID: '1',
+          Genes: 'SMED30036029',
+        }, {
+          ID: '2',
+          Genes: 'SMED30036028',
+        }, {
+          ID: '3',
+          Genes: 'SMED30036026',
+        }, {
+          ID: '4',
+          Genes: 'SMED30036025',
+        }, {
+          ID: '5',
+          Genes: 'SMED30036024',
+        }, {
+          ID: '6',
+          Genes: 'SMED30036022',
+        }],
+        multipleSelection: [],
+        saved_clusters:[],
+        tableData:[{
+           ID: '0',
           Celltype: 'Cluster0',
         }, {
           ID: '1',
@@ -104,19 +215,19 @@
         }, {
           ID: '6',
           Celltype: 'Cluster6',
+
         }],
-        multipleSelection: [],
-        saved_clusters:[],
         jsondata : null,
         COLOR_ALL : [
-          '#37A2DA',
-          '#e06343',
-          '#37a354',
-          '#b55dba',
-          '#b5bd48',
-          '#8378EA',
-          '#96BFFF',
-          '#555555',
+          '#8dd3c7',
+          '#ffffb3',
+          '#bebada',
+          '#fb8072',
+          '#80b1d3',
+          '#fdb462',
+          '#b3de69',
+          '#fccde5',
+          '#d9d9d9',
         ],
         option: {
            tooltip: {
@@ -147,6 +258,9 @@
       }; // end of data return
     },
     methods: {
+      handleClick(tab, event){
+        console.log(tab, event);
+      },
       applyStatus(){
         var self = this;
         console.log("change cluster showing option");
@@ -157,8 +271,13 @@
       handleSelectionChange(val) {
         this.multipleSelection = val;
         var tmp_clusters=[0,0,0,0,0,0,0,0,0,0];
-        for( var i = 0 ; i < val.length ; i++)
-        {tmp_clusters[val[i].ID]=1;}
+        for( var i = 0 ; i < val.length ; i++) {
+          if ( i < 11){
+            tmp_clusters[val[i].ID]=1;
+          } else if (i==11){
+            
+          }
+        }
         this.saved_clusters=tmp_clusters;
         console.log("saved clusters");
         console.log(this.saved_clusters);
