@@ -94,23 +94,23 @@
           });
         }
       },
-      show_WT(){this.update_basic("WT"); },
-      show_0hpa1(){},
-      show_0hpa2(){} ,
-      show_12hpa1(){},
-      show_12hpa2(){},
-      show_36hpa1(){},
-      show_36hpa2(){},
-      show_3dpa1(){} ,
-      show_3dpa2(){} ,
-      show_5dpa1(){} ,
-      show_5dpa2(){} ,
-      show_7dpa1(){} ,
-      show_7dpa2(){} ,
-      show_10dpa1(){},
-      show_10dpa2(){},
-      show_14dpa1(){},
-      show_14dpa2(){},
+      show_WT()     {  this.update_basic("WT");     },
+      show_0hpa1()  {  this.update_basic("0hpa1");  },
+      show_0hpa2()  {  this.update_basic("0hpa2");  },
+      show_12hpa1() {  this.update_basic("12hpa1"); },
+      show_12hpa2() {  this.update_basic("12hpa2"); },
+      show_36hpa1() {  this.update_basic("36hpa1"); },
+      show_36hpa2() {  this.update_basic("36hpa2"); },
+      show_3dpa1()  {  this.update_basic("3dpa1");  },
+      show_3dpa2()  {  this.update_basic("3dpa2");  },
+      show_5dpa1()  {  this.update_basic("5dpa1");  },
+      show_5dpa2()  {  this.update_basic("5dpa2");  },
+      show_7dpa1()  {  this.update_basic("7dpa1");  },
+      show_7dpa2()  {  this.update_basic("7dpa2");  },
+      show_10dpa1() {  this.update_basic("10dpa1"); },
+      show_10dpa2() {  this.update_basic("10dpa2"); },
+      show_14dpa1() {  this.update_basic("14dpa1"); },
+      show_14dpa2() {  this.update_basic("14dpa2"); },
       //-------------switching individual end-------------------//
 
       //-------------switching gene start -------------------//
@@ -145,11 +145,11 @@
       setGeneData(_data){
         console.log('get gene json loaded');
         var gene_xyz= [];
-        gene_xyz.push( ['x','y','z'] );
+        gene_xyz.push( ['x','y','z','e'] );
         for(var j=0 ; j< _data.length; j++)
         {
             var curr_item = _data[j];
-            gene_xyz.push( [curr_item[0],curr_item[1],curr_item[2]]);
+            gene_xyz.push( [curr_item[0],curr_item[1],curr_item[2],curr_item[3]]);
         }
         this.gene_xyz = gene_xyz;
       },
@@ -192,13 +192,13 @@
               var one_series = {
                   name : 'gene',
                   type : 'scatter3D',
-                  dimensions: [ 'x','y','z' ],
+                  dimensions: [ 'x','y','z' ,'e'],
                   data: this.gene_xyz,
                   symbolSize: 2,
                   itemStyle: {
                     borderWidth: 1,
-                    borderColor: gene_color,
-                    color : gene_color,
+                    //borderColor: gene_color,
+                    //color : gene_color,
                   },
               };
               series_list.push(one_series);
@@ -247,6 +247,21 @@
             },
             series: series_list
           }; // end of var opt
+          if( this.gene_xyz != null)
+          {
+            opt.visualMap= [
+            {
+               type: 'continuous',
+               min: 0,
+               max: 6,
+               dimension: 3, // the fourth dimension of series.data (i.e. value[3]) is mapped
+               seriesIndex: 1, // The fourth series is mapped.
+               inRange: {
+                  // The ädvisual configuration in the selected range
+                  color: ['blue', '#121122', 'red'], // A list of colors that defines the graph color mapping
+               }
+            }];
+          }
           console.log('reset option');
           return opt;
         } // end of else.
