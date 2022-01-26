@@ -33,88 +33,89 @@
           </el-submenu>
         </el-menu>
     </div>
-    <div>
+
+    <div class='parent'>
       <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
+        <div class='child' style='background-color:white;'>
+          <div style="width:120px;">
+            <el-button align='right' style='width:100%;' icon='el-icon-caret-bottom' @click="showWorkflow = true">Cell/Gene</el-button>
+          </div>
+          <el-tabs style='width:300px;' v-if="showWorkflow" @tab-click="handleClick">
+            <el-tab-pane style='width:160;' label='Cell' name='first'>
+              <el-table
+                id="cellTable"
+                class="table"
+                ref="clusterTable"
+                style="width:160;"
+                :show-header='true'
+                :height='height'
+                :row-key="getRowKey"
+                :highlight-current-row='true'
+                :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                @selection-change="handleSelectionChange">
+                  <el-table-column
+                    :reserve-selection="true"
+                    type="selection"
+                    width="55">
+                  </el-table-column>
+                  <el-table-column
+                    property="Celltype"
+                    label="Cell Type"
+                    width="80">
+                  </el-table-column>
+              </el-table>
+               <el-pagination 
+                layout="total, sizes, prev, pager, next, jumper" 
+                :total="this.tableDataGenes.length"
+                :current-page="currentPage"
+                @current-change="handleCurrentChange"
+                @size-change="handleSizeChange"
+                :page-sizes="[5,10,15]"
+                :page-size="pageSize"
+                :current-page.sync="currentPage">
+              </el-pagination>
+            </el-tab-pane>
+           
+            <el-tab-pane label='Gene' name='second'>
+              <el-table
+                class="table"
+                ref="multipleTable"
+                style="width:160;"
+                :data="tableDataGenes.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                :show-header='true'
+                :height='height'
+                @selection-change="handleSelectionChange">
+                  <el-table-column
+                    type="selection"
+                    width="55">
+                  </el-table-column>
+                  <el-table-column
+                    property="Genes"
+                    label="Gene Name"
+                    width="80">
+                  </el-table-column>
+              </el-table>
+              <el-pagination 
+                layout="total, sizes, prev, pager, next, jumper" 
+                :total="this.tableDataGenes.length"
+                :current-page="currentPage"
+                @current-change="handleCurrentChange"
+                @size-change="handleSizeChange"
+                :page-sizes="[5,10,15]"
+                :page-size="pageSize"
+                :current-page.sync="currentPage">
+              </el-pagination>
+            </el-tab-pane>
+            <div>
+              <el-button @click="applyStatus">Apply</el-button>
+              <el-button @click='clearSelect'>Clear</el-button>
+              <el-button @click='resetSelect'>Reset</el-button>
+              <el-button @click='showWorkflow = false' icon='el-icon-caret-top'>hide</el-button>
+            </div> 
+          </el-tabs>
+        </div>
     </div>
-      
-    <div>
-      <el-tabs style='width:500px;background-color:white;' @tab-click="handleClick">
-        <el-tab-pane style='width:160;' label='Cell' name='first'>
-          <el-table
-            id="cellTable"
-            class="table"
-            ref="clusterTable"
-            style="width:160;"
-            :show-header='false'
-            :height='height'
-            :row-key="getRowKey"
-            :highlight-current-row='true'
-            :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-            @selection-change="handleSelectionChange">
-              <el-table-column
-                :reserve-selection="true"
-                type="selection"
-                width="55">
-              </el-table-column>
-              <el-table-column
-                property="Celltype"
-                label="Celltype"
-                width="80">
-              </el-table-column>
-          </el-table>
-           <el-pagination 
-            layout="total, sizes, prev, pager, next, jumper" 
-            :total="this.tableDataGenes.length"
-            :current-page="currentPage"
-            @current-change="handleCurrentChange"
-            @size-change="handleSizeChange"
-            :page-sizes="[5,10,15]"
-            :page-size="pageSize"
-            :current-page.sync="currentPage">
-          </el-pagination>
-             
-        </el-tab-pane>
-       
-        <el-tab-pane label='Gene' name='second'>
-          <el-table
-            class="table"
-            ref="multipleTable"
-            style="width:160;"
-            :data="tableDataGenes.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-            :show-header='true'
-            :height='height'
-            @selection-change="handleSelectionChange">
-              <el-table-column
-                type="selection"
-                width="55">
-              </el-table-column>
-              <el-table-column
-                property="Genes"
-                label="Genes"
-                width="80">
-              </el-table-column>
-          </el-table>
-          <el-pagination 
-            layout="total, sizes, prev, pager, next, jumper" 
-            :total="this.tableDataGenes.length"
-            :current-page="currentPage"
-            @current-change="handleCurrentChange"
-            @size-change="handleSizeChange"
-            :page-sizes="[5,10,15]"
-            :page-size="pageSize"
-            :current-page.sync="currentPage">
-          </el-pagination>
-          <div style="margin-left:3%;width:20px">
-            <el-button @click="applyStatus">Apply</el-button>
-          </div> 
-        </el-tab-pane>
-       <div style="margin-left:3%;width:300px">
-          <el-button @click="applyStatus">Apply</el-button>
-          <el-button @click='clearSelect'>Clear</el-button>
-          <el-button @click='resetSelect'>Reset</el-button>
-        </div> 
-      </el-tabs>
-    </div>
+
   </div>
 </template>
 
@@ -141,6 +142,8 @@
     },
     data(){
       return {
+        showWorkflow: false,
+
         height:'200px',
 
         activeIndex: '1',
@@ -572,5 +575,13 @@
 .chart {
   width: 100%;
   height: 800px;
+}
+.parent {
+  position: relative;
+}
+.child {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 </style>
