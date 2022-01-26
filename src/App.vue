@@ -23,7 +23,7 @@
     <hr>
     <footer>
       <div class="line"></div>
-      <p>Power by Element.UI framework and Echarts library.</p>
+      <p>Powered by Element.UI framework and Echarts library.</p>
       <p>Contact: guolidong@genomics.cn; liyao1@genomics.cn; </p>
     </footer>
   </div>
