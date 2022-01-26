@@ -37,14 +37,16 @@
       <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
     </div>
       
-    <div class="window" style='width:300px;height:300px;'>
-      <el-tabs style='width:300px;' @tab-click="handleClick">
+    <div>
+      <el-tabs style='width:500px;background-color:blue;' @tab-click="handleClick">
         <el-tab-pane style='width:160;' label='Cell' name='first'>
           <el-table
+            id="cellTable"
             class="table"
             ref="multipleTable"
             style="width:160;"
             :show-header='false'
+            :height='height'
             :highlight-current-row='true'
             :data="tableData"
             @selection-change="handleSelectionChange">
@@ -67,8 +69,9 @@
             class="table"
             ref="multipleTable"
             style="width:160;"
-            :data="tableDataGenes"
-            :show-header='false'
+            :data="tableDataGenes.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+            :show-header='true'
+            :height='height'
             @selection-change="handleSelectionChange">
               <el-table-column
                 type="selection"
@@ -80,6 +83,15 @@
                 width="80">
               </el-table-column>
           </el-table>
+          <el-pagination 
+            layout="total, sizes, prev, pager, next, jumper" 
+            :total="this.tableDataGenes.length"
+            :current-page="currentPage"
+            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+            :page-sizes="[5,10,15]"
+            :page-size="pageSize">
+          </el-pagination>
           <div style="margin-left:3%;width:20px">
             <el-button @click="applyStatus">Apply</el-button>
           </div> 
@@ -112,9 +124,12 @@
     },
     data(){
       return {
+        height:'200px',
+
         activeIndex: '1',
-        pagesize: 10,
+        pageSize:3,
         currentPage:1,
+        
         tableDataGenes: [{
           ID: '0',
           Genes: 'SMED30036034',
@@ -276,7 +291,33 @@
         showd_clusters:[1,1,1,1,1,1,1,1,1,1]
       }; // end of data return
     },
+    //computed: {
+     //pagedTableData() {
+       //return this.tableDataGenes.slice(this.pageSize * this.currentPage - this.pageSize, this.pageSize * this.currentPage)
+     //}
+   //},
     methods: {
+      handleSizeChange: function (size) {
+        this.pageSize = size;
+    },
+      handleCurrentChange: function(currentPage){
+        this.currentPage = currentPage;
+       // console.log(this.tableDataGenes.slice((this.currentPage-1)*this.pageSize,this.currentPage*this.pageSize));
+    },
+      //setPage (val) {
+        //this.page = val
+      //},
+      getAutoHeight() {
+        let el = document.querySelector("#cellTable"),
+        elParent = el.parentNode,
+        pt = this.getStyle(elParent, "paddingTop"),
+        pb = this.getStyle(elParent, "paddingBottom");
+        console.log(elParent);
+      // 一定要使用 nextTick 来改变height 不然不会起作用
+      this.$nextTick(() => {
+        this.height = elParent.clientHeight - (pt + pb) + "px";
+      });
+    },
       handleClick(tab, event){
       //  console.log(tab, event);
       },
@@ -484,6 +525,7 @@
           console.log('json loaded');
           //self.option = self.getOption();
         });
+        //this.getAutoHeight();
     }
   }; // end of export defaul.
 </script>
