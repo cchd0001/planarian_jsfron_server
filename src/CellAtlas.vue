@@ -33,9 +33,11 @@
           </el-submenu>
         </el-menu>
     </div>
-
+    <div>
       <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
-    <div class="window" style='background-color:blue;width:800px;height:300px;'>
+    </div>
+      
+    <div class="window" style='width:800px;height:300px;'>
       <el-tabs style='width:800px;height:200px;' @tab-click="handleClick">
         <el-tab-pane style='width:160;' label='Cell' name='first'>
           <el-table
@@ -84,63 +86,6 @@
         </el-tab-pane>
       </el-tabs>
     </div>
- <el-container style="height: 800px; border: 1px solid #eee">
-      <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-        <p> Gene Expression </p>
-      <el-tabs style='width:800px;height:200px;' @tab-click="handleClick">
-        <el-tab-pane style='width:160;' label='Cell' name='first'>
-          <el-table
-            class="table"
-            ref="multipleTable"
-            style="width:160;"
-            :data="tableData"
-            :show-header='false'
-            @selection-change="handleSelectionChange">
-              <el-table-column
-                type="selection"
-                width="55">
-              </el-table-column>
-              <el-table-column
-                show-header='false'
-                property="Celltype"
-                label="Celltype"
-                width="80">
-              </el-table-column>
-          </el-table>
-          <div style="margin-left:3%;width:20px">
-            <el-button @click="applyStatus">Apply</el-button>
-          </div>    
-        </el-tab-pane>
-        <el-tab-pane label='Gene' name='second'>
-          <el-table
-            class="table"
-            ref="multipleTable"
-            style="width:160;"
-            :data="tableDataGenes"
-            :show-header='false'
-            @selection-change="handleSelectionChange">
-              <el-table-column
-                type="selection"
-                width="55">
-              </el-table-column>
-              <el-table-column
-                property="Genes"
-                label="Genes"
-                width="80">
-              </el-table-column>
-          </el-table>
-          <div style="margin-left:3%;width:20px">
-            <el-button @click="applyStatus">Apply</el-button>
-          </div> 
-        </el-tab-pane>
-      </el-tabs>
-      </el-aside>
-
-      <el-main>
-        <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
-      </el-main>
-    </el-container>
-
   </div>
 </template>
 
