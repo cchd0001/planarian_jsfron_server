@@ -84,7 +84,7 @@
   var bin14_r05_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin14_r0.5.json'
   // the loading chart before we cache the real dataset
   export default {
-    name : "Planarian",
+    name : "SingleCell",
     components: {
         VChart
     },
