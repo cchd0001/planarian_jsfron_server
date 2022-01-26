@@ -65,6 +65,7 @@
         basic_xyz: null,
         gene_xyz:null,
         option: {
+           backgroundColor:'#000000',
            title :{
                text : 'Please select a specific individual to show.',
                left: "center",
@@ -160,6 +161,7 @@
       getOption() {
         if ( this.basic_xyz == null ) {
           return {
+             backgroundColor:'#000000',
              title :{
               text : 'Loading model now ...',
               left: "center",
