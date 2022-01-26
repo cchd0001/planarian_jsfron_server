@@ -38,19 +38,21 @@
     </div>
       
     <div>
-      <el-tabs style='width:500px;background-color:blue;' @tab-click="handleClick">
+      <el-tabs style='width:500px;background-color:white;' @tab-click="handleClick">
         <el-tab-pane style='width:160;' label='Cell' name='first'>
           <el-table
             id="cellTable"
             class="table"
-            ref="multipleTable"
+            ref="clusterTable"
             style="width:160;"
             :show-header='false'
             :height='height'
+            :row-key="getRowKey"
             :highlight-current-row='true'
-            :data="tableData"
+            :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
             @selection-change="handleSelectionChange">
               <el-table-column
+                :reserve-selection="true"
                 type="selection"
                 width="55">
               </el-table-column>
@@ -60,8 +62,19 @@
                 width="80">
               </el-table-column>
           </el-table>
-          <div style="margin-left:3%;width:20px">
+           <el-pagination 
+            layout="total, sizes, prev, pager, next, jumper" 
+            :total="this.tableDataGenes.length"
+            :current-page="currentPage"
+            @current-change="handleCurrentChange"
+            @size-change="handleSizeChange"
+            :page-sizes="[5,10,15]"
+            :page-size="pageSize"
+            :current-page.sync="currentPage">
+          </el-pagination>
+          <div style="margin-left:3%;width:200px">
             <el-button @click="applyStatus">Apply</el-button>
+            <el-button @click='clearSelect'>Clear</el-button>
           </div>    
         </el-tab-pane>
         <el-tab-pane label='Gene' name='second'>
@@ -90,7 +103,8 @@
             @current-change="handleCurrentChange"
             @size-change="handleSizeChange"
             :page-sizes="[5,10,15]"
-            :page-size="pageSize">
+            :page-size="pageSize"
+            :current-page.sync="currentPage">
           </el-pagination>
           <div style="margin-left:3%;width:20px">
             <el-button @click="applyStatus">Apply</el-button>
@@ -127,7 +141,7 @@
         height:'200px',
 
         activeIndex: '1',
-        pageSize:3,
+        pageSize:5,
         currentPage:1,
         
         tableDataGenes: [{
@@ -155,25 +169,31 @@
         multipleSelection: [],
         saved_clusters:[],
         tableData:[{
-           ID: '0',
+          ID: '0',
+          uid: '00',
           Celltype: 'Cluster0',
         }, {
           ID: '1',
+          uid:'01',
           Celltype: 'Cluster1',
         }, {
           ID: '2',
+          uid: '02',
           Celltype: 'Cluster2',
         }, {
           ID: '3',
+          uid: '03',
           Celltype: 'Cluster3',
         }, {
           ID: '4',
           Celltype: 'Cluster4',
         }, {
           ID: '5',
+          uid: '05',
           Celltype: 'Cluster5',
         }, {
           ID: '6',
+          uid: '06',
           Celltype: 'Cluster6',
 
         }],
@@ -297,22 +317,32 @@
      //}
    //},
     methods: {
-      handleSizeChange: function (size) {
+      clearSelect () {
+        //var self = this;
+        this.$refs.clusterTable.clearSelection();
+        //this.showd_clusters=[0,0,0,0,0,0,0,0,0,0];
+        //self.option=self.getOption();
+
+    },
+      getRowKey (row) {
+        return row.uid
+    },
+      handleSizeChange (size) {
         this.pageSize = size;
     },
-      handleCurrentChange: function(currentPage){
-        this.currentPage = currentPage;
+      handleCurrentChange (currentpage){
+        this.currentPage = currentpage;
        // console.log(this.tableDataGenes.slice((this.currentPage-1)*this.pageSize,this.currentPage*this.pageSize));
     },
       //setPage (val) {
         //this.page = val
       //},
       getAutoHeight() {
-        let el = document.querySelector("#cellTable"),
+        let el = document.querySelector("#table"),
         elParent = el.parentNode,
         pt = this.getStyle(elParent, "paddingTop"),
         pb = this.getStyle(elParent, "paddingBottom");
-        console.log(elParent);
+        //console.log(elParent);
       // 一定要使用 nextTick 来改变height 不然不会起作用
       this.$nextTick(() => {
         this.height = elParent.clientHeight - (pt + pb) + "px";
@@ -329,17 +359,14 @@
       },
 
       handleSelectionChange(val) {
+        console.log('val is ');
+        console.log(val);
         this.multipleSelection = val;
-        var tmp_clusters=[0,0,0,0,0,0,0,0];
+        var tmp_clusters=[0,0,0,0,0,0,0,0,0,0];
         for( var i = 0 ; i < val.length ; i++) {
-          if ( i < 11){
             tmp_clusters[val[i].ID]=1;
-          } else if (i==11){
-            
           }
-        }
         this.saved_clusters=tmp_clusters;
-        // not in use
       },
 
       handleSelect(key, keyPath) {
