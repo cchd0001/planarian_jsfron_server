@@ -72,11 +72,9 @@
             :page-size="pageSize"
             :current-page.sync="currentPage">
           </el-pagination>
-          <div style="margin-left:3%;width:200px">
-            <el-button @click="applyStatus">Apply</el-button>
-            <el-button @click='clearSelect'>Clear</el-button>
-          </div>    
+             
         </el-tab-pane>
+       
         <el-tab-pane label='Gene' name='second'>
           <el-table
             class="table"
@@ -110,6 +108,11 @@
             <el-button @click="applyStatus">Apply</el-button>
           </div> 
         </el-tab-pane>
+       <div style="margin-left:3%;width:300px">
+          <el-button @click="applyStatus">Apply</el-button>
+          <el-button @click='clearSelect'>Clear</el-button>
+          <el-button @click='resetSelect'>Reset</el-button>
+        </div> 
       </el-tabs>
     </div>
   </div>
@@ -317,12 +320,16 @@
      //}
    //},
     methods: {
+      resetSelect(){
+        var self = this;
+        this.showd_clusters=[1,1,1,1,1,1,1,1,1,1];
+        self.option=self.getOption();
+      },
       clearSelect () {
-        //var self = this;
+        var self = this;
         this.$refs.clusterTable.clearSelection();
-        //this.showd_clusters=[0,0,0,0,0,0,0,0,0,0];
-        //self.option=self.getOption();
-
+        this.showd_clusters=[0,0,0,0,0,0,0,0,0,0];
+        self.option=self.getOption();
     },
       getRowKey (row) {
         return row.uid
