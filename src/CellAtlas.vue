@@ -33,15 +33,17 @@
           </el-submenu>
         </el-menu>
     </div>
-
+    <div>
       <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
-    <div class="window" style='background-color:blue;width:800px;height:300px;'>
-      <el-tabs style='width:800px;height:200px;' @tab-click="handleClick">
+    </div>
+      
+    <div class="window" style='width:300px;height:300px;'>
+      <el-tabs style='width:300px;' @tab-click="handleClick">
         <el-tab-pane style='width:160;' label='Cell' name='first'>
           <el-table
             class="table"
             ref="multipleTable"
-            style="width:160;height:200px;"
+            style="width:160;"
             :show-header='false'
             :highlight-current-row='true'
             :data="tableData"
@@ -64,7 +66,7 @@
           <el-table
             class="table"
             ref="multipleTable"
-            style="width:160;height:200px;"
+            style="width:160;"
             :data="tableDataGenes"
             :show-header='false'
             @selection-change="handleSelectionChange">
@@ -84,63 +86,6 @@
         </el-tab-pane>
       </el-tabs>
     </div>
- <el-container style="height: 800px; border: 1px solid #eee">
-      <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-        <p> Gene Expression </p>
-      <el-tabs style='width:800px;height:200px;' @tab-click="handleClick">
-        <el-tab-pane style='width:160;' label='Cell' name='first'>
-          <el-table
-            class="table"
-            ref="multipleTable"
-            style="width:160;"
-            :data="tableData"
-            :show-header='false'
-            @selection-change="handleSelectionChange">
-              <el-table-column
-                type="selection"
-                width="55">
-              </el-table-column>
-              <el-table-column
-                show-header='false'
-                property="Celltype"
-                label="Celltype"
-                width="80">
-              </el-table-column>
-          </el-table>
-          <div style="margin-left:3%;width:20px">
-            <el-button @click="applyStatus">Apply</el-button>
-          </div>    
-        </el-tab-pane>
-        <el-tab-pane label='Gene' name='second'>
-          <el-table
-            class="table"
-            ref="multipleTable"
-            style="width:160;"
-            :data="tableDataGenes"
-            :show-header='false'
-            @selection-change="handleSelectionChange">
-              <el-table-column
-                type="selection"
-                width="55">
-              </el-table-column>
-              <el-table-column
-                property="Genes"
-                label="Genes"
-                width="80">
-              </el-table-column>
-          </el-table>
-          <div style="margin-left:3%;width:20px">
-            <el-button @click="applyStatus">Apply</el-button>
-          </div> 
-        </el-tab-pane>
-      </el-tabs>
-      </el-aside>
-
-      <el-main>
-        <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
-      </el-main>
-    </el-container>
-
   </div>
 </template>
 
@@ -219,16 +164,90 @@
         }],
         jsondata : null,
         COLOR_ALL : [
-          '#8dd3c7',
-          '#ffffb3',
-          '#bebada',
-          '#fb8072',
-          '#80b1d3',
-          '#fdb462',
-          '#b3de69',
-          '#fccde5',
-          '#d9d9d9',
-        ],
+            '#604E97',
+            '#F6A600',
+            '#B3446C',
+            '#DCD300',
+            '#882D17',
+            '#8DB600',
+            '#654522',
+            '#E25822',
+            '#2B3D26',
+            '#191970',
+            '#000080',
+            '#6495ED',
+            '#1E90FF',
+            '#00BFFF',
+            '#00FFFF',
+            '#FF1493',
+            '#FF00FF',
+            '#A020F0',
+            '#63B8FF',
+            '#008B8B',
+            '#54FF9F',
+            '#00FF00',
+            '#76EE00',
+            '#FFF68F',
+            'Yellow1',
+            'Gold1'  ,
+            'DarkGoldenrod4',
+            '#FF6A6A',
+            '#FFFF00',
+            '#1CE6FF',
+            '#FF34FF',
+            '#FF4A46',
+            '#008941',
+            '#006FA6',
+            '#A30059',
+            '#FFE4E1',
+            '#0000A6',
+            '#63FFAC',
+            '#B79762',
+            '#004D43',
+            '#8FB0FF',
+            '#997D87',
+            '#5A0007',
+            '#809693',
+            '#1B4400',
+            '#4FC601',
+            '#3B5DFF',
+            '#FF2F80',
+            '#BA0900',
+            '#6B7900',
+            '#00C2A0',
+            '#FFAA92',
+            '#FF90C9',
+            '#B903AA',
+            '#DDEFFF',
+            '#7B4F4B',
+            '#A1C299',
+            '#0AA6D8',
+            '#00A087',
+            '#4DBBD5',
+            '#E64B35',
+            '#3C5488',
+            '#F38400',
+            '#A1CAF1',
+            '#C2B280',
+            '#848482',
+            '#E68FAC',
+            '#0067A5',
+            '#F99379',
+            '#FF8247',
+            '#FFA54F',
+            '#FF7F24',
+            '#FF3030',
+            '#FFA500',
+            '#FF7F00',
+            '#FF7256',
+            '#FF6347',
+            '#FF4500',
+            '#FF1493',
+            '#FF6EB4',
+            '#EE30A7',
+            '#8B008B',
+            '#888888',
+       ],
         option: {
            tooltip: {
              formatter: '{a} <br/>{b} : {c}%'
@@ -253,13 +272,13 @@
              }
            ]
         },
-        all_clusters:[0,1,2,3,4,5,6,7],
-        showd_clusters:[1,1,1,1,1,1,1,1]
+        all_clusters:[0,1,2,3,4,5,6,7,8,9],
+        showd_clusters:[1,1,1,1,1,1,1,1,1,1]
       }; // end of data return
     },
     methods: {
       handleClick(tab, event){
-        console.log(tab, event);
+      //  console.log(tab, event);
       },
       applyStatus(){
         var self = this;
@@ -279,14 +298,12 @@
           }
         }
         this.saved_clusters=tmp_clusters;
-        console.log("saved clusters");
-        console.log(this.saved_clusters);
+        // not in use
       },
 
       handleSelect(key, keyPath) {
-        console.log(key);
-        console.log(keyPath); 
-    },
+        // not in use
+      },
       show_14_r05(){
         var self = this;
         $.getJSON(dpa2_14_r05_url,function(_data) {
@@ -316,7 +333,6 @@
             curr_draw_datas.push([['x','y','z']]);
         }
         var left_index = this.all_clusters.length;
-        console.log(_data.length);
         for(var j=0 ; j< _data.length; j++)
         {
           var curr_item = _data[j];
@@ -345,7 +361,6 @@
         }
         else {
           console.log('knowing json loaded');
-          console.log('01');
           var curr_draw_datas = this.jsondata;
           var series_list = [];
           var legend_list = [];
@@ -355,7 +370,7 @@
           for( var i = 0 ; i<this.showd_clusters.length; i++ )
           {
             var curr_cluster = this.all_clusters[i];
-            legend_list.push("Celltype"+curr_cluster);
+            legend_list.push("CellType"+curr_cluster);
             if(this.showd_clusters[i] == 1)
             {
               curr_color = this.COLOR_ALL[i];
