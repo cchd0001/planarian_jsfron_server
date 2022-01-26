@@ -40,7 +40,8 @@
   import $ from 'jquery';
   import * as echarts from 'echarts';
   import 'echarts-gl';
-  import VChart, { THEME_KEY } from "vue-echarts";
+  //import VChart, { THEME_KEY } from "vue-echarts";
+  import VChart from "vue-echarts";
   // the dateset url
   //var GENE_CONF_URL="http://49.232.213.84/conf/genes.json"
   var SC_URL="http://49.232.213.84/single_cell/"
@@ -53,9 +54,9 @@
     components: {
         VChart
     },
-    provide: {
-      [THEME_KEY]: "dark"
-    },
+    //provide: {
+    //  [THEME_KEY]: "dark"
+    //},
     data(){
       return {
         genes : conf_gens,
@@ -205,6 +206,7 @@
           }
           // end of for showd_clusters.length
           var opt={
+            backgroundColor:'#000000',
             title :{
               text : 'Individual: '+this.curr_name+".    Gene :"+this.curr_gene,
               left: "center",
@@ -227,9 +229,9 @@
               type: 'value'
             },
             grid3D: {
-              boxWidth:800,
-              boxHeight:50,
-              boxDepth:250,
+              boxWidth:400,
+              boxHeight:20,
+              boxDepth:100,
               axisLine: {
                 lineStyle: {
                   color: '#fff'
@@ -252,13 +254,14 @@
             opt.visualMap= [
             {
                type: 'continuous',
-               min: 0,
-               max: 6,
+               min: 1,
+               max: 5,
                dimension: 3, // the fourth dimension of series.data (i.e. value[3]) is mapped
                seriesIndex: 1, // The fourth series is mapped.
                inRange: {
                   // The ädvisual configuration in the selected range
-                  color: ['blue', '#121122', 'red'], // A list of colors that defines the graph color mapping
+                  //color: ['blue', '#121122', 'red'], // A list of colors that defines the graph color mapping
+                  color: ['blue', 'yellow', 'red'], // A list of colors that defines the graph color mapping
                }
             }];
           }
