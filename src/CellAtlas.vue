@@ -33,59 +33,98 @@
           </el-submenu>
         </el-menu>
     </div>
-    <div>
+
+    <div class='parent'>
       <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
+        <div class='child' style='background-color:white;'>
+          <div style="width:120px;">
+            <el-button align='right' style='width:100%;' @click="isHidden = !isHidden">Cell/Gene</el-button>
+          </div>
+          <el-tabs style='width:300px;' v-if="!isHidden" @tab-click="handleClick">
+            <el-tab-pane style='width:160;' label='Cell' name='first'>
+              <el-table
+                id="cellTable"
+                class="table"
+                ref="clusterTable"
+                style="width:160;"
+                :show-header='false'
+                :height='height'
+                :row-key="getRowKey"
+                :highlight-current-row='true'
+                :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                @selection-change="handleSelectionChange">
+                  <el-table-column
+                    :reserve-selection="true"
+                    type="selection"
+                    width="55">
+                  </el-table-column>
+                  <el-table-column
+                    property="Celltype"
+                    label="Cell Type"
+                    width="80">
+                  </el-table-column>
+              </el-table>
+               <el-pagination 
+                layout="total, sizes, prev, pager, next, jumper" 
+                :total="this.tableDataGenes.length"
+                :current-page="currentPage"
+                @current-change="handleCurrentChange"
+                @size-change="handleSizeChange"
+                :page-sizes="[5,10,15]"
+                :page-size="pageSize"
+                :current-page.sync="currentPage">
+              </el-pagination>
+            </el-tab-pane>
+           
+
+            <el-tab-pane label='Gene' name='second'>
+              <el-select v-model="test" @change="selectGene" filterable placeholder="Search Gene">
+                <el-option
+                  v-for="item in tableDataGenes"
+                  :key="item.ID"
+                  :label="item.label"
+                  :value="item.Genes">
+                </el-option>
+              </el-select>
+
+              <el-table
+                class="table"
+                ref="multipleTable"
+                style="width:160;"
+                :data="tableDataGenes.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                :show-header='false'
+                :height='height'
+                @selection-change="handleSelectionChange">
+                <el-table-column
+                    type="selection"
+                    width="55">
+                  </el-table-column>
+                  <el-table-column
+                    property="Genes"
+                    label="Gene Name"
+                    width="80">
+                  </el-table-column>
+              </el-table>
+              <el-pagination 
+                layout="total, sizes, prev, pager, next, jumper" 
+                :total="this.tableDataGenes.length"
+                :current-page="currentPage"
+                @current-change="handleCurrentChange"
+                @size-change="handleSizeChange"
+                :page-sizes="[5,10,15]"
+                :page-size="pageSize"
+                :current-page.sync="currentPage">
+              </el-pagination>
+            </el-tab-pane>
+            <div>
+              <el-button @click="applyStatus">Apply</el-button>
+              <el-button @click='clearSelect'>Clear</el-button>
+              <el-button @click='resetSelect'>Reset</el-button>
+            </div> 
+          </el-tabs>
+        </div>
     </div>
-      
-    <div class="window" style='width:300px;height:300px;'>
-      <el-tabs style='width:300px;' @tab-click="handleClick">
-        <el-tab-pane style='width:160;' label='Cell' name='first'>
-          <el-table
-            class="table"
-            ref="multipleTable"
-            style="width:160;"
-            :show-header='false'
-            :highlight-current-row='true'
-            :data="tableData"
-            @selection-change="handleSelectionChange">
-              <el-table-column
-                type="selection"
-                width="55">
-              </el-table-column>
-              <el-table-column
-                property="Celltype"
-                label="Celltype"
-                width="80">
-              </el-table-column>
-          </el-table>
-          <div style="margin-left:3%;width:20px">
-            <el-button @click="applyStatus">Apply</el-button>
-          </div>    
-        </el-tab-pane>
-        <el-tab-pane label='Gene' name='second'>
-          <el-table
-            class="table"
-            ref="multipleTable"
-            style="width:160;"
-            :data="tableDataGenes"
-            :show-header='false'
-            @selection-change="handleSelectionChange">
-              <el-table-column
-                type="selection"
-                width="55">
-              </el-table-column>
-              <el-table-column
-                property="Genes"
-                label="Genes"
-                width="80">
-              </el-table-column>
-          </el-table>
-          <div style="margin-left:3%;width:20px">
-            <el-button @click="applyStatus">Apply</el-button>
-          </div> 
-        </el-tab-pane>
-      </el-tabs>
-    </div>
+
   </div>
 </template>
 
@@ -112,18 +151,25 @@
     },
     data(){
       return {
+        search: '',
+        isHidden: true,
+        height:'200px',
         activeIndex: '1',
-        pagesize: 10,
+        pageSize:5,
         currentPage:1,
+        
         tableDataGenes: [{
           ID: '0',
           Genes: 'SMED30036034',
+          label: "test",
         }, {
           ID: '1',
           Genes: 'SMED30036029',
+          label: "absolute_vodka",
         }, {
           ID: '2',
           Genes: 'SMED30036028',
+          label: "test233",
         }, {
           ID: '3',
           Genes: 'SMED30036026',
@@ -140,25 +186,31 @@
         multipleSelection: [],
         saved_clusters:[],
         tableData:[{
-           ID: '0',
+          ID: '0',
+          uid: '00',
           Celltype: 'Cluster0',
         }, {
           ID: '1',
+          uid:'01',
           Celltype: 'Cluster1',
         }, {
           ID: '2',
+          uid: '02',
           Celltype: 'Cluster2',
         }, {
           ID: '3',
+          uid: '03',
           Celltype: 'Cluster3',
         }, {
           ID: '4',
           Celltype: 'Cluster4',
         }, {
           ID: '5',
+          uid: '05',
           Celltype: 'Cluster5',
         }, {
           ID: '6',
+          uid: '06',
           Celltype: 'Cluster6',
 
         }],
@@ -276,7 +328,75 @@
         showd_clusters:[1,1,1,1,1,1,1,1,1,1]
       }; // end of data return
     },
+    //computed: {
+     //pagedTableData() {
+       //return this.tableDataGenes.slice(this.pageSize * this.currentPage - this.pageSize, this.pageSize * this.currentPage)
+     //}
+   //},
+    computed:{
+      tables:function(){
+        var search=this.search;
+        if(search){
+          return  this.tableData.filter(function(dataNews){
+            return Object.keys(dataNews).some(function(key){
+              return String(dataNews[key]).toLowerCase().indexOf(search) > -1
+            })
+          })
+        }
+        return this.tableData
+      }
+    },
+
     methods: {
+      selectGene(item){
+        console.log(item);
+        if(this.curr_name != null){
+          if(this.curr_gene != item ){
+            var self=this;
+            var used_url = GENE_URL+"/"+this.curr_name+"/"+item+".json";
+            $.getJSON(used_url,function(_data) {
+              self.curr_gene = item;
+              self.setGeneData(_data);
+              self.option = self.getOption();
+            });
+          }
+        }
+      },
+      resetSelect(){
+        var self = this;
+        this.showd_clusters=[1,1,1,1,1,1,1,1,1,1];
+        self.option=self.getOption();
+      },
+      clearSelect () {
+        var self = this;
+        this.$refs.clusterTable.clearSelection();
+        this.showd_clusters=[0,0,0,0,0,0,0,0,0,0];
+        self.option=self.getOption();
+    },
+      getRowKey (row) {
+        return row.uid
+    },
+      handleSizeChange (size) {
+        this.pageSize = size;
+    },
+      handleCurrentChange (currentpage){
+        this.currentPage = currentpage;
+       // console.log(this.tableDataGenes.slice((this.currentPage-1)*this.pageSize,this.currentPage*this.pageSize));
+    },
+      //setPage (val) {
+        //this.page = val
+      //},
+      getAutoHeight() {
+        let el = document.querySelector("#table"),
+        elParent = el.parentNode,
+        pt = this.getStyle(elParent, "paddingTop"),
+        pb = this.getStyle(elParent, "paddingBottom");
+        //console.log(elParent);
+      // 一定要使用 nextTick 来改变height 不然不会起作用
+      this.$nextTick(() => {
+        this.height = elParent.clientHeight - (pt + pb) + "px";
+      });
+    },
       handleClick(tab, event){
       //  console.log(tab, event);
       },
@@ -288,17 +408,14 @@
       },
 
       handleSelectionChange(val) {
+        console.log('val is ');
+        console.log(val);
         this.multipleSelection = val;
-        var tmp_clusters=[0,0,0,0,0,0,0,0];
+        var tmp_clusters=[0,0,0,0,0,0,0,0,0,0];
         for( var i = 0 ; i < val.length ; i++) {
-          if ( i < 11){
             tmp_clusters[val[i].ID]=1;
-          } else if (i==11){
-            
           }
-        }
         this.saved_clusters=tmp_clusters;
-        // not in use
       },
 
       handleSelect(key, keyPath) {
@@ -484,6 +601,7 @@
           console.log('json loaded');
           //self.option = self.getOption();
         });
+        //this.getAutoHeight();
     }
   }; // end of export defaul.
 </script>
@@ -496,5 +614,13 @@
 .chart {
   width: 100%;
   height: 800px;
+}
+.parent {
+  position: relative;
+}
+.child {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 </style>

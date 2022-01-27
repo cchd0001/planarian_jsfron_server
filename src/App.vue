@@ -24,7 +24,7 @@
     <footer>
       <div class="line"></div>
       <p>Contact: guolidong@genomics.cn; liyao1@genomics.cn; </p>
-      <p>Power by Element.js framework and Echarts.js library.</p>
+      <p>Powered by Element.js framework and Echarts.js library.</p>
     </footer>
   </div>
 </template>
