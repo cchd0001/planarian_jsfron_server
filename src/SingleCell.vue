@@ -39,7 +39,7 @@
         </div>
       </el-aside>
       <el-main>
-        <v-chart class="chart" :option="option" :style="{width: chart_width +'px', height: chart_height+ 'px'}" />
+        <v-chart class="chart" :option="option" style="width:1500px;height:700px" />
       </el-main>
     </el-container>
   </div>
@@ -70,7 +70,10 @@
            title : {
                text : 'Please select a specific individual to show.',
                left: "center",
-               top: "center"
+               top: "center",
+               textStyle: {
+                  color: '#cccccc'
+               },
            }
         },
         // conf table and configure cache
@@ -81,8 +84,6 @@
         // drawing cache
         curr_name : null,
         curr_data : null,
-        chart_width:1600,
-        chart_height:680,
       }; // end of data return
     },
     computed:{
@@ -91,7 +92,6 @@
         else{
             var name = 'label_'+this.curr_name;
             console.log(name);
-            this.chart_width = idvd_conf['label_'+this.curr_name].x * 4;
             return idvd_conf['label_'+this.curr_name].x * 4;
         }
       },
@@ -102,7 +102,6 @@
       getHeight : function() {
         if( this.curr_name == null ) return 600;
         else {
-          this.chart_height= idvd_conf['label_'+this.curr_name].y * 4;
           return idvd_conf['label_'+this.curr_name].y * 4;
         }
       },
@@ -192,9 +191,12 @@
           return {
              backgroundColor:'#000000',
              title : {
-                 text : 'Start loading data ...',
-                 left: "center",
-                 top: "center"
+               text : 'Start loading data ...',
+               left: "center",
+               top: "center",
+               textStyle: {
+                  color: '#cccccc'
+               },
              }
           };
         }

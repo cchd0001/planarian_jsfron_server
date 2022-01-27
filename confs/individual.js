@@ -65,9 +65,9 @@ module.exports = {
         z: 26
     },
     label_10dpa1: {
-        y: 185,
-        x: 213,
-        z: 21
+        y: 213,
+        x: 320,
+        z: 14
     },
     label_10dpa2: {
         y: 159,
@@ -85,9 +85,9 @@ module.exports = {
         z: 21
     },
     label_14dpa1: {
-        y: 213,
-        x: 320,
-        z: 14
+        y: 121,
+        x: 253,
+        z: 17
     },
     label_14dpa2: {
         y: 164,
