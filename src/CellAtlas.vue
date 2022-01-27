@@ -34,14 +34,18 @@
         </el-menu>
     </div>
 
+    <!-- main window -->
     <div class='parent'>
+      <!-- I. chart content -->
       <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
         <div class='child' style='background-color:white;'>
           <div style="width:120px;">
             <el-button align='right' style='width:100%;' @click="isHidden = !isHidden">Cell/Gene</el-button>
           </div>
-          <el-tabs style='width:300px;' v-if="!isHidden" @tab-click="handleClick">
+          <!-- II. configuration content -->
+          <el-tabs style='width:300px;' v-model="activeName" v-if="!isHidden" @tab-click="handleClick">
             <el-tab-pane style='width:160;' label='Cell' name='first'>
+              <!-- 1. cell table content -->
               <el-table
                 id="cellTable"
                 class="table"
@@ -63,6 +67,11 @@
                     label="Cell Type"
                     width="80">
                   </el-table-column>
+                  <el-table-column label="Display" width="160">
+                    <template slot-scope="scope">
+                      <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button>
+                    </template>
+                  </el-table-column>
               </el-table>
                <el-pagination 
                 layout="total, sizes, prev, pager, next, jumper" 
@@ -75,18 +84,18 @@
                 :current-page.sync="currentPage">
               </el-pagination>
             </el-tab-pane>
-           
 
             <el-tab-pane label='Gene' name='second'>
-              <el-select v-model="test" @change="selectGene" filterable placeholder="Search Gene">
+              <!-- 2. search content -->
+              <el-select v-model="selectValue" @change="selectGene" filterable placeholder="Search Gene">
                 <el-option
                   v-for="item in tableDataGenes"
                   :key="item.ID"
-                  :label="item.label"
+                  :label="item.Genes"
                   :value="item.Genes">
                 </el-option>
               </el-select>
-
+              <!-- 2. gene table content -->
               <el-table
                 class="table"
                 ref="multipleTable"
@@ -94,7 +103,7 @@
                 :data="tableDataGenes.slice((currentPage-1)*pageSize,currentPage*pageSize)"
                 :show-header='false'
                 :height='height'
-                @selection-change="handleSelectionChange">
+                @selection-change="handleGeneSelectionChange">
                 <el-table-column
                     type="selection"
                     width="55">
@@ -103,6 +112,11 @@
                     property="Genes"
                     label="Gene Name"
                     width="80">
+                  </el-table-column>
+                  <el-table-column label="Display" width="160">
+                    <template slot-scope="scope">
+                      <el-button size="mini" type="primary" plain @click.native="changeColor">color</el-button>
+                    </template>
                   </el-table-column>
               </el-table>
               <el-pagination 
@@ -115,6 +129,7 @@
                 :page-size="pageSize"
                 :current-page.sync="currentPage">
               </el-pagination>
+              <el-button @click='applyGene'>get gene</el-button>
             </el-tab-pane>
             <div>
               <el-button @click="applyStatus">Apply</el-button>
@@ -122,7 +137,7 @@
               <el-button @click='resetSelect'>Reset</el-button>
             </div> 
           </el-tabs>
-        </div>
+        </div> <!-- end of the main window -->
     </div>
 
   </div>
@@ -134,12 +149,16 @@
   import 'echarts-gl';
   import VChart, { THEME_KEY } from "vue-echarts";
   // the dateset url
+  var SC_URL="http://49.232.213.84/single_cell/"
+  var GENE_URL="http://49.232.213.84/genes"
+
   var dpa2_14_r05_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/14dpa2_r0.5.json"
   var dpa2_14_r08_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/14dpa2_r0.8.json"
   var wt_r08_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/wt_r0.8.json"
   var bin50_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin50.json'
   var bin20_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin20.json'
   var bin14_r05_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin14_r0.5.json'
+  var wt_genes_url = ''
   // the loading chart before we cache the real dataset
   export default {
     name : "Planarian",
@@ -151,16 +170,20 @@
     },
     data(){
       return {
+        show_gene_list:[],
+        curr_name : null,
+        curr_data : null,
+        selectValue: '',
         search: '',
         isHidden: true,
         height:'200px',
         activeIndex: '1',
         pageSize:5,
         currentPage:1,
-        
+        activeName: 'first',
         tableDataGenes: [{
           ID: '0',
-          Genes: 'SMED30036034',
+          Genes: 'SMED30033583',
           label: "test",
         }, {
           ID: '1',
@@ -328,11 +351,6 @@
         showd_clusters:[1,1,1,1,1,1,1,1,1,1]
       }; // end of data return
     },
-    //computed: {
-     //pagedTableData() {
-       //return this.tableDataGenes.slice(this.pageSize * this.currentPage - this.pageSize, this.pageSize * this.currentPage)
-     //}
-   //},
     computed:{
       tables:function(){
         var search=this.search;
@@ -348,8 +366,44 @@
     },
 
     methods: {
-      selectGene(item){
-        console.log(item);
+      setGeneData(_data){
+        console.log('get gene json loaded');
+        var gene_xyz= [];
+        gene_xyz.push( ['x','y','z','e'] );
+        for(var j=0 ; j< _data.length; j++)
+        {
+            var curr_item = _data[j];
+            gene_xyz.push( [curr_item[0],curr_item[1],curr_item[2],curr_item[3]]);
+        }
+        this.gene_xyz = gene_xyz;
+      },
+      handleGeneSelectionChange(val){
+       this.multipleSelection = val;
+       for ( var i = 0 ; i < val.length ; i++){
+         console.log(val[i].Genes);
+         this.show_gene_list[i]=val[i].Genes;
+       }
+      },
+      applyGene(){
+        for (var i = 0 ; i < this.show_gene_list.length ; i++){
+          if(this.curr_name != null){
+            var self = this;
+            var item = this.show_gene_list[i];
+            var self=this;
+            var used_url = GENE_URL+"/"+this.curr_name+"/"+item+".json";
+            console.log(used_url);
+            $.getJSON(used_url,function(_data) {
+              self.curr_gene = item;
+              self.setGeneData(_data);
+              self.option = self.getOption();
+            });
+          }
+        }
+      },
+      changeColor(){
+        console.log('change color');
+      },
+      selectGene(){
         if(this.curr_name != null){
           if(this.curr_gene != item ){
             var self=this;
@@ -381,24 +435,19 @@
     },
       handleCurrentChange (currentpage){
         this.currentPage = currentpage;
-       // console.log(this.tableDataGenes.slice((this.currentPage-1)*this.pageSize,this.currentPage*this.pageSize));
     },
-      //setPage (val) {
-        //this.page = val
-      //},
       getAutoHeight() {
         let el = document.querySelector("#table"),
         elParent = el.parentNode,
         pt = this.getStyle(elParent, "paddingTop"),
         pb = this.getStyle(elParent, "paddingBottom");
-        //console.log(elParent);
       // 一定要使用 nextTick 来改变height 不然不会起作用
       this.$nextTick(() => {
         this.height = elParent.clientHeight - (pt + pb) + "px";
       });
     },
       handleClick(tab, event){
-      //  console.log(tab, event);
+        this.activeName = tab.name;
       },
       applyStatus(){
         var self = this;
@@ -406,7 +455,6 @@
         this.showd_clusters=this.saved_clusters;
         self.option=self.getOption();
       },
-
       handleSelectionChange(val) {
         console.log('val is ');
         console.log(val);
@@ -421,12 +469,31 @@
       handleSelect(key, keyPath) {
         // not in use
       },
+      update_basic(name){
+        if( this.curr_name != name)
+        {
+          // set new name
+          this.curr_name = name;
+          //clean buffer
+          this.curr_data = null;
+          // show loading first
+          this.option = this.getOption();
+          var used_url = SC_URL+"/"+name+"/label.json";
+          // loading data and re-draw graph
+          var self = this;
+          $.getJSON(used_url,function(_data) {
+            //self.setSCData(_data);
+            self.option = self.getOption();
+          });
+        }
+      },
       show_14_r05(){
         var self = this;
         $.getJSON(dpa2_14_r05_url,function(_data) {
         self.setJsonData(_data);
         console.log('14dpa2_r05 json loaded');
         self.option = self.getOption();});
+        this.update_basic('14dpa2');
     },
       show_14_r08(){
         var self = this;
@@ -436,11 +503,12 @@
         self.option = self.getOption();});
     },
       show_wt_r08(){
-        var self = this;
-        $.getJSON(wt_r08_url,function(_data) {
-        self.setJsonData(_data);
-        console.log('wt_r08 json loaded');
-        self.option = self.getOption();});
+        //var self = this;
+        //$.getJSON(wt_r08_url,function(_data) {
+        //self.setJsonData(_data);
+        //console.log('wt_r08 json loaded');
+        //self.option = self.getOption();});
+        this.update_basic("WT");
     },
       setJsonData(_data){
         console.log('knowing json loaded');
@@ -509,11 +577,6 @@
                   borderColor: curr_color,
                   color: curr_color
                 },
-                //emphasis: {
-                //  itemStyle: {
-                //    color: this.COLOR_ALL[i]
-                //  }
-                //}
             };
             series_list.push(one_series);
           } // end of for showd_clusters.length
@@ -533,15 +596,6 @@
               borderColor: curr_color,
               color: curr_color
             },
-            //itemStyle: {
-            //  borderWidth: 1,
-            //  borderColor: 'rgba(255,255,255,1)'
-            //},
-            //emphasis: {
-            //  itemStyle: {
-            //    color: this.COLOR_ALL[this.COLOR_ALL.length-1]
-            //  }
-            //}
           };
           series_list.push(left_series);
           console.log('end series');
