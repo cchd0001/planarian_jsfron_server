@@ -7,7 +7,7 @@
           <template slot="title">3D Atlas Visuliazation</template>
             <el-menu-item index="2-1">Cell Type Atlas</el-menu-item>
             <el-menu-item index="2-2">Gene Expression Atlas</el-menu-item>
-            <el-menu-item index="2-3">Single-cell Transfer Cell Atlas</el-menu-item>
+            <el-menu-item index="2-3">Single-cell-label-transfered Cell Atlas</el-menu-item>
         </el-submenu>
         <el-menu-item index="3" disabled>Data analysis</el-menu-item>
         <el-menu-item index="4"><a href="https://en.wikipedia.org/wiki/Planarian" target="_blank">Planarian wiki</a></el-menu-item>
@@ -23,8 +23,8 @@
     <hr>
     <footer>
       <div class="line"></div>
-      <p>Powered by Element.UI framework and Echarts library.</p>
       <p>Contact: guolidong@genomics.cn; liyao1@genomics.cn; </p>
+      <p>Powered by Element.js framework and Echarts.js library.</p>
     </footer>
   </div>
 </template>
