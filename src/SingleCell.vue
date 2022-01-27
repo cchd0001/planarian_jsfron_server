@@ -86,27 +86,18 @@
         curr_data : null,
       }; // end of data return
     },
-    computed:{
-      getWidth : function(){
-        if( this.curr_name == null ) return 1400;
-        else{
-            var name = 'label_'+this.curr_name;
-            console.log(name);
-            return idvd_conf['label_'+this.curr_name].x * 4;
-        }
-      },
-      getDepth : function() {
-        if( this.curr_name == null ) return 20;
-        else return idvd_conf['label_'+this.curr_name].z * 4;
-      },
-      getHeight : function() {
-        if( this.curr_name == null ) return 600;
-        else {
-          return idvd_conf['label_'+this.curr_name].y * 4;
-        }
-      },
-    },
     methods: {
+      //-------------3d box conf start-------------------//
+      getWidth(){
+        return idvd_conf['label_'+this.curr_name].x ;
+      },
+      getDepth() {
+        return idvd_conf['label_'+this.curr_name].z ;
+      },
+      getHeight() {
+        return idvd_conf['label_'+this.curr_name].y ;
+      },
+      //-------------3d box conf end-------------------//
 
       //-------------color configure start -------------------//
       applyStatus(){
@@ -260,9 +251,9 @@
             series_list.push(one_series);
           } // end of for showd_clusters.length
           console.log('end series');
-          var xmax = this.getWidth/4;
-          var ymax = this.getHeight/4;
-          var zmax = this.getDepth/4;
+          var xmax = this.getWidth();
+          var ymax = this.getHeight();
+          var zmax = this.getDepth();
           var opt={
             backgroundColor:'#000000',
             title : {

@@ -21,17 +21,16 @@
           <el-menu-item index="17" @click.native="show_14dpa2"  >14dpa2 </el-menu-item>
         </el-menu>
     </div>
-    <div style="margin-left:0%;" align="left">
-      <p> Please select the gene of your interest.</p>
-      <el-select v-model="value" filterable placeholder="tspan1" @change="selectGene" >
+    <div style="margin-left:0%;background-color: rgb(238, 241, 246); border: 3px solid #eee;" >
+      <p class="inline_item" > Please select the gene of your interest.</p>
+      <el-select class="inline_item" v-model="curr_selected_gene" filterable placeholder="" @change="selectGene" >
         <el-option v-for="item in genes" :key="item.value" 
            :label="item.label" :value="item.value">
         </el-option>
       </el-select>
     </div>
-    <hr>
     <div>
-      <v-chart class="chart" :option="option" style="width:1600px;height:800px;" />
+      <v-chart :option="option" style="width:1600px;height:700px;" />
     </div>
   </div>
 </template>
@@ -43,20 +42,16 @@
   //import VChart, { THEME_KEY } from "vue-echarts";
   import VChart from "vue-echarts";
   // the dateset url
-  //var GENE_CONF_URL="http://49.232.213.84/conf/genes.json"
   var SC_URL="http://49.232.213.84/single_cell/"
   var GENE_URL="http://49.232.213.84/genes/";
   let conf_gens = require('../confs/genes.js');
-  //var test_gens = {name:1,value:1};
-  // the loading chart before we cache the real dataset
+  var idvd_conf = require('../confs/individual.js');
+
   export default {
     name : "GeneExpression",
     components: {
         VChart
     },
-    //provide: {
-    //  [THEME_KEY]: "dark"
-    //},
     data(){
       return {
         genes : conf_gens,
@@ -69,12 +64,27 @@
            title :{
                text : 'Please select a specific individual to show.',
                left: "center",
-               top: "center"
+               top: "center",
+               textStyle: {
+                  color: '#cccccc'
+               },
            }
         },
+        curr_selected_gene:'',
       }; // end of data return
     },
     methods: {
+      //-------------3d box conf start-------------------//
+      getWidth(){
+        return idvd_conf['label_'+this.curr_name].x ;
+      },
+      getDepth() {
+        return idvd_conf['label_'+this.curr_name].z ;
+      },
+      getHeight() {
+        return idvd_conf['label_'+this.curr_name].y ;
+      },
+      //-------------3d box conf end-------------------//
       //-------------switching individual start -------------------//
       update_basic(name){
         if( this.curr_name != name)
@@ -84,7 +94,8 @@
           //clean buffer 
           this.curr_gene = null;
           this.basic_xyz = null;
-          this.gen_xyz = null;
+          this.gene_xyz = null;
+          this.curr_selected_gene = null;
           // show loading first
           this.option = this.getOption();
           var used_url = SC_URL+"/"+name+"/label.json";
@@ -165,18 +176,21 @@
              title :{
               text : 'Loading model now ...',
               left: "center",
-              top: "center"
+              top: "center",
+              textStyle: {
+                 color: '#cccccc'
+              },
             }
           };
         }
         else {
-          console.log('knowing json loaded');
-          console.log('01');
+          //console.log('knowing json loaded');
+          //console.log('01');
           var curr_draw_datas = this.basic_xyz;
           console.log('draw background first');
           var bk_color = "#888888";
           var one_series = {
-              name : 'bk',
+              name : this.curr_name,
               type : 'scatter3D',
               dimensions: [ 'x','y','z' ],
               data: this.basic_xyz,
@@ -189,11 +203,13 @@
               },
           };
           var series_list = [];
+          var legend_list = [this.curr_name];
+          var legend_color = [bk_color];
           series_list.push(one_series);
           if(this.gene_xyz != null ){
               var gene_color = "#ff1111"
               var one_series = {
-                  name : 'gene',
+                  name : this.curr_gene,
                   type : 'scatter3D',
                   dimensions: [ 'x','y','z' ,'e'],
                   data: this.gene_xyz,
@@ -206,11 +222,28 @@
               };
               series_list.push(one_series);
           }
+          else{
+              console.log('no gene data');
+              var gene_color = "#ff1111"
+              var one_series = {
+                  name : this.curr_gene,
+                  type : 'scatter3D',
+                  dimensions: [ 'x','y','z' ,'e'],
+                  data: [],
+                  symbolSize: 2,
+                  itemStyle: {
+                    borderWidth: 1,
+                    //borderColor: gene_color,
+                    //color : gene_color,
+                  },
+              };
+              series_list.push(one_series);
+          }
           // end of for showd_clusters.length
-          var opt={
+          var opt= {
             backgroundColor:'#000000',
             title :{
-              text : 'Individual: '+this.curr_name+".    Gene :"+this.curr_gene,
+              text : '',
               left: "center",
               top : "top"
             },
@@ -230,10 +263,17 @@
               scale:1,
               type: 'value'
             },
+            legend :{
+              color :legend_color,
+              data:legend_list,
+              textStyle: {
+                 color: '#cccccc'
+              },
+            },
             grid3D: {
-              boxWidth:400,
-              boxHeight:20,
-              boxDepth:100,
+              boxWidth:this.getWidth(),
+              boxHeight:this.getDepth(),
+              boxDepth:this.getHeight(),
               axisLine: {
                 lineStyle: {
                   color: '#fff'
@@ -245,7 +285,7 @@
                 }
               },
               viewControl: {
-                // autoRotate: true
+                //autoRotate: true
                 //projection: 'orthographic'
               }
             },
@@ -281,8 +321,8 @@
   font-family: Helvetica, sans-serif;
   text-align: center;
 }
-.chart {
-  width: 100%;
-  height: 800px;
+.inline_item {
+  display: inline-block;
+  margin-left: 20px;
 }
 </style>
