@@ -1,39 +1,33 @@
 <template>
   <div id="app">
-
-    <div style="margin-left:40%;" align="center">
-        <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-          <el-submenu index="1">
-            <template slot="title">7dpa</template>
-              <el-menu-item index="1-1" disabled>0.5</el-menu-item>
-              <el-menu-item index="1-2" disabled>0.8</el-menu-item>
-              <el-menu-item index="1-3" disabled>1.2</el-menu-item>
-              <el-menu-item index="1-4" disabled>1.8</el-menu-item>
-          </el-submenu>
-          <el-submenu index="2">
-            <template slot="title">14dpa</template>
-              <el-menu-item index="2-1" @click.native="show_14_r05">0.5</el-menu-item>
-              <el-menu-item index="2-2" @click.native="show_14_r08">0.8</el-menu-item>
-              <el-menu-item index="2-3" disabled>1.2</el-menu-item>
-              <el-menu-item index="2-4" disabled>1.8</el-menu-item>
-          </el-submenu>
-          <el-submenu index="3">
-            <template slot="title">wt</template>
-              <el-menu-item index="3-1" disabled>0.5</el-menu-item>
-              <el-menu-item index="3-2" @click.native="show_wt_r08">0.8</el-menu-item>
-              <el-menu-item index="3-3" disabled>1.2</el-menu-item>
-              <el-menu-item index="3-4" disabled>1.8</el-menu-item>
-          </el-submenu>
-          <el-submenu index="4">
-            <template slot="title">0hpa</template>
-              <el-menu-item index="4-1" disabled>0.5</el-menu-item>
-              <el-menu-item index="4-2" disabled>0.8</el-menu-item>
-              <el-menu-item index="4-3" disabled>1.2</el-menu-item>
-              <el-menu-item index="4-4" disabled>1.8</el-menu-item>
-          </el-submenu>
-        </el-menu>
+    <div style="margin-left:0%;" align="center">
+      <el-menu  class="el-menu-demo" mode="horizontal" >
+        <el-menu-item index="1"  @click.native="show_WT"      >WT     </el-menu-item>
+        <el-menu-item index="2"  @click.native="show_0hpa1"   >0hpa1  </el-menu-item>
+        <el-menu-item index="3"  @click.native="show_0hpa2"   >0hpa2  </el-menu-item>
+        <el-menu-item index="4"  @click.native="show_12hpa1"  >12hpa1 </el-menu-item>
+        <el-menu-item index="5"  @click.native="show_12hpa2"  >12hpa2 </el-menu-item>
+        <el-menu-item index="6"  @click.native="show_36hpa1"  >36hpa1 </el-menu-item>
+        <el-menu-item index="7"  @click.native="show_36hpa2"  >36hpa2 </el-menu-item>
+        <el-menu-item index="8"  @click.native="show_3dpa1"   >3dpa1  </el-menu-item>
+        <el-menu-item index="9"  @click.native="show_3dpa2"   >3dpa2  </el-menu-item>
+        <el-menu-item index="10" @click.native="show_5dpa1"   >5dpa1  </el-menu-item>
+        <el-menu-item index="11" @click.native="show_5dpa2"   >5dpa2  </el-menu-item>
+        <el-menu-item index="12" @click.native="show_7dpa1"   >7dpa1  </el-menu-item>
+        <el-menu-item index="13" @click.native="show_7dpa2"   >7dpa2  </el-menu-item>
+        <el-menu-item index="14" @click.native="show_10dpa1"  >10dpa1 </el-menu-item>
+        <el-menu-item index="15" @click.native="show_10dpa2"  >10dpa2 </el-menu-item>
+        <el-menu-item index="16" @click.native="show_14dpa1"  >14dpa1 </el-menu-item>
+        <el-menu-item index="17" @click.native="show_14dpa2"  >14dpa2 </el-menu-item>
+      </el-menu>
     </div>
-
+    <div>
+      <p class="inline_item" > Please select a resolution : </p>
+      <el-button class="inline_item" @click ="use_r0_1">r0.1</el-button>
+      <el-button class="inline_item" @click ="use_r0_2">r0.2</el-button>
+      <el-button class="inline_item" @click ="use_r0_3">r0.3</el-button>
+      <el-button class="inline_item" @click ="use_r0_8">r0.8</el-button>
+    </div>
     <!-- main window -->
     <div class='parent'>
       <!-- I. chart content -->
@@ -149,223 +143,188 @@
   import 'echarts-gl';
   import VChart, { THEME_KEY } from "vue-echarts";
   // the dateset url
-  var SC_URL="http://49.232.213.84/single_cell/"
+  var CT_URL="http://49.232.213.84/celltype/"
   var GENE_URL="http://49.232.213.84/genes"
-
-  var dpa2_14_r05_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/14dpa2_r0.5.json"
-  var dpa2_14_r08_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/14dpa2_r0.8.json"
-  var wt_r08_url = "https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/wt_r0.8.json"
-  var bin50_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin50.json'
-  var bin20_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin20.json'
-  var bin14_r05_url = 'https://cdn.jsdelivr.net/gh/cchd0001/temp_db@master/bin14_r0.5.json'
   var wt_genes_url = ''
+  var COLOR_ALL = require('../confs/discret_color.js');
   // the loading chart before we cache the real dataset
   export default {
     name : "Planarian",
     components: {
         VChart
     },
-    provide: {
-      [THEME_KEY]: "dark"
-    },
     data(){
       return {
+        //------------show clusters-----------
         show_gene_list:[],
-        curr_name : null,
-        curr_data : null,
+        multipleSelection: [],
+        saved_clusters:[],
+        all_clusters:[0,1,2,3,4,5,6,7,8,9],
+        showd_clusters:[1,1,1,1,1,1,1,1,1,1],
         selectValue: '',
+        //------------show clusters-----------
+
+        //------------gene selection------
         search: '',
+        //------------ui selection------
         isHidden: true,
         height:'200px',
         activeIndex: '1',
         pageSize:5,
         currentPage:1,
         activeName: 'first',
+        //------------confs------
         tableDataGenes: [{
-          ID: '0',
-          Genes: 'SMED30033583',
-          label: "test",
-        }, {
-          ID: '1',
-          Genes: 'SMED30036029',
-          label: "absolute_vodka",
-        }, {
-          ID: '2',
-          Genes: 'SMED30036028',
-          label: "test233",
-        }, {
-          ID: '3',
-          Genes: 'SMED30036026',
-        }, {
-          ID: '4',
-          Genes: 'SMED30036025',
-        }, {
-          ID: '5',
-          Genes: 'SMED30036024',
-        }, {
-          ID: '6',
-          Genes: 'SMED30036022',
-        }],
-        multipleSelection: [],
-        saved_clusters:[],
+            ID: '0',
+            Genes: 'SMED30033583',
+            label: "test",
+          }, {
+            ID: '1',
+            Genes: 'SMED30036029',
+            label: "absolute_vodka",
+          }, {
+            ID: '2',
+            Genes: 'SMED30036028',
+            label: "test233",
+          }, {
+            ID: '3',
+            Genes: 'SMED30036026',
+          }, {
+            ID: '4',
+            Genes: 'SMED30036025',
+          }, {
+            ID: '5',
+            Genes: 'SMED30036024',
+          }, {
+            ID: '6',
+            Genes: 'SMED30036022',
+          }
+        ],
         tableData:[{
-          ID: '0',
-          uid: '00',
-          Celltype: 'Cluster0',
-        }, {
-          ID: '1',
-          uid:'01',
-          Celltype: 'Cluster1',
-        }, {
-          ID: '2',
-          uid: '02',
-          Celltype: 'Cluster2',
-        }, {
-          ID: '3',
-          uid: '03',
-          Celltype: 'Cluster3',
-        }, {
-          ID: '4',
-          Celltype: 'Cluster4',
-        }, {
-          ID: '5',
-          uid: '05',
-          Celltype: 'Cluster5',
-        }, {
-          ID: '6',
-          uid: '06',
-          Celltype: 'Cluster6',
-
-        }],
-        jsondata : null,
-        COLOR_ALL : [
-            '#604E97',
-            '#F6A600',
-            '#B3446C',
-            '#DCD300',
-            '#882D17',
-            '#8DB600',
-            '#654522',
-            '#E25822',
-            '#2B3D26',
-            '#191970',
-            '#000080',
-            '#6495ED',
-            '#1E90FF',
-            '#00BFFF',
-            '#00FFFF',
-            '#FF1493',
-            '#FF00FF',
-            '#A020F0',
-            '#63B8FF',
-            '#008B8B',
-            '#54FF9F',
-            '#00FF00',
-            '#76EE00',
-            '#FFF68F',
-            'Yellow1',
-            'Gold1'  ,
-            'DarkGoldenrod4',
-            '#FF6A6A',
-            '#FFFF00',
-            '#1CE6FF',
-            '#FF34FF',
-            '#FF4A46',
-            '#008941',
-            '#006FA6',
-            '#A30059',
-            '#FFE4E1',
-            '#0000A6',
-            '#63FFAC',
-            '#B79762',
-            '#004D43',
-            '#8FB0FF',
-            '#997D87',
-            '#5A0007',
-            '#809693',
-            '#1B4400',
-            '#4FC601',
-            '#3B5DFF',
-            '#FF2F80',
-            '#BA0900',
-            '#6B7900',
-            '#00C2A0',
-            '#FFAA92',
-            '#FF90C9',
-            '#B903AA',
-            '#DDEFFF',
-            '#7B4F4B',
-            '#A1C299',
-            '#0AA6D8',
-            '#00A087',
-            '#4DBBD5',
-            '#E64B35',
-            '#3C5488',
-            '#F38400',
-            '#A1CAF1',
-            '#C2B280',
-            '#848482',
-            '#E68FAC',
-            '#0067A5',
-            '#F99379',
-            '#FF8247',
-            '#FFA54F',
-            '#FF7F24',
-            '#FF3030',
-            '#FFA500',
-            '#FF7F00',
-            '#FF7256',
-            '#FF6347',
-            '#FF4500',
-            '#FF1493',
-            '#FF6EB4',
-            '#EE30A7',
-            '#8B008B',
-            '#888888',
-       ],
+            ID: '0',
+            uid: '00',
+            Celltype: 'Cluster0',
+          }, {
+            ID: '1',
+            uid:'01',
+            Celltype: 'Cluster1',
+          }, {
+            ID: '2',
+            uid: '02',
+            Celltype: 'Cluster2',
+          }, {
+            ID: '3',
+            uid: '03',
+            Celltype: 'Cluster3',
+          }, {
+            ID: '4',
+            Celltype: 'Cluster4',
+          }, {
+            ID: '5',
+            uid: '05',
+            Celltype: 'Cluster5',
+          }, {
+            ID: '6',
+            uid: '06',
+            Celltype: 'Cluster6',
+          }
+        ],
+        // -- tip graph
         option: {
-           tooltip: {
-             formatter: '{a} <br/>{b} : {c}%'
-           },
-           series: [
-             {
-               name: 'Pressure',
-               type: 'gauge',
-               progress: {
-                 show: true
-               },
-               detail: {
-                 valueAnimation: true,
-                 formatter: '{value}'
-               },
-               data: [
-                 {
-                   value: '100',
-                   name: 'Loading\n Please waiting ...'
-                 }
-               ]
-             }
-           ]
+          backgroundColor:'#000000',
+          title : {
+              text : 'Please select a specific individual and resolution to show.',
+              left: "center",
+              top: "center",
+              textStyle: {
+                 color: '#cccccc'
+              },
+          }
         },
-        all_clusters:[0,1,2,3,4,5,6,7,8,9],
-        showd_clusters:[1,1,1,1,1,1,1,1,1,1]
+        //------------data selection------
+        curr_name : null,
+        curr_data : null,
+        curr_rs : null,
+        jsondata : null,
       }; // end of data return
-    },
-    computed:{
-      tables:function(){
-        var search=this.search;
-        if(search){
-          return  this.tableData.filter(function(dataNews){
-            return Object.keys(dataNews).some(function(key){
-              return String(dataNews[key]).toLowerCase().indexOf(search) > -1
-            })
-          })
-        }
-        return this.tableData
-      }
     },
 
     methods: {
+      //-------------switching individual start -------------------//
+      update_basic(used_url){
+        // loading data and re-draw graph
+        var self = this;
+        $.getJSON(used_url,function(_data) {
+          console.log("loaded");
+          self.setJsonData(_data);
+          self.option = self.getOption();
+        });
+      },
+      use_r0_1(){
+        if(this.curr_rs != "0.1"){
+           // show loading first
+           this.curr_rs = "0.1";
+           console.log(this.curr_rs);
+           var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
+           this.option = this.getOption();
+           this.update_basic(used_url);
+        }
+      },
+      use_r0_2(){
+        if(this.curr_rs != "0.2"){
+           // show loading first
+           this.curr_rs = "0.2";
+           var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
+           this.option = this.getOption();
+           this.update_basic(used_url);
+        }
+      },
+      use_r0_3(){
+        if(this.curr_rs != "0.3"){
+           // show loading first
+           this.curr_rs = "0.3";
+           var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
+           this.option = this.getOption();
+           this.update_basic(used_url);
+        }
+      },
+      use_r0_8(){
+        if(this.curr_rs != "0.8"){
+           // show loading first
+           this.curr_rs = "0.8";
+           var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
+           this.option = this.getOption();
+           this.update_basic(used_url);
+        }
+      },
+      resetIndividual(name){
+          if ( this.curr_name != name ) {
+            this.curr_name = name ;
+            this.curr_data = null ;
+            this.curr_rs = null ;
+            this.option = this.getOption();
+          }
+      },
+      show_WT()     {  this.resetIndividual("WT");     },
+      show_0hpa1()  {  this.resetIndividual("0hpa1");  },
+      show_0hpa2()  {  this.resetIndividual("0hpa2");  },
+      show_12hpa1() {  this.resetIndividual("12hpa1"); },
+      show_12hpa2() {  this.resetIndividual("12hpa2"); },
+      show_36hpa1() {  this.resetIndividual("36hpa1"); },
+      show_36hpa2() {  this.resetIndividual("36hpa2"); },
+      show_3dpa1()  {  this.resetIndividual("3dpa1");  },
+      show_3dpa2()  {  this.resetIndividual("3dpa2");  },
+      show_5dpa1()  {  this.resetIndividual("5dpa1");  },
+      show_5dpa2()  {  this.resetIndividual("5dpa2");  },
+      show_7dpa1()  {  this.resetIndividual("7dpa1");  },
+      show_7dpa2()  {  this.resetIndividual("7dpa2");  },
+      show_10dpa1() {  this.resetIndividual("10dpa1"); },
+      show_10dpa2() {  this.resetIndividual("10dpa2"); },
+      show_14dpa1() {  this.resetIndividual("14dpa1"); },
+      show_14dpa2() {  this.resetIndividual("14dpa2"); },
+      //-------------switching individual end-------------------//
+      
+
       setGeneData(_data){
         console.log('get gene json loaded');
         var gene_xyz= [];
@@ -469,47 +428,6 @@
       handleSelect(key, keyPath) {
         // not in use
       },
-      update_basic(name){
-        if( this.curr_name != name)
-        {
-          // set new name
-          this.curr_name = name;
-          //clean buffer
-          this.curr_data = null;
-          // show loading first
-          this.option = this.getOption();
-          var used_url = SC_URL+"/"+name+"/label.json";
-          // loading data and re-draw graph
-          var self = this;
-          $.getJSON(used_url,function(_data) {
-            //self.setSCData(_data);
-            self.option = self.getOption();
-          });
-        }
-      },
-      show_14_r05(){
-        var self = this;
-        $.getJSON(dpa2_14_r05_url,function(_data) {
-        self.setJsonData(_data);
-        console.log('14dpa2_r05 json loaded');
-        self.option = self.getOption();});
-        this.update_basic('14dpa2');
-    },
-      show_14_r08(){
-        var self = this;
-        $.getJSON(dpa2_14_r08_url,function(_data) {
-        self.setJsonData(_data);
-        console.log('14dpa2_r08 json loaded');
-        self.option = self.getOption();});
-    },
-      show_wt_r08(){
-        //var self = this;
-        //$.getJSON(wt_r08_url,function(_data) {
-        //self.setJsonData(_data);
-        //console.log('wt_r08 json loaded');
-        //self.option = self.getOption();});
-        this.update_basic("WT");
-    },
       setJsonData(_data){
         console.log('knowing json loaded');
         var curr_draw_datas= [];
@@ -558,11 +476,11 @@
             legend_list.push("CellType"+curr_cluster);
             if(this.showd_clusters[i] == 1)
             {
-              curr_color = this.COLOR_ALL[i];
+              curr_color = COLOR_ALL[i];
             }
             else
             {
-              curr_color = this.COLOR_ALL[this.COLOR_ALL.length-1];
+              curr_color = COLOR_ALL[COLOR_ALL.length-1];
             }
             legend_color.push(curr_color);
             var the_data = curr_draw_datas[i];
@@ -581,7 +499,7 @@
             series_list.push(one_series);
           } // end of for showd_clusters.length
           legend_list.push("others");
-          curr_color = this.COLOR_ALL[this.COLOR_ALL.length-1];
+          curr_color = COLOR_ALL[COLOR_ALL.length-1];
           legend_color.push(curr_color);
           var left_index = this.showd_clusters.length;
           var left_data =  curr_draw_datas[left_index];
@@ -646,17 +564,19 @@
         } // end of else.
       } // end of function option.
     },
-    mounted: function(){
-      // load the 3D basic dataset here
-        var self = this;
-        console.log('start json loading');
-        $.getJSON(bin14_r05_url,function(_data) {
-          self.setJsonData(_data);
-          console.log('json loaded');
-          //self.option = self.getOption();
-        });
-        //this.getAutoHeight();
-    }
+    computed:{
+      tables:function(){
+        var search=this.search;
+        if(search){
+          return  this.tableData.filter(function(dataNews){
+            return Object.keys(dataNews).some(function(key){
+              return String(dataNews[key]).toLowerCase().indexOf(search) > -1
+            })
+          })
+        }
+        return this.tableData
+      }
+    },
   }; // end of export defaul.
 </script>
 
