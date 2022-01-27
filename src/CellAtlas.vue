@@ -147,6 +147,8 @@
   var GENE_URL="http://49.232.213.84/genes"
   var wt_genes_url = ''
   var COLOR_ALL = require('../confs/discret_color.js');
+  var idvd_conf = require('../confs/individual.js');
+
   // the loading chart before we cache the real dataset
   export default {
     name : "Planarian",
@@ -243,13 +245,22 @@
         },
         //------------data selection------
         curr_name : null,
-        curr_data : null,
         curr_rs : null,
         jsondata : null,
       }; // end of data return
     },
 
     methods: {
+      //-------------3d box conf start-------------------//
+      getWidth(){
+        return idvd_conf['label_'+this.curr_name].x ;
+      },
+      getDepth() {
+        return idvd_conf['label_'+this.curr_name].z ;
+      },
+      getHeight() {
+        return idvd_conf['label_'+this.curr_name].y ;
+      },
       //-------------switching individual start -------------------//
       update_basic(used_url){
         // loading data and re-draw graph
@@ -300,7 +311,7 @@
       resetIndividual(name){
           if ( this.curr_name != name ) {
             this.curr_name = name ;
-            this.curr_data = null ;
+            this.jsondata = null ;
             this.curr_rs = null ;
             this.option = this.getOption();
           }
@@ -459,8 +470,17 @@
       },
       getOption() {
         if ( this.jsondata == null ) {
-          console.log('still draw loading');
-          return this.loading_option;
+          return {
+            backgroundColor:'#000000',
+             title :{
+              text : 'Please select a resolution ...',
+              left: "center",
+              top: "center",
+              textStyle: {
+                 color: '#cccccc'
+              },
+            }
+          };       
         }
         else {
           console.log('knowing json loaded');
@@ -518,6 +538,18 @@
           series_list.push(left_series);
           console.log('end series');
           var opt={
+            title :{
+              text : '',
+              left: "center",
+              top : "top"
+            },
+            legend :{
+              color :legend_color,
+              data:legend_list,
+              textStyle: {
+                color: '#cccccc'
+              }
+            },
             tooltip: {},
             xAxis3D: {
               name: 'x',
@@ -536,12 +568,15 @@
             },
             legend :{
               color :legend_color,
-              data:legend_list
+              data:legend_list,
+              textStyle: {
+                 color: '#cccccc'
+              },
             },
             grid3D: {
-              boxWidth:800,
-              boxHeight:50,
-              boxDepth:250,
+              boxWidth:this.getWidth(),
+              boxHeight:this.getDepth(),
+              boxDepth:this.getHeight(),
               axisLine: {
                 lineStyle: {
                   color: '#fff'
@@ -552,7 +587,7 @@
                   color: '#ffbd67'
                 }
               },
-              viewControl: {
+            viewControl: {
                 // autoRotate: true
                 //projection: 'orthographic'
               }
