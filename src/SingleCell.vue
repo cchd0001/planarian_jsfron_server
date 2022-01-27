@@ -21,7 +21,7 @@
         <el-menu-item index="17" @click.native="show_14dpa2"  >14dpa2 </el-menu-item>
       </el-menu>
     </div>
-    <el-container style="height: 800px; border: 1px solid #eee">
+    <el-container style="height: 750px; border: 1px solid #eee">
       <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
         <p> Color Configuration </p>
         <el-table class="table" ref="multipleTable" style="width:160;" :data="tableData"
@@ -31,12 +31,15 @@
             <el-table-column show-header='false' property="Celltype" label="Celltype" width="125">
             </el-table-column>
         </el-table>
-        <div style="margin-left:20%;width:75px">
-          <el-button @click="applyStatus">Apply</el-button>
+        <div style="margin-left:1%;width:25px">
+          <el-button @click="applyStatus">Highlight selected types</el-button>
+        </div>
+        <div style="margin-left:1%;width:25px">
+          <el-button @click="resetAll">Highlight all types</el-button>
         </div>
       </el-aside>
       <el-main>
-        <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
+        <v-chart class="chart" :option="option" :style="{width: chart_width +'px', height: chart_height+ 'px'}" />
       </el-main>
     </el-container>
   </div>
@@ -52,6 +55,7 @@
   var SC_URL="http://49.232.213.84/single_cell/"
   var COLOR_ALL = require('../confs/discret_color.js');
   var sc_conf = require('../confs/single_cell_transfered_type.js');
+  var idvd_conf = require('../confs/individual.js');
 
   export default {
     name : "SingleCell",
@@ -77,7 +81,31 @@
         // drawing cache
         curr_name : null,
         curr_data : null,
+        chart_width:1600,
+        chart_height:680,
       }; // end of data return
+    },
+    computed:{
+      getWidth : function(){
+        if( this.curr_name == null ) return 1400;
+        else{
+            var name = 'label_'+this.curr_name;
+            console.log(name);
+            this.chart_width = idvd_conf['label_'+this.curr_name].x * 4;
+            return idvd_conf['label_'+this.curr_name].x * 4;
+        }
+      },
+      getDepth : function() {
+        if( this.curr_name == null ) return 20;
+        else return idvd_conf['label_'+this.curr_name].z * 4;
+      },
+      getHeight : function() {
+        if( this.curr_name == null ) return 600;
+        else {
+          this.chart_height= idvd_conf['label_'+this.curr_name].y * 4;
+          return idvd_conf['label_'+this.curr_name].y * 4;
+        }
+      },
     },
     methods: {
 
@@ -88,7 +116,10 @@
         this.colored_cache =this.select_cache;
         self.option=self.getOption();
       },
-
+      resetAll(){
+         this.colored_cache = [];
+         this.option = this.getOption();
+      },
       handleSelectionChange(val) {
         var show = [];
         for( var i=0; i<this.tableData.length; i++ ) {
@@ -227,7 +258,9 @@
             series_list.push(one_series);
           } // end of for showd_clusters.length
           console.log('end series');
-
+          var xmax = this.getWidth/4;
+          var ymax = this.getHeight/4;
+          var zmax = this.getDepth/4;
           var opt={
             backgroundColor:'#000000',
             title : {
@@ -239,17 +272,23 @@
             xAxis3D: {
               name: 'x',
               scale:1,
-              type: 'value'
+              type: 'value',
+              min:0,
+              max:xmax,
             },
             yAxis3D: {
               name: 'y',
               scale:1,
-              type: 'value'
+              type: 'value',
+              min:0,
+              max:ymax,
             },
             zAxis3D: {
               name: 'z',
               scale:1,
-              type: 'value'
+              type: 'value',
+              min:0,
+              max:zmax,
             },
             legend :{
               color :legend_color,
@@ -259,9 +298,9 @@
               },
             },
             grid3D: {
-              boxWidth:400,
-              boxHeight:20,
-              boxDepth:150,
+              boxWidth: xmax,
+              boxHeight: zmax,
+              boxDepth: ymax,
               axisLine: {
                 lineStyle: {
                   color: '#fff'
