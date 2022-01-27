@@ -38,16 +38,16 @@
       <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
         <div class='child' style='background-color:white;'>
           <div style="width:120px;">
-            <el-button align='right' style='width:100%;' icon='el-icon-caret-bottom' @click="showWorkflow = true">Cell/Gene</el-button>
+            <el-button align='right' style='width:100%;' @click="isHidden = !isHidden">Cell/Gene</el-button>
           </div>
-          <el-tabs style='width:300px;' v-if="showWorkflow" @tab-click="handleClick">
+          <el-tabs style='width:300px;' v-if="!isHidden" @tab-click="handleClick">
             <el-tab-pane style='width:160;' label='Cell' name='first'>
               <el-table
                 id="cellTable"
                 class="table"
                 ref="clusterTable"
                 style="width:160;"
-                :show-header='true'
+                :show-header='false'
                 :height='height'
                 :row-key="getRowKey"
                 :highlight-current-row='true'
@@ -76,16 +76,26 @@
               </el-pagination>
             </el-tab-pane>
            
+
             <el-tab-pane label='Gene' name='second'>
+              <el-select v-model="test" @change="selectGene" filterable placeholder="Search Gene">
+                <el-option
+                  v-for="item in tableDataGenes"
+                  :key="item.ID"
+                  :label="item.label"
+                  :value="item.Genes">
+                </el-option>
+              </el-select>
+
               <el-table
                 class="table"
                 ref="multipleTable"
                 style="width:160;"
                 :data="tableDataGenes.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-                :show-header='true'
+                :show-header='false'
                 :height='height'
                 @selection-change="handleSelectionChange">
-                  <el-table-column
+                <el-table-column
                     type="selection"
                     width="55">
                   </el-table-column>
@@ -110,7 +120,6 @@
               <el-button @click="applyStatus">Apply</el-button>
               <el-button @click='clearSelect'>Clear</el-button>
               <el-button @click='resetSelect'>Reset</el-button>
-              <el-button @click='showWorkflow = false' icon='el-icon-caret-top'>hide</el-button>
             </div> 
           </el-tabs>
         </div>
@@ -142,10 +151,9 @@
     },
     data(){
       return {
-        showWorkflow: false,
-
+        search: '',
+        isHidden: true,
         height:'200px',
-
         activeIndex: '1',
         pageSize:5,
         currentPage:1,
@@ -153,12 +161,15 @@
         tableDataGenes: [{
           ID: '0',
           Genes: 'SMED30036034',
+          label: "test",
         }, {
           ID: '1',
           Genes: 'SMED30036029',
+          label: "absolute_vodka",
         }, {
           ID: '2',
           Genes: 'SMED30036028',
+          label: "test233",
         }, {
           ID: '3',
           Genes: 'SMED30036026',
@@ -322,7 +333,35 @@
        //return this.tableDataGenes.slice(this.pageSize * this.currentPage - this.pageSize, this.pageSize * this.currentPage)
      //}
    //},
+    computed:{
+      tables:function(){
+        var search=this.search;
+        if(search){
+          return  this.tableData.filter(function(dataNews){
+            return Object.keys(dataNews).some(function(key){
+              return String(dataNews[key]).toLowerCase().indexOf(search) > -1
+            })
+          })
+        }
+        return this.tableData
+      }
+    },
+
     methods: {
+      selectGene(item){
+        console.log(item);
+        if(this.curr_name != null){
+          if(this.curr_gene != item ){
+            var self=this;
+            var used_url = GENE_URL+"/"+this.curr_name+"/"+item+".json";
+            $.getJSON(used_url,function(_data) {
+              self.curr_gene = item;
+              self.setGeneData(_data);
+              self.option = self.getOption();
+            });
+          }
+        }
+      },
       resetSelect(){
         var self = this;
         this.showd_clusters=[1,1,1,1,1,1,1,1,1,1];
