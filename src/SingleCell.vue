@@ -39,7 +39,7 @@
         </div>
       </el-aside>
       <el-main>
-        <v-chart ref="myecharts"  class="chart" :option="option" style="width:1500px;height:700px" />
+        <v-chart ref="myecharts"  class="chart" :option="option" style="width:100%;height:700px" />
       </el-main>
     </el-container>
   </div>

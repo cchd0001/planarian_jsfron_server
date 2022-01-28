@@ -30,7 +30,7 @@
       </el-select>
     </div>
     <div>
-      <v-chart ref="myecharts"  :option="option" style="width:1600px;height:700px;" />
+      <v-chart ref="myecharts"  :option="option" style="width:100%;height:700px;" />
     </div>
   </div>
 </template>
