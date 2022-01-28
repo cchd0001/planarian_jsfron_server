@@ -30,7 +30,7 @@
       </el-select>
     </div>
     <div>
-      <v-chart :option="option" style="width:1600px;height:700px;" />
+      <v-chart ref="myecharts"  :option="option" style="width:1600px;height:700px;" />
     </div>
   </div>
 </template>
@@ -97,13 +97,15 @@
           this.gene_xyz = null;
           this.curr_selected_gene = null;
           // show loading first
-          this.option = this.getOption();
+          this.$refs.myecharts.setOption(this.getOption(),true);
+          //this.option = this.getOption();
           var used_url = SC_URL+"/"+name+"/label.json";
           // loading data and re-draw graph
           var self = this;
           $.getJSON(used_url,function(_data) {
             self.setBasicData(_data);
-            self.option = self.getOption();
+            //self.option = self.getOption();
+            self.$refs.myecharts.setOption(self.getOption(),true);
           });
         }
       },
