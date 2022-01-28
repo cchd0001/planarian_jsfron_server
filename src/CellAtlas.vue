@@ -145,7 +145,6 @@
   // the dateset url
   var CT_URL="http://49.232.213.84/celltype/"
   var GENE_URL="http://49.232.213.84/genes"
-  var wt_genes_url = ''
   var COLOR_ALL = require('../confs/discret_color.js');
   var idvd_conf = require('../confs/individual.js');
 
@@ -161,11 +160,13 @@
         show_gene_list:[],
         multipleSelection: [],
         saved_clusters:[],
-        all_clusters:[0,1,2,3,4,5,6,7,8,9],
+        //all_clusters:[0,1,2,3,4,5,6,7,8,9],
         showd_clusters:[1,1,1,1,1,1,1,1,1,1],
         selectValue: '',
         //------------show clusters-----------
-
+        max_showd_clusters: 20,
+        all_clusters: [],
+        final_clusters: [],
         //------------gene selection------
         search: '',
         //------------ui selection------
@@ -334,8 +335,6 @@
       show_14dpa1() {  this.resetIndividual("14dpa1"); },
       show_14dpa2() {  this.resetIndividual("14dpa2"); },
       //-------------switching individual end-------------------//
-      
-
       setGeneData(_data){
         console.log('get gene json loaded');
         var gene_xyz= [];
@@ -442,16 +441,22 @@
       setJsonData(_data){
         console.log('knowing json loaded');
         var curr_draw_datas= [];
-        for(var i = 0; i<=this.all_clusters.length; i++ )
+        this.final_clusters = new Array(this.max_showd_clusters).fill(0);
+        this.all_clusters = Array.from(Array(this.max_showd_clusters).keys());
+
+        // ---------- iterate through clusters setting (short)
+        for(var i = 0; i<=this.max_showd_clusters; i++ )
         {
             curr_draw_datas.push([['x','y','z']]);
         }
-        var left_index = this.all_clusters.length;
+
+        // --------- iterate through real data (long)
+        var left_index = this.max_showd_clusters;
         for(var j=0 ; j< _data.length; j++)
         {
           var curr_item = _data[j];
           var found=0;
-          for(var i = 0; i< this.all_clusters.length; i++ )
+          for(var i = 0; i< this.max_showd_clusters; i++ )
           {
             var curr_cluster = this.all_clusters[i];
             if( curr_item[3] == curr_cluster )
@@ -466,6 +471,24 @@
             curr_draw_datas[left_index].push([curr_item[0],curr_item[1],curr_item[2]]);
           }
         } // end of for _data
+        
+        // --------- check if any cluster has only one element aka the header
+        console.log(curr_draw_datas.length);
+        for (var i = 0; i < curr_draw_datas.length; i++){
+          if (curr_draw_datas[i].length == 1) {
+            console.log('length is 1');
+            console.log(i);
+            this.all_clusters.pop();
+          }else{
+            //final_showd_clusters.push(1);
+            //this.final_clusters.push(1);
+            this.final_clusters[i] = 1;
+          }
+        }
+
+        console.log('after for loop');
+        console.log(this.all_clusters);
+        console.log(this.final_clusters);
         this.jsondata = curr_draw_datas;
       },
       getOption() {
@@ -490,11 +513,11 @@
           var legend_color = [];
           var curr_color ;
           console.log('start series');
-          for( var i = 0 ; i<this.showd_clusters.length; i++ )
+          for( var i = 0 ; i<this.all_clusters.length; i++ )
           {
             var curr_cluster = this.all_clusters[i];
             legend_list.push("CellType"+curr_cluster);
-            if(this.showd_clusters[i] == 1)
+            if(this.final_clusters[i] == 1)
             {
               curr_color = COLOR_ALL[i];
             }
@@ -517,11 +540,12 @@
                 },
             };
             series_list.push(one_series);
-          } // end of for showd_clusters.length
+          } // end of for final_clusters.length
           legend_list.push("others");
+          legend_list.splice(10, 0, '');
           curr_color = COLOR_ALL[COLOR_ALL.length-1];
           legend_color.push(curr_color);
-          var left_index = this.showd_clusters.length;
+          var left_index = this.all_clusters.length + 1;
           var left_data =  curr_draw_datas[left_index];
           var left_series = {
             name : legend_list[left_index],
