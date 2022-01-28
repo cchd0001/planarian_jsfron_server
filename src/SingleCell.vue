@@ -39,7 +39,7 @@
         </div>
       </el-aside>
       <el-main>
-        <v-chart class="chart" :option="option" style="width:1500px;height:700px" />
+        <v-chart ref="myecharts"  class="chart" :option="option" style="width:1500px;height:700px" />
       </el-main>
     </el-container>
   </div>
@@ -132,7 +132,8 @@
           //clean buffer
           this.curr_data = null;
           // show loading first
-          this.option = this.getOption();
+          this.$refs.myecharts.setOption(this.getOption(),true);
+          //this.option = this.getOption();
           var used_url = SC_URL+"/"+name+"/label.json";
           // loading data and re-draw graph
           var self = this;
