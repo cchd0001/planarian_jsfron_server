@@ -385,7 +385,7 @@
       },
       resetSelect(){
         var self = this;
-        this.showd_clusters=[1,1,1,1,1,1,1,1,1,1];
+        this.final_clusters=new Array(this.all_clusters.length).fill(1);
         self.option=self.getOption();
       },
       clearSelect () {
