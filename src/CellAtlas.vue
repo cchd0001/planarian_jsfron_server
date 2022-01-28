@@ -21,22 +21,34 @@
         <el-menu-item index="17" @click.native="show_14dpa2"  >14dpa2 </el-menu-item>
       </el-menu>
     </div>
+
     <div>
-      <p class="inline_item" > Please select a resolution : </p>
+      <p class="inline_item" > Select a resolution : </p>
       <el-button class="inline_item" @click ="use_r0_1">r0.1</el-button>
       <el-button class="inline_item" @click ="use_r0_2">r0.2</el-button>
       <el-button class="inline_item" @click ="use_r0_3">r0.3</el-button>
+      <el-button class="inline_item" @click ="use_r0_5">r0.5</el-button>
       <el-button class="inline_item" @click ="use_r0_8">r0.8</el-button>
+      <el-button class="inline_item" @click ="use_r1_2">r1.2</el-button>
+      <el-button class="inline_item" @click ="use_r1_5">r1.5</el-button>
+      <el-button class="inline_item" @click ="use_r2_0">r2.0</el-button>
     </div>
+    
+    <div>
+      <p class='inline_item'> Select number of clusters to display : </p>
+      <el-input style='width:200px;height:50px;' :min='min_cluster_number' :max='max_cluster_number' type='number' v-model="tmp_cluster_num" placeholder="Cluster Number"></el-input>
+      <el-button @click.native="changeClusterNumber">Display</el-button>
+    </div>
+
     <!-- main window -->
     <div class='parent'>
       <!-- I. chart content -->
-      <v-chart class="chart" :option="option" style="width:100%;height:800px;" />
+      <v-chart class="chart" ref="myecharts" :option="option" style="width:100%;height:800px;" />
+        <!-- II. configuration content -->
         <div class='child' style='background-color:white;'>
           <div style="width:120px;">
             <el-button align='right' style='width:100%;' @click="isHidden = !isHidden">Cell/Gene</el-button>
           </div>
-          <!-- II. configuration content -->
           <el-tabs style='width:300px;' v-model="activeName" v-if="!isHidden" @tab-click="handleClick">
             <el-tab-pane style='width:160;' label='Cell' name='first'>
               <!-- 1. cell table content -->
@@ -49,7 +61,7 @@
                 :height='height'
                 :row-key="getRowKey"
                 :highlight-current-row='true'
-                :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                :data="tableDataClusters.slice((currentPage-1)*pageSize,currentPage*pageSize)"
                 @selection-change="handleSelectionChange">
                   <el-table-column
                     :reserve-selection="true"
@@ -69,7 +81,7 @@
               </el-table>
                <el-pagination 
                 layout="total, sizes, prev, pager, next, jumper" 
-                :total="this.tableDataGenes.length"
+                :total="this.tableDataClusters.length"
                 :current-page="currentPage"
                 @current-change="handleCurrentChange"
                 @size-change="handleSizeChange"
@@ -79,7 +91,7 @@
               </el-pagination>
             </el-tab-pane>
 
-            <el-tab-pane label='Gene' name='second'>
+            <el-tab-pane :disabled='true' label='Gene' name='second'>
               <!-- 2. search content -->
               <el-select v-model="selectValue" @change="selectGene" filterable placeholder="Search Gene">
                 <el-option
@@ -164,7 +176,10 @@
         showd_clusters:[1,1,1,1,1,1,1,1,1,1],
         selectValue: '',
         //------------show clusters-----------
-        max_showd_clusters: 20,
+        min_cluster_number: 0,
+        max_cluster_number: 100,
+        tmp_cluster_num: 0,
+        max_showd_clusters: 100,
         all_clusters: [],
         final_clusters: [],
         //------------gene selection------
@@ -203,6 +218,7 @@
             Genes: 'SMED30036022',
           }
         ],
+        tableDataClusters: [],
         tableData:[{
             ID: '0',
             uid: '00',
@@ -263,58 +279,36 @@
         return idvd_conf['label_'+this.curr_name].y ;
       },
       //-------------switching individual start -------------------//
-      update_basic(used_url){
-        // loading data and re-draw graph
-        var self = this;
-        $.getJSON(used_url,function(_data) {
-          console.log("loaded");
-          self.setJsonData(_data);
-          self.option = self.getOption();
-        });
-      },
-      use_r0_1(){
-        if(this.curr_rs != "0.1"){
-           // show loading first
-           this.curr_rs = "0.1";
-           console.log(this.curr_rs);
-           var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
-           this.option = this.getOption();
-           this.update_basic(used_url);
+      update_basic(r){
+        if (this.curr_rs != r){
+          // loading data and re-draw graph
+          var self = this;
+          this.curr_rs = r;
+          var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
+          this.option = this.getOption();
+          $.getJSON(used_url,function(_data) {
+            console.log("loaded");
+            self.setJsonData(_data);
+            self.option = self.getOption();
+          });
         }
       },
-      use_r0_2(){
-        if(this.curr_rs != "0.2"){
-           // show loading first
-           this.curr_rs = "0.2";
-           var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
-           this.option = this.getOption();
-           this.update_basic(used_url);
-        }
-      },
-      use_r0_3(){
-        if(this.curr_rs != "0.3"){
-           // show loading first
-           this.curr_rs = "0.3";
-           var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
-           this.option = this.getOption();
-           this.update_basic(used_url);
-        }
-      },
-      use_r0_8(){
-        if(this.curr_rs != "0.8"){
-           // show loading first
-           this.curr_rs = "0.8";
-           var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
-           this.option = this.getOption();
-           this.update_basic(used_url);
-        }
-      },
+      use_r0_1(){this.update_basic('0.1');}, 
+      use_r0_2(){this.update_basic('0.2');},
+      use_r0_3(){this.update_basic('0.3');},
+      use_r0_5(){this.update_basic('0.5');},
+      use_r0_8(){this.update_basic('0.8');},
+      use_r1_2(){this.update_basic('1.2');},
+      use_r1_5(){this.update_basic('1.5');},
+      use_r2_0(){this.update_basic('2.0');},
+      
       resetIndividual(name){
           if ( this.curr_name != name ) {
             this.curr_name = name ;
             this.jsondata = null ;
             this.curr_rs = null ;
-            this.option = this.getOption();
+            this.$refs.myecharts.setOption(this.getOption(),true);
+            //this.option = this.getOption();
           }
       },
       show_WT()     {  this.resetIndividual("WT");     },
@@ -335,6 +329,10 @@
       show_14dpa1() {  this.resetIndividual("14dpa1"); },
       show_14dpa2() {  this.resetIndividual("14dpa2"); },
       //-------------switching individual end-------------------//
+       changeClusterNumber(){
+        this.max_showd_clusters = this.tmp_cluster_num;
+        this.$refs.myecharts.setOption(this.getOption(),true);
+      },
       setGeneData(_data){
         console.log('get gene json loaded');
         var gene_xyz= [];
@@ -397,7 +395,7 @@
         self.option=self.getOption();
     },
       getRowKey (row) {
-        return row.uid
+        return row.Celltype
     },
       handleSizeChange (size) {
         this.pageSize = size;
@@ -421,17 +419,18 @@
       applyStatus(){
         var self = this;
         console.log("change cluster showing option");
-        this.showd_clusters=this.saved_clusters;
+        this.final_clusters=this.saved_clusters;
         self.option=self.getOption();
       },
       handleSelectionChange(val) {
         console.log('val is ');
         console.log(val);
         this.multipleSelection = val;
-        var tmp_clusters=[0,0,0,0,0,0,0,0,0,0];
+        var tmp_clusters= new Array(this.all_clusters.length).fill(0);
         for( var i = 0 ; i < val.length ; i++) {
             tmp_clusters[val[i].ID]=1;
           }
+        console.log(tmp_clusters);
         this.saved_clusters=tmp_clusters;
       },
 
@@ -441,17 +440,17 @@
       setJsonData(_data){
         console.log('knowing json loaded');
         var curr_draw_datas= [];
-        this.final_clusters = new Array(this.max_showd_clusters).fill(0);
-        this.all_clusters = Array.from(Array(this.max_showd_clusters).keys());
+        this.final_clusters = new Array(301).fill(0);
+        this.all_clusters = Array.from(Array(301).keys());
 
         // ---------- iterate through clusters setting (short)
-        for(var i = 0; i<=this.max_showd_clusters; i++ )
+        for(var i = 0; i<=300; i++ )
         {
             curr_draw_datas.push([['x','y','z']]);
         }
 
         // --------- iterate through real data (long)
-        var left_index = this.max_showd_clusters;
+        var left_index = 300;
         for(var j=0 ; j< _data.length; j++)
         {
           var curr_item = _data[j];
@@ -476,8 +475,6 @@
         console.log(curr_draw_datas.length);
         for (var i = 0; i < curr_draw_datas.length; i++){
           if (curr_draw_datas[i].length == 1) {
-            console.log('length is 1');
-            console.log(i);
             this.all_clusters.pop();
           }else{
             //final_showd_clusters.push(1);
@@ -485,10 +482,16 @@
             this.final_clusters[i] = 1;
           }
         }
-
-        console.log('after for loop');
-        console.log(this.all_clusters);
-        console.log(this.final_clusters);
+        if (this.all_clusters.length < this.max_showd_clusters){
+          this.max_showd_clusters = this.all_clusters.length;
+        }
+        //var tableDataClusters = [];
+        console.log('before create tabledata, all_clsuters length is ');
+        console.log(this.all_clusters.length);
+        for (var i=0; i < this.all_clusters.length; i++){
+          this.tableDataClusters.push({ID: i, Celltype: 'Cluster'+i});
+        }
+        console.log(this.tableDataClusters);
         this.jsondata = curr_draw_datas;
       },
       getOption() {
@@ -513,10 +516,10 @@
           var legend_color = [];
           var curr_color ;
           console.log('start series');
-          for( var i = 0 ; i<this.all_clusters.length; i++ )
+          for( var i = 0 ; i<this.max_showd_clusters; i++ )
           {
-            var curr_cluster = this.all_clusters[i];
-            legend_list.push("CellType"+curr_cluster);
+            //var curr_cluster = this.all_clusters[i];
+            legend_list.push("CellType"+i);
             if(this.final_clusters[i] == 1)
             {
               curr_color = COLOR_ALL[i];
@@ -541,27 +544,15 @@
             };
             series_list.push(one_series);
           } // end of for final_clusters.length
-          legend_list.push("others");
+          //legend_list.push("others");
           legend_list.splice(10, 0, '');
-          curr_color = COLOR_ALL[COLOR_ALL.length-1];
-          legend_color.push(curr_color);
-          var left_index = this.all_clusters.length + 1;
-          var left_data =  curr_draw_datas[left_index];
-          var left_series = {
-            name : legend_list[left_index],
-            type : 'scatter3D',
-            dimensions: [ 'x','y','z' ],
-            data: left_data,
-            symbolSize: 2,
-            itemStyle: {
-              borderWidth: 1,
-              borderColor: curr_color,
-              color: curr_color
-            },
-          };
-          series_list.push(left_series);
+          //curr_color = COLOR_ALL[COLOR_ALL.length-1];
+          //legend_color.push(curr_color);
+          //var left_index = this.all_clusters.length + 1;
+          //var left_data =  curr_draw_datas[left_index];
           console.log('end series');
           var opt={
+            backgroundColor:'#000000',
             title :{
               text : '',
               left: "center",
@@ -655,5 +646,9 @@
   position: absolute;
   top: 0;
   left: 0;
+}
+.inline_item {
+  display: inline-block;
+  margin-left: 20px;
 }
 </style>
