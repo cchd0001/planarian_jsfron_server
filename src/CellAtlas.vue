@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <!-- individual and resolution selecting menu start ... -->
     <div  style="margin-left:0%;" align="center">
       <el-menu  class="el-menu-demo" mode="horizontal" >
         <el-menu-item index="1"  @click.native="show_WT"      >WT     </el-menu-item>
@@ -21,71 +22,102 @@
         <el-menu-item index="17" @click.native="show_14dpa2"  >14dpa2 </el-menu-item>
       </el-menu>
       <el-menu  class="el-menu-demo" mode="horizontal" >
-        <el-menu-item index="1"   @click.native ="use_r0_1">r0.1</el-menu-item>
-        <el-menu-item index="2"   @click.native ="use_r0_2">r0.2</el-menu-item>
-        <el-menu-item index="3"   @click.native ="use_r0_3">r0.3</el-menu-item>
-        <el-menu-item index="4"   @click.native ="use_r0_5">r0.5</el-menu-item>
-        <el-menu-item index="5"   @click.native ="use_r0_8">r0.8</el-menu-item>
-        <el-menu-item index="6"   @click.native ="use_r1_2">r1.2</el-menu-item>
-        <el-menu-item index="7"   @click.native ="use_r1_5">r1.5</el-menu-item>
-        <el-menu-item index="8"   @click.native ="use_r2_0">r2.0</el-menu-item>
+        <el-menu-item index="1"  @click.native ="use_r0_1">r0.1</el-menu-item>
+        <el-menu-item index="2"  @click.native ="use_r0_2">r0.2</el-menu-item>
+        <el-menu-item index="3"  @click.native ="use_r0_3">r0.3</el-menu-item>
+        <el-menu-item index="4"  @click.native ="use_r0_5">r0.5</el-menu-item>
+        <el-menu-item index="5"  @click.native ="use_r0_8">r0.8</el-menu-item>
+        <el-menu-item index="6"  @click.native ="use_r1_2">r1.2</el-menu-item>
+        <el-menu-item index="7"  @click.native ="use_r1_5">r1.5</el-menu-item>
+        <el-menu-item index="8"  @click.native ="use_r2_0">r2.0</el-menu-item>
       </el-menu>
     </div>
+    <!-- individual and resolution selecting menu end ... -->
+    <!-- Configuration menu start ... -->
     <div>
-      <p class='inline_item'> Select number of clusters to display : </p>
-      <el-input class='inline_item' style='width:200px;height:50px;' :min='min_cluster_number' 
-              :max='max_cluster_number' type='number' v-model="tmp_cluster_num" placeholder="Cluster Number"></el-input>
-      <el-button class='inline_item' @click.native="changeClusterNumber">Display</el-button>
-      <!-- II. configuration content -->
+      <!-- Cell type configuration menu start ... -->
       <div class='inline_item' >
-        <el-button align='right' style='width:100%;' @click="isHidden = !isHidden">Cell Type Configuration</el-button>
+        <el-button align='right' style='width:100%;' @click.native="openCTC">Cell Type Configuration</el-button>
         <div class='parent' style='width:10px; ' >
           <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isHidden">
+            <hr>
             <!-- 1. cell table content -->
-            <el-table
-              class="table"
-              ref="clusterTable"
-              style="width:160;"
-              :show-header='false'
-              :height='height'
-              :row-key="getRowKey"
-              :highlight-current-row='true'
+            <el-table class="table" ref="clusterTable" style="width:130;" :show-header='false'
+              :height='height' :row-key="getRowKey" :highlight-current-row='true'
               :data="tableDataClusters.slice((currentPage-1)*pageSize,currentPage*pageSize)"
               @selection-change="handleSelectionChange">
-                <el-table-column
-                  :reserve-selection="true"
-                  type="selection"
-                  width="55">
-                </el-table-column>
-                <el-table-column
-                  property="Celltype"
-                  label="Cell Type"
-                  width="80">
-                </el-table-column>
+                <el-table-column :reserve-selection="true" type="selection" width="55"></el-table-column>
+                <el-table-column property="Celltype" label="Cell Type" width="80"> </el-table-column>
                 <el-table-column label="Display" width="160">
                   <template slot-scope="scope">
                     <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button>
                   </template>
                 </el-table-column>
             </el-table>
-            <el-pagination 
-              layout="total, sizes, prev, pager, next, jumper" 
-              :total="this.tableDataClusters.length"
-              :current-page="currentPage"
-              @current-change="handleCurrentChange"
-              @size-change="handleSizeChange"
-              :page-sizes="[5,10,15]"
-              :page-size="pageSize"
-              :current-page.sync="currentPage">
+            <el-pagination layout="total,sizes, prev, jumper, next" 
+              :total="this.tableDataClusters.length" :current-page="currentPage" 
+              @current-change="handleCurrentChange" @size-change="handleSizeChange" 
+              :page-sizes="[5,10,15]" :page-size="pageSize" :current-page.sync="currentPage">
             </el-pagination>
+            <!-- 1. cell table content end-->
             <div>
-              <el-button @click="applyStatus">Apply</el-button>
-              <el-button @click='clearSelect'>Clear</el-button>
-              <el-button @click='resetSelect'>Reset</el-button>
+              <el-button @click="applyStatus">Highlight selected </el-button>
+              <el-button @click='clearSelect'>Clear selected</el-button>
+              <hr>
             </div> <!-- end of buttons -->
+            <div>
+              <p class='inline_item_tight'> Highlight top </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' :min='min_cluster_number' 
+                      :max='max_cluster_number' type='number' v-model="tmp_cluster_num" placeholder="5"></el-input>
+              <p class='inline_item_tight'> clusters.</p>
+              <el-button class='inline_item' @click.native="TopN">Apply</el-button>
+              <hr>
+              <el-button class='inline_item' @click='resetSelect'>Reset all</el-button>
+              <el-button class='inline_item' @click.native="closeCTC">Close Configuration Panel</el-button>
+              <hr>
+            </div> <!-- end of top N buttons -->
           </div> <!-- end of hiden panel -->
         </div> <!-- end of empty parent of hiden panel -->
       </div> <!-- end of cell type config -->
+      <!-- Cell type configuration menu end ... -->
+      <!-- ROI configuration menu start ... -->
+      <div class='inline_item' >
+        <el-button align='right' style='width:100%;' @click.native="openROI">ROI Configuration</el-button>
+        <div class='parent' style='width:10px; ' >
+          <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isROIHidden">
+              <hr>
+              <p class='inline_item_tight'> Z gap scale : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_z_scale" placeholder="1"></el-input>
+              <el-button class='inline_item' @click.native="changeZScale">Apply</el-button>
+              <hr>
+              <p class='inline_item_tight'> X min : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_x_min" placeholder="0"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeXMin">Apply</el-button>
+              <p class='inline_item'> X max : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_x_max" placeholder="300"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeXMax">Apply</el-button>
+              <hr>
+              <p class='inline_item_tight'> Y min : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_y_min" placeholder="0"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeYMin">Apply</el-button>
+              <p class='inline_item'> Y max : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_y_max" placeholder="300"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeYMax">Apply</el-button>
+              <hr>
+              <p class='inline_item_tight'> Z min : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_z_min" placeholder="0"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeZMin">Apply</el-button>
+              <p class='inline_item'> Z max : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_z_max" placeholder="300"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeZMax">Apply</el-button>
+              <hr>
+              <el-button class='inline_item' @click.native="resetROI">Reset ROI</el-button>
+              <el-button class='inline_item' @click.native="closeCTC">Close Configuration Panel</el-button>
+              <hr>
+          </div>
+        </div>
+      </div>
+      <!-- ROI configuration menu end ... -->
     </div> <!-- end of inline block -->
 
     <!-- main window -->
@@ -119,22 +151,33 @@
         min_cluster_number: 0,
         max_cluster_number: 100,
         tableDataClusters: [],
-        //------------show clusters-----------
-        saved_clusters:[], // the selection cache
-        tmp_cluster_num: 0,
-        max_showd_clusters: 100,
-        all_clusters: 0,
-        final_clusters: [],
-        //------------gene selection------
-        search: '',
-        //------------ui selection------
         isHidden: true,
-        height:'200px',
-        activeIndex: '1',
+        isROIHidden:true,
+        height:'250px',
         pageSize:5,
         currentPage:1,
         activeName: 'first',
-        //------------confs------
+        //------------show clusters-----------
+        tmp_cluster_num: 0,
+        all_clusters: 0,
+        saved_clusters:[], // the selection cache
+        final_clusters: [],
+        //------------roi confs------
+        z_scale:1,
+        tmp_z_scale:1,
+        // roi
+        tmp_x_min:0,
+        tmp_y_min:0,
+        tmp_z_min:0,
+        tmp_x_max:300,
+        tmp_y_max:300,
+        tmp_z_max:300,
+        x_min:0,
+        y_min:0,
+        z_min:0,
+        x_max:300,
+        y_max:300,
+        z_max:300,
         // -- tip graph
         option: {
           backgroundColor:'#000000',
@@ -150,6 +193,7 @@
         //------------data selection------
         curr_name : null,
         curr_rs : null,
+        rawdata:null,
         jsondata : null,
       }; // end of data return
     },
@@ -165,7 +209,9 @@
       getHeight() {
         return idvd_conf['label_'+this.curr_name].y ;
       },
-      //-------------switching individual start -------------------//
+      //-------------3d box conf end -------------------//
+
+      //-------------switching individual and resolution start -------------------//
       update_basic(r){
         if (this.curr_rs != r){
           // loading data and re-draw graph
@@ -193,7 +239,9 @@
           if ( this.curr_name != name ) {
             this.curr_name = name ;
             this.jsondata = null ;
+            this.rawdata = null;
             this.curr_rs = null ;
+            this.resetROIdata();
             this.$refs.myecharts.setOption(this.getOption(),true);
             //this.option = this.getOption();
           }
@@ -215,27 +263,30 @@
       show_10dpa2() {  this.resetIndividual("10dpa2"); },
       show_14dpa1() {  this.resetIndividual("14dpa1"); },
       show_14dpa2() {  this.resetIndividual("14dpa2"); },
-      //-------------switching individual end-------------------//
-      //-------------configure cell type start -------------------//
-      changeClusterNumber(){
-        if(this.tmp_cluster_num < 1){
-          this.max_showd_clusters = 1;
-        } else if( this.tmp_cluster_num > this.all_clusters) {
-          this.max_showd_clusters =  this.all_clusters;
-        } else {
-          this.max_showd_clusters = this.tmp_cluster_num;
-        }
-        this.$refs.myecharts.setOption(this.getOption(),true);
+      //-------------switching individual and resolution end-------------------//
+
+      //-------------switch configuration panel start-------------------------------//
+      openCTC(){
+        this.isROIHidden = true;
+        if(this.isHidden)
+           this.isHidden = false;
+        else 
+            this.isHidden = true;
       },
-      resetSelect(){
-        var self = this;
-        this.final_clusters=new Array(this.all_clusters).fill(1);
-        self.option=self.getOption();
+      openROI(){
+        this.isHidden = true;
+        if(this.isROIHidden)
+           this.isROIHidden = false;
+        else 
+            this.isROIHidden = true;
       },
-      clearSelect () {
-        var self = this;
-        this.$refs.clusterTable.clearSelection();
+      closeCTC(){
+        this.isHidden = true;
+        this.isROIHidden = true;
       },
+      //-------------switch configuration panel end-------------------------------//
+
+      //-------------table like configuration panel start-------------------------------//
       getRowKey (row) {
         return row.Celltype
       },
@@ -255,12 +306,38 @@
           this.height = elParent.clientHeight - (pt + pb) + "px";
         });
       },
+      //-------------table like configuration panel end-------------------------------//
+
+      //-------------configure cell type start -------------------//
+      TopN(){
+        var topn = 1;
+        if(this.tmp_cluster_num < 1){
+          topn  = 1;
+        } else if( this.tmp_cluster_num > this.all_clusters) {
+          topn  =  this.all_clusters;
+        } else {
+          topn = this.tmp_cluster_num;
+        }
+        this.final_clusters=new Array(this.all_clusters).fill(0);
+        for(var i = 0; i<topn; i++){
+            this.final_clusters[i] = 1;
+        }
+        //this.$refs.myecharts.setOption(this.getOption(),true);
+        this.option=this.getOption();
+      },
+      resetSelect(){
+        this.final_clusters=new Array(this.all_clusters).fill(1);
+        this.option=this.getOption();
+      },
+      clearSelect () {
+        this.$refs.clusterTable.clearSelection();
+      },
       applyStatus(){
         var self = this;
         console.log("change cluster showing option");
         this.final_clusters=this.saved_clusters;
-        //self.option=self.getOption();
-        this.$refs.myecharts.setOption(this.getOption(),true);
+        self.option=self.getOption();
+        //this.$refs.myecharts.setOption(this.getOption(),true);
       },
       handleSelectionChange(val) {
         console.log('val is ');
@@ -272,14 +349,108 @@
         console.log(tmp_clusters);
         this.saved_clusters=tmp_clusters;
       },
-
-      handleSelect(key, keyPath) {
-        // not in use
-      },
-      //-------------configure cell type end-------------------//
       changeColor(){
         console.log('change color');
       },
+      //-------------configure cell type end -------------------//
+
+      //-------------configure ROI start -------------------//
+      resetROIdata(){
+        // reset-roi
+        this.z_scale = 1;this.tmp_z_scale=1;
+        this.x_min = 0;this.y_min = 0;this.z_min = 0;this.tmp_x_min=0;this.tmp_y_min=0;this.tmp_z_min=0;
+        this.x_max = this.getWidth();this.y_max = this.getHeight(); this.z_max = this.getDepth();
+        this.tmp_x_max = this.x_max; this.tmp_y_max = this.y_max; this.tmp_z_max = this.z_max;
+      },
+      resetROI(){
+        this.resetROIdata();
+        this.jsondata = this.rawdata;
+        this.option=this.getOption();
+      },
+      updateJsonData(){
+        var curr_draw_datas = [];
+        for(var i =0;i<this.all_clusters;i++)
+            curr_draw_datas.push([['x','y','z']]);
+        for(var i =0;i<this.all_clusters;i++){
+          for(var j =1;j<this.rawdata[i].length; j++){
+             var info = this.rawdata[i][j];
+             if( info[0]<this.x_min) continue;
+             if( info[1]<this.y_min) continue;
+             if( info[2]<this.z_min) continue;
+             if( info[0]>this.x_max) continue;
+             if( info[1]>this.y_max) continue;
+             if( info[2]>this.z_max) continue;
+             curr_draw_datas[i].push(info)
+          }
+        }
+        this.jsondata = curr_draw_datas;
+      },
+      changeXMin(){
+        if(this.x_min != this.tmp_x_min){
+          if(this.tmp_x_min<0)                          this.x_min = 0;
+          else if (this.tmp_x_min>this.x_max-1)         this.x_min = this.x_max-1;
+          else if (this.tmp_x_min>this.getWidth()-1)    this.x_min = this.getWidth()-1;
+          else                                          this.x_min = this.tmp_x_min;
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      changeXMax(){
+        if(this.x_max != this.tmp_x_max){
+          if(this.tmp_x_max<1)                          this.x_max = 1;
+          else if (this.tmp_x_max<Number(this.x_min)+1) this.x_max = Number(this.x_min) +1;
+          else if (this.tmp_x_max>this.getWidth())      this.x_max = this.getWidth();
+          else                                          this.x_max = this.tmp_x_max;
+          console.log(this.x_max);
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      changeYMin(){
+        if(this.y_min != this.tmp_y_min){
+          if(this.tmp_y_min<0)                          this.y_min = 0;
+          else if (this.tmp_y_min>this.y_max-1)         this.y_min = this.y_max-1;
+          else if (this.tmp_y_min>this.getHeight()-1)   this.y_min = this.getHeight()-1;
+          else                                          this.y_min = this.tmp_y_min;
+          console.log(this.y_min);
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      changeYMax(){
+        if(this.y_max != this.tmp_y_max){
+          if(this.tmp_y_max<1)                          this.y_max = 1;
+          else if (this.tmp_y_max<Number(this.y_min)+1) this.y_max = Number(this.y_min) +1;
+          else if (this.tmp_y_max>this.getHeight())     this.y_max = this.getHeight();
+          else                                          this.y_max = this.tmp_y_max;
+          console.log(this.y_max);
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      changeZMin(){
+        if(this.z_min != this.tmp_z_min){
+          if(this.tmp_z_min<0)                          this.z_min = 0;
+          else if (this.tmp_z_min>this.z_max-1)         this.z_min = this.z_max-1;
+          else if (this.tmp_z_min>this.getDepth()-1)    this.z_min = this.getDepth()-1;
+          else                                          this.z_min = this.tmp_z_min;
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      changeZMax(){
+        if(this.z_max != this.tmp_z_max){
+          if(this.tmp_z_max<1)                          this.z_max = 1;
+          else if (this.tmp_z_max<Number(this.z_min)+1) this.z_max = Number(this.z_min) +1;
+          else if (this.tmp_z_max>this.getDepth())      this.z_max = this.getDepth();
+          else                                          this.z_max = this.tmp_z_max;
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      //-------------configure ROI end -------------------//
+
+
       //-------------data manager start-------------------//
       setJsonData(_data){
         console.log('knowing json loaded');
@@ -316,9 +487,6 @@
             this.final_clusters[i] = 1;
           }
         }
-        if (this.all_clusters != this.max_showd_clusters){
-          this.max_showd_clusters = this.all_clusters;
-        }
         console.log('before create tabledata, all_clsuters length is ');
         console.log(this.all_clusters);
         var new_tableDataClusters = [];
@@ -327,10 +495,16 @@
         }
         this.tableDataClusters = new_tableDataClusters;
         //console.log(this.tableDataClusters);
+        this.rawdata = curr_draw_datas;
         this.jsondata = curr_draw_datas;
       },
       //-------------data manager end -------------------//
+
       //-------------drawing function start -------------------//
+      changeZScale(){
+        this.z_scale = this.tmp_z_scale;
+        this.option = this.getOption();
+      },
       getOption() {
         if ( this.jsondata == null ) {
           var curr_title = 'Loading data now ...';
@@ -354,17 +528,19 @@
           var curr_draw_datas = this.jsondata;
           var series_list = [];
           var legend_list = [];
-          var legend_color = [];
+          var legend_show = {};
           var curr_color ;
           console.log('start series');
-          for( var i = 0 ; i<this.max_showd_clusters; i++ )
+          for( var i = 0 ; i<this.all_clusters; i++ )
           {
+            var curr_legend_name = "CellType"+i;
             if(this.final_clusters[i] == 0){
-              continue;
+              legend_show[curr_legend_name] = false;
+            } else {
+              legend_show[curr_legend_name] = true;
             }
-            legend_list.push("CellType"+i);
+            legend_list.push(curr_legend_name);
             curr_color = COLOR_ALL[i];
-            legend_color.push(curr_color);
             var the_data = curr_draw_datas[i];
             var one_series = {
                 name : legend_list[i],
@@ -381,6 +557,8 @@
             series_list.push(one_series);
           } // end of for final_clusters.length
           console.log('end series');
+          //console.log(legend_show);
+          //console.log(legend_list);
           var opt={
             backgroundColor:'#000000',
             title :{
@@ -389,8 +567,8 @@
               top : "top"
             },
             legend :{
-              color :legend_color,
               data:legend_list,
+              selected: legend_show,
               textStyle: {
                 color: '#cccccc'
               }
@@ -399,28 +577,27 @@
             xAxis3D: {
               name: 'x',
               scale:1,
-              type: 'value'
+              type: 'value',
+              min:0,
+              max:this.getWidth(),
             },
             yAxis3D: {
               name: 'y',
               scale:1,
-              type: 'value'
+              type: 'value',
+              min:0,
+              max:this.getHeight(),
             },
             zAxis3D: {
               name: 'z',
               scale:1,
-              type: 'value'
-            },
-            legend :{
-              color :legend_color,
-              data:legend_list,
-              textStyle: {
-                 color: '#cccccc'
-              },
+              type: 'value',
+              min:0,
+              max:this.getDepth(),
             },
             grid3D: {
               boxWidth:this.getWidth(),
-              boxHeight:this.getDepth(),
+              boxHeight:this.getDepth() *this.z_scale,
               boxDepth:this.getHeight(),
               axisLine: {
                 lineStyle: {
@@ -467,6 +644,10 @@
   position: absolute;
   top: 0;
   left: 0;
+}
+.inline_item_tight {
+  display: inline-block;
+  margin-left: 3px;
 }
 .inline_item {
   display: inline-block;
