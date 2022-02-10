@@ -2,7 +2,8 @@
   <div id="app">
     <!-- individual and resolution selecting menu start ... -->
     <div  style="margin-left:0%;" align="center">
-      <el-menu  class="el-menu-demo" mode="horizontal" >
+      <!--:route="{path: '/area'}" #ffd04b -->
+      <el-menu  class="el-menu-demo" mode="horizontal" active-text-color="#409eff">
         <el-menu-item index="1"  @click.native="show_WT"      >WT     </el-menu-item>
         <el-menu-item index="2"  @click.native="show_0hpa1"   >0hpa1  </el-menu-item>
         <el-menu-item index="3"  @click.native="show_0hpa2"   >0hpa2  </el-menu-item>
@@ -21,7 +22,7 @@
         <el-menu-item index="16" @click.native="show_14dpa1"  >14dpa1 </el-menu-item>
         <el-menu-item index="17" @click.native="show_14dpa2"  >14dpa2 </el-menu-item>
       </el-menu>
-      <el-menu  class="el-menu-demo" mode="horizontal" >
+      <el-menu  class="el-menu-demo" mode="horizontal" active-text-color="#409eff">
         <el-menu-item index="1"  @click.native ="use_r0_1">r0.1</el-menu-item>
         <el-menu-item index="2"  @click.native ="use_r0_2">r0.2</el-menu-item>
         <el-menu-item index="3"  @click.native ="use_r0_3">r0.3</el-menu-item>
@@ -36,8 +37,8 @@
     <!-- Configuration menu start ... -->
     <div>
       <!-- Cell type configuration menu start ... -->
-      <div class='inline_item' >
-        <el-button align='right' style='width:100%;' @click.native="openCTC">Cell Type Configuration</el-button>
+      <div class='inline_item'>
+        <el-button align='right' @click.native="openCTC" @mousedown.native="moveStart" @mouseup.native="moveStop" @mouseout.native="moveStop" style='width:100%;'>Cell Type Configuration</el-button>
         <div class='parent' style='width:10px; ' >
           <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isHidden">
             <hr>
@@ -287,6 +288,18 @@
       //-------------switch configuration panel end-------------------------------//
 
       //-------------table like configuration panel start-------------------------------//
+      moveStart(){
+        let _this = this;
+        this.timer && this.moveStop();
+        this.timer = setInterval(() => {
+            console.log("mouse long press");
+          }, 100);
+        console.log("touch start");
+      },
+      moveStop() {
+        console.log("touch end");
+        clearInterval(this.timer);
+      },
       getRowKey (row) {
         return row.Celltype
       },
@@ -340,13 +353,10 @@
         //this.$refs.myecharts.setOption(this.getOption(),true);
       },
       handleSelectionChange(val) {
-        console.log('val is ');
-        console.log(val);
         var tmp_clusters= new Array(this.all_clusters).fill(0);
         for( var i = 0 ; i < val.length ; i++) {
             tmp_clusters[val[i].ID]=1;
           }
-        console.log(tmp_clusters);
         this.saved_clusters=tmp_clusters;
       },
       changeColor(){
