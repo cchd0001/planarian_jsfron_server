@@ -51,8 +51,6 @@ export default {
   },
   methods: {
     handleSelect(key, keyPath) {
-        console.log(key);
-        console.log(keyPath);
         if ( key == "2-1" )
         {
             this.selected = "CellAtlas";
