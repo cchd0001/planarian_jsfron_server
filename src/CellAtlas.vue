@@ -45,49 +45,52 @@
       <!-- switch symbol size end -->
       <!-- Cell type configuration menu start ... -->
       <div class='inline_item'>
-        <el-button align='right' @click.native="openCTC" @mousedown.native="moveStart" @mouseup.native="moveStop" @mouseout.native="moveStop" style='width:100%;'>Cell Type Configuration</el-button>
-        <div class='parent' style='width:10px; ' >
-          <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isHidden">
-            <hr>
-            <!-- 1. cell table content -->
-            <el-table class="table" ref="clusterTable" style="width:130;" :show-header='false'
-              :height='height' :row-key="getRowKey" :highlight-current-row='true'
-              :data="tableDataClusters.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-              @selection-change="handleSelectionChange">
-                <el-table-column :reserve-selection="true" type="selection" width="55"></el-table-column>
-                <el-table-column property="Celltype" label="Cell Type" width="80"> </el-table-column>
-                <el-table-column label="Display" width="160">
-                  <template slot-scope="scope">
-                    <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button>
-                  </template>
-                </el-table-column>
-            </el-table>
-            <el-pagination layout="total,sizes, prev, jumper, next" 
-              :total="this.tableDataClusters.length" :current-page="currentPage" 
-              @current-change="handleCurrentChange" @size-change="handleSizeChange" 
-              :page-sizes="[5,10,15]" :page-size="pageSize" :current-page.sync="currentPage">
-            </el-pagination>
-            <!-- 1. cell table content end-->
-            <div>
-              <el-button @click="applyStatus">Highlight selected </el-button>
-              <el-button @click='clearSelect'>Clear selected</el-button>
+        <div class='cellPanel' v-draggable='draggableValue' style='background-color:blue;'>
+          <div :ref="handleId">
+            <el-button align='right' @click.native="openCTC" style='width:100%;z-index:9999;'>Cell Type Configuration</el-button>
+            <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isHidden">
               <hr>
-            </div> <!-- end of buttons -->
-            <div>
-              <p class='inline_item_tight'> Highlight top </p>
-              <el-input class='inline_item_tight' style='width:80px;height:50px;' :min='min_cluster_number' 
-                      :max='max_cluster_number' type='number' v-model="tmp_cluster_num" placeholder="5"></el-input>
-              <p class='inline_item_tight'> clusters.</p>
-              <el-button class='inline_item' @click.native="TopN">Apply</el-button>
-              <hr>
-              <el-button class='inline_item' @click='resetSelect'>Reset all</el-button>
-              <el-button class='inline_item' @click.native="closeCTC">Close Configuration Panel</el-button>
-              <hr>
-            </div> <!-- end of top N buttons -->
-          </div> <!-- end of hiden panel -->
-        </div> <!-- end of empty parent of hiden panel -->
+              <!-- 1. cell table content -->
+              <el-table class="table" ref="clusterTable" style="width:130;" :show-header='false'
+                :height='height' :row-key="getRowKey" :highlight-current-row='true'
+                :data="tableDataClusters.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                @selection-change="handleSelectionChange">
+                  <el-table-column :reserve-selection="true" type="selection" width="55"></el-table-column>
+                  <el-table-column property="Celltype" label="Cell Type" width="80"> </el-table-column>
+                  <el-table-column label="Display" width="160">
+                    <template slot-scope="scope">
+                      <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button>
+                    </template>
+                  </el-table-column>
+              </el-table>
+              <el-pagination layout="total,sizes, prev, jumper, next" 
+                :total="this.tableDataClusters.length" :current-page="currentPage" 
+                @current-change="handleCurrentChange" @size-change="handleSizeChange" 
+                :page-sizes="[5,10,15]" :page-size="pageSize" :current-page.sync="currentPage">
+              </el-pagination>
+              <!-- 1. cell table content end-->
+              <div>
+                <el-button @click="applyStatus">Highlight selected </el-button>
+                <el-button @click='clearSelect'>Clear selected</el-button>
+                <hr>
+              </div> <!-- end of buttons -->
+              <div>
+                <p class='inline_item_tight'> Highlight top </p>
+                <el-input class='inline_item_tight' style='width:80px;height:50px;' :min='min_cluster_number' 
+                        :max='max_cluster_number' type='number' v-model="tmp_cluster_num" placeholder="5"></el-input>
+                <p class='inline_item_tight'> clusters.</p>
+                <el-button class='inline_item' @click.native="TopN">Apply</el-button>
+                <hr>
+                <el-button class='inline_item' @click='resetSelect'>Reset all</el-button>
+                <el-button class='inline_item' @click.native="closeCTC">Close Configuration Panel</el-button>
+                <hr>
+              </div> <!-- end of top N buttons -->
+            </div> <!-- end of hiden panel -->
+          </div> <!-- end of handle id -->
+        </div> <!-- end of v-draggable -->
       </div> <!-- end of cell type config -->
       <!-- Cell type configuration menu end ... -->
+
       <!-- ROI configuration menu start ... -->
       <div class='inline_item' >
         <el-button align='right' style='width:100%;' @click.native="openROI">ROI Configuration</el-button>
@@ -128,8 +131,8 @@
       <!-- ROI configuration menu end ... -->
       <!-- switch symbol size start -->
       <div class="inline_item">
-        <span class="inline_item">Symbol size :</span>
-        <el-slider class="inline_item" style="width:200px" v-model="symbolSize"
+        <span class="inline_item" style="z-index:1;">Symbol size :</span>
+        <el-slider class="inline_item" style="width:200px;z-index:1;" v-model="symbolSize"
            :step="1" :min="2" :max="10" @change="refresh" show-stops>
          </el-slider>
       </div>
@@ -150,6 +153,8 @@
   import * as echarts from 'echarts';
   import 'echarts-gl';
   import VChart, { THEME_KEY } from "vue-echarts";
+  import { Draggable } from 'draggable-vue-directive';
+
   // the dateset url
   var CT_URL="http://49.232.213.84/celltype/"
   var COLOR_ALL = require('../confs/discret_color.js');
@@ -161,6 +166,9 @@
     components: {
         VChart
     },
+    directives: {
+      Draggable,
+    },
     data(){
       return {
         //------------ui configurations-----------
@@ -171,6 +179,8 @@
         isHidden: true,
         isROIHidden:true,
         // conf table
+        handleId: "handle-id",
+        draggableValue: { },
         tableDataClusters: [],
         height:'250px',
         pageSize:5,
@@ -308,6 +318,10 @@
       //-------------switch configuration panel end-------------------------------//
 
       //-------------table like configuration panel start-------------------------------//
+      onPosChanged: function(pos) {
+        console.log("left corner", pos.x);
+        console.log("top corner", pos.y);
+      },
       moveStart(){
         let _this = this;
         this.timer && this.moveStop();
@@ -667,6 +681,10 @@
       } // end of function option.
       //-------------drawing function end-------------------//
     },
+    mounted(){
+      this.draggableValue.handle = this.$refs[this.handleId];
+      this.draggableValue.onPositionChange = this.onPosChanged;
+    },
   }; // end of export defaul.
 </script>
 
@@ -684,11 +702,17 @@
 }
 .parent {
   position: relative;
+  z-index: -1;
+}
+.cellPanel{
+  position: absolute;
+  z-index: 9999;
 }
 .child {
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 9999;
 }
 .inline_item_tight {
   display: inline-block;
