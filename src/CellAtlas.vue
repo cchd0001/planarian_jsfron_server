@@ -35,7 +35,14 @@
     </div>
     <!-- individual and resolution selecting menu end ... -->
     <!-- Configuration menu start ... -->
-    <div>
+    <div class="block" style="margin-left:0%;background-color: rgb(238, 241, 246); border: 3px solid #eee;">
+      <!-- switch background start -->
+      <el-switch class='inline_item' active-text="Black theme" inactive-text="White theme" 
+        v-model="black_background" @change="refresh" >
+      </el-switch>
+      <!-- switch background end -->
+      <!-- switch symbol size start -->
+      <!-- switch symbol size end -->
       <!-- Cell type configuration menu start ... -->
       <div class='inline_item'>
         <el-button align='right' @click.native="openCTC" @mousedown.native="moveStart" @mouseup.native="moveStop" @mouseout.native="moveStop" style='width:100%;'>Cell Type Configuration</el-button>
@@ -119,6 +126,14 @@
         </div>
       </div>
       <!-- ROI configuration menu end ... -->
+      <!-- switch symbol size start -->
+      <div class="inline_item">
+        <span class="inline_item">Symbol size :</span>
+        <el-slider class="inline_item" style="width:200px" v-model="symbolSize"
+           :step="1" :min="2" :max="10" @change="refresh" show-stops>
+         </el-slider>
+      </div>
+      <!-- switch symbol size end -->
     </div> <!-- end of inline block -->
 
     <!-- main window -->
@@ -149,15 +164,20 @@
     data(){
       return {
         //------------ui configurations-----------
+        // number input
         min_cluster_number: 0,
         max_cluster_number: 100,
-        tableDataClusters: [],
+        // conf panel
         isHidden: true,
         isROIHidden:true,
+        // conf table
+        tableDataClusters: [],
         height:'250px',
         pageSize:5,
         currentPage:1,
-        activeName: 'first',
+        // drawing theme
+        black_background:true,
+        symbolSize:2,
         //------------show clusters-----------
         tmp_cluster_num: 0,
         all_clusters: 0,
@@ -320,6 +340,12 @@
         });
       },
       //-------------table like configuration panel end-------------------------------//
+
+      //-------------refresh  -------------------//
+      refresh(){
+        this.option=this.getOption();
+      },
+      //-------------refresh  -------------------//
 
       //-------------configure cell type start -------------------//
       TopN(){
@@ -516,19 +542,25 @@
         this.option = this.getOption();
       },
       getOption() {
+        var bk_color = '#000000';
+        var ft_color = '#cccccc';
+        if ( this.black_background == false ) {
+          bk_color = '#FFFFFF';
+          ft_color = '#333333';
+        }
         if ( this.jsondata == null ) {
           var curr_title = 'Loading data now ...';
           if( this.curr_rs == null ) {
             curr_title = 'Please select a resolution ...';
           }
           return {
-            backgroundColor:'#000000',
+            backgroundColor:bk_color,
              title :{
               text : curr_title,
               left: "center",
               top: "center",
               textStyle: {
-                 color: '#cccccc'
+                 color: ft_color
               },
             }
           };
@@ -557,7 +589,7 @@
                 type : 'scatter3D',
                 dimensions: [ 'x','y','z' ],
                 data: the_data,
-                symbolSize: 2,
+                symbolSize: this.symbolSize,
                 itemStyle: {
                   borderWidth: 1,
                   borderColor: curr_color,
@@ -570,17 +602,20 @@
           //console.log(legend_show);
           //console.log(legend_list);
           var opt={
-            backgroundColor:'#000000',
+            backgroundColor:bk_color,
             title :{
               text : '',
               left: "center",
-              top : "top"
+              top : "top",
+              textStyle: {
+                 color: ft_color
+              },
             },
             legend :{
               data:legend_list,
               selected: legend_show,
               textStyle: {
-                color: '#cccccc'
+                color:ft_color,
               }
             },
             tooltip: {},
@@ -611,12 +646,12 @@
               boxDepth:this.getHeight(),
               axisLine: {
                 lineStyle: {
-                  color: '#fff'
+                  color:ft_color,
                 }
               },
               axisPointer: {
                 lineStyle: {
-                  color: '#ffbd67'
+                  color: ft_color
                 }
               },
             viewControl: {
@@ -658,9 +693,11 @@
 .inline_item_tight {
   display: inline-block;
   margin-left: 3px;
+  vertical-align: middle;
 }
 .inline_item {
   display: inline-block;
   margin-left: 20px;
+  vertical-align: middle;
 }
 </style>
