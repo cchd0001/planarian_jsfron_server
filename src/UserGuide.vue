@@ -1,19 +1,20 @@
 <template>
   <div id="app">
-    <p> users guide powerpoints </p>
+    <!-- <pdf ref="pdf" :src="url" style="width: 100%;" /> -->
+    <a :href="url">Cell Atlas Tutorial</a>
   </div>
 </template>
 
 <script>
+//import pdf from 'vue-pdf'
 
 export default {
+ // components:{
+   // pdf
+  //},
   data() {
     return {
-    }
-  },
-  methods: {
-    handleSelect(key, keyPath) {
-        console.log("will replace it with url link");
+      url: "http://49.232.213.84/guide/cell_atlas_tutorial.pptx",
     }
   },
 }
