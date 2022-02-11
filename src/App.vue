@@ -1,17 +1,17 @@
 <template>
   <div id="app">
     <header>
-      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" active-text-color="#409eff">
         <el-menu-item index="1">Home</el-menu-item>
-        <el-submenu index="2">
+        <el-submenu index="2" active-text-color="#409eff">
           <template slot="title">3D Atlas Visuliazation</template>
             <el-menu-item index="2-1">Cell Type Atlas</el-menu-item>
             <el-menu-item index="2-2">Gene Expression Atlas</el-menu-item>
             <el-menu-item index="2-3">Single-cell-label-transfered Cell Atlas</el-menu-item>
         </el-submenu>
-        <el-menu-item index="3" disabled>Data analysis</el-menu-item>
-        <el-menu-item index="4"><a href="https://en.wikipedia.org/wiki/Planarian" target="_blank">Planarian wiki</a></el-menu-item>
-        <el-menu-item index="5" disabled>About us</a></el-menu-item>
+        <el-menu-item index="3" disabled>Data Analysis</el-menu-item>
+        <el-menu-item index="4">User Guide</a></el-menu-item>
+        <el-menu-item index="5" disabled>About Us</a></el-menu-item>
       </el-menu>
       <div class="line"></div>
     </header>
@@ -35,6 +35,7 @@ import Home from "./Home.vue";
 import CellAtlas from "./CellAtlas.vue";
 import GeneExpression from "./GeneExpression.vue";
 import SingleCell from "./SingleCell.vue";
+import UserGuide from "./UserGuide.vue";
 
 export default {
   data() {
@@ -47,7 +48,8 @@ export default {
      Home,
      CellAtlas,
      SingleCell,
-     GeneExpression
+     GeneExpression,
+     UserGuide
   },
   methods: {
     handleSelect(key, keyPath) {
@@ -62,6 +64,10 @@ export default {
         else if (key == "2-3")
         {
             this.selected = 'SingleCell';
+        }
+        else if (key == "4")
+        {
+            this.selected = 'UserGuide';
         }
         else if ( key == "1")
         {
