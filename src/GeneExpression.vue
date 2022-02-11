@@ -28,6 +28,52 @@
            :label="item.label" :value="item.value">
         </el-option>
       </el-select>
+      <!-- ROI configuration menu start ... -->
+      <div class='inline_item' >
+        <el-button align='right' style='width:100%;' @click.native="openROI">ROI Configuration</el-button>
+        <div class='parent' style='width:10px; ' >
+          <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isROIHidden">
+              <hr>
+              <p class='inline_item_tight'> Z gap scale : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_z_scale" placeholder="1"></el-input>
+              <el-button class='inline_item' @click.native="changeZScale">Apply</el-button>
+              <hr>
+              <p class='inline_item_tight'> X min : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_x_min" placeholder="0"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeXMin">Apply</el-button>
+              <p class='inline_item'> X max : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_x_max" placeholder="300"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeXMax">Apply</el-button>
+              <hr>
+              <p class='inline_item_tight'> Y min : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_y_min" placeholder="0"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeYMin">Apply</el-button>
+              <p class='inline_item'> Y max : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_y_max" placeholder="300"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeYMax">Apply</el-button>
+              <hr>
+              <p class='inline_item_tight'> Z min : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_z_min" placeholder="0"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeZMin">Apply</el-button>
+              <p class='inline_item'> Z max : </p>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_z_max" placeholder="300"></el-input>
+              <el-button class='inline_item_tight' @click.native="changeZMax">Apply</el-button>
+              <hr>
+              <el-button class='inline_item' @click.native="resetROI">Reset ROI</el-button>
+              <el-button class='inline_item' @click.native="closeCTC">Close Configuration Panel</el-button>
+              <hr>
+          </div>
+        </div>
+      </div>
+      <!-- ROI configuration menu end ... -->
+      <!-- switch symbol size start -->
+      <div class="inline_item">
+        <span class="inline_item" style="z-index:1;">Symbol size :</span>
+        <el-slider class="inline_item" style="width:200px;z-index:1;" v-model="symbolSize"
+           :step="1" :min="2" :max="10" @change="refresh" show-stops>
+         </el-slider>
+      </div>
+      <!-- switch symbol size end -->
     </div>
     <div>
       <v-chart ref="myecharts"  :option="option" style="width:100%;height:700px;" />
@@ -61,6 +107,7 @@
         curr_gene: "",
         basic_xyz: null,
         gene_xyz:null,
+        gene_xyz_raw:null,
         option: {
            backgroundColor:'#000000',
            title :{
@@ -73,6 +120,27 @@
            }
         },
         curr_selected_gene:'',
+        // drawing theme
+        black_background:true,
+        symbolSize:2,
+        //------------roi confs start ------
+        isROIHidden:true,
+        z_scale:1,
+        tmp_z_scale:1,
+        // roi
+        tmp_x_min:0,
+        tmp_y_min:0,
+        tmp_z_min:0,
+        tmp_x_max:300,
+        tmp_y_max:300,
+        tmp_z_max:300,
+        x_min:0,
+        y_min:0,
+        z_min:0,
+        x_max:300,
+        y_max:300,
+        z_max:300,
+        //------------roi confs end------
       }; // end of data return
     },
     methods: {
@@ -87,6 +155,20 @@
         return idvd_conf['label_'+this.curr_name].y ;
       },
       //-------------3d box conf end-------------------//
+      //-------------roi panel start-------------------//
+      openROI(){
+        //console.log("open roi");
+        this.isHidden = true;
+        if(this.isROIHidden)
+           this.isROIHidden = false;
+        else 
+            this.isROIHidden = true;
+      },
+      closeCTC(){
+        //this.isHidden = true;
+        this.isROIHidden = true;
+      },
+      //-------------roi panel end-------------------//
       //-------------switching individual start -------------------//
       update_basic(name){
         if( this.curr_name != name)
@@ -97,6 +179,7 @@
           this.curr_gene = null;
           this.basic_xyz = null;
           this.gene_xyz = null;
+          this.gene_xyz_raw = null;
           this.curr_selected_gene = null;
           // show loading first
           this.$refs.myecharts.setOption(this.getOption(),true);
@@ -160,6 +243,7 @@
             basic_xyz.push( [curr_item[0],curr_item[1],curr_item[2]]);
         }
         this.basic_xyz = basic_xyz;
+        this.resetROIdata();
       },
       setGeneData(_data){
         console.log('get gene json loaded');
@@ -171,10 +255,112 @@
             gene_xyz.push( [curr_item[0],curr_item[1],curr_item[2],curr_item[3]]);
         }
         this.gene_xyz = gene_xyz;
+        this.gene_xyz_raw = gene_xyz ;
       },
       //-------------setting data end -------------------//
+      //-------------refresh  -------------------//
+      refresh(){
+        this.option=this.getOption();
+      },
+      //-------------refresh  -------------------//
 
+      //-------------configure ROI start -------------------//
+      resetROIdata(){
+        // reset-roi
+        this.z_scale = 1;this.tmp_z_scale=1;
+        this.x_min = 0;this.y_min = 0;this.z_min = 0;this.tmp_x_min=0;this.tmp_y_min=0;this.tmp_z_min=0;
+        this.x_max = this.getWidth();this.y_max = this.getHeight(); this.z_max = this.getDepth();
+        this.tmp_x_max = this.x_max; this.tmp_y_max = this.y_max; this.tmp_z_max = this.z_max;
+      },
+      resetROI(){
+        this.resetROIdata();
+        this.gene_xyz= this.gene_xyz_raw;
+        this.option=this.getOption();
+      },
+      updateJsonData(){
+        var curr_draw_datas = [];
+        curr_draw_datas.push(['x','y','z']);
+        for(var j =1;j<this.gene_xyz_raw.length; j++){
+          var info = this.gene_xyz_raw[j];
+          if( info[0]<this.x_min) continue;
+          if( info[1]<this.y_min) continue;
+          if( info[2]<this.z_min) continue;
+          if( info[0]>this.x_max) continue;
+          if( info[1]>this.y_max) continue;
+          if( info[2]>this.z_max) continue;
+          curr_draw_datas.push(info)
+        }
+        this.gene_xyz= curr_draw_datas;
+      },
+      changeXMin(){
+        if(this.x_min != this.tmp_x_min){
+          if(this.tmp_x_min<0)                          this.x_min = 0;
+          else if (this.tmp_x_min>this.x_max-1)         this.x_min = this.x_max-1;
+          else if (this.tmp_x_min>this.getWidth()-1)    this.x_min = this.getWidth()-1;
+          else                                          this.x_min = this.tmp_x_min;
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      changeXMax(){
+        if(this.x_max != this.tmp_x_max){
+          if(this.tmp_x_max<1)                          this.x_max = 1;
+          else if (this.tmp_x_max<Number(this.x_min)+1) this.x_max = Number(this.x_min) +1;
+          else if (this.tmp_x_max>this.getWidth())      this.x_max = this.getWidth();
+          else                                          this.x_max = this.tmp_x_max;
+          console.log(this.x_max);
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      changeYMin(){
+        if(this.y_min != this.tmp_y_min){
+          if(this.tmp_y_min<0)                          this.y_min = 0;
+          else if (this.tmp_y_min>this.y_max-1)         this.y_min = this.y_max-1;
+          else if (this.tmp_y_min>this.getHeight()-1)   this.y_min = this.getHeight()-1;
+          else                                          this.y_min = this.tmp_y_min;
+          console.log(this.y_min);
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      changeYMax(){
+        if(this.y_max != this.tmp_y_max){
+          if(this.tmp_y_max<1)                          this.y_max = 1;
+          else if (this.tmp_y_max<Number(this.y_min)+1) this.y_max = Number(this.y_min) +1;
+          else if (this.tmp_y_max>this.getHeight())     this.y_max = this.getHeight();
+          else                                          this.y_max = this.tmp_y_max;
+          console.log(this.y_max);
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      changeZMin(){
+        if(this.z_min != this.tmp_z_min){
+          if(this.tmp_z_min<0)                          this.z_min = 0;
+          else if (this.tmp_z_min>this.z_max-1)         this.z_min = this.z_max-1;
+          else if (this.tmp_z_min>this.getDepth()-1)    this.z_min = this.getDepth()-1;
+          else                                          this.z_min = this.tmp_z_min;
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      changeZMax(){
+        if(this.z_max != this.tmp_z_max){
+          if(this.tmp_z_max<1)                          this.z_max = 1;
+          else if (this.tmp_z_max<Number(this.z_min)+1) this.z_max = Number(this.z_min) +1;
+          else if (this.tmp_z_max>this.getDepth())      this.z_max = this.getDepth();
+          else                                          this.z_max = this.tmp_z_max;
+          this.updateJsonData();
+          this.option=this.getOption();
+        }
+      },
+      //-------------configure ROI end -------------------//
       //-------------construct graph begin -------------------//
+      changeZScale(){
+        this.z_scale = this.tmp_z_scale;
+        this.option = this.getOption();
+      },
       getOption() {
         if ( this.basic_xyz == null ) {
           return {
@@ -219,9 +405,9 @@
                   type : 'scatter3D',
                   dimensions: [ 'x','y','z' ,'e'],
                   data: this.gene_xyz,
-                  symbolSize: 2,
+                  symbolSize: this.symbolSize,
                   itemStyle: {
-                    borderWidth: 1,
+                    borderWidth: 0,
                     //borderColor: gene_color,
                     //color : gene_color,
                   },
@@ -257,17 +443,23 @@
             xAxis3D: {
               name: 'x',
               scale:1,
-              type: 'value'
+              type: 'value',
+              min : 0,
+              max : this.getWidth(),
             },
             yAxis3D: {
               name: 'y',
               scale:1,
-              type: 'value'
+              type: 'value',
+              min : 0,
+              max : this.getHeight(),
             },
             zAxis3D: {
               name: 'z',
               scale:1,
-              type: 'value'
+              type: 'value',
+              min : 0,
+              max : this.getDepth(),
             },
             legend :{
               color :legend_color,
@@ -278,7 +470,7 @@
             },
             grid3D: {
               boxWidth:this.getWidth(),
-              boxHeight:this.getDepth(),
+              boxHeight:this.getDepth() * Number(this.z_scale),
               boxDepth:this.getHeight(),
               axisLine: {
                 lineStyle: {
@@ -310,7 +502,10 @@
                   // The ädvisual configuration in the selected range
                   //color: ['blue', '#121122', 'red'], // A list of colors that defines the graph color mapping
                   color: ['blue', 'yellow', 'red'], // A list of colors that defines the graph color mapping
-               }
+               },
+               textStyle: {
+                  color: '#cccccc'
+               },
             }];
           }
           console.log('reset option');
@@ -327,8 +522,22 @@
   font-family: Helvetica, sans-serif;
   text-align: center;
 }
+.parent {
+  position: relative;
+}
+.child {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.inline_item_tight {
+  display: inline-block;
+  margin-left: 3px;
+  vertical-align: middle;
+}
 .inline_item {
   display: inline-block;
   margin-left: 20px;
+  vertical-align: middle;
 }
 </style>
