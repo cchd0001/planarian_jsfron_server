@@ -44,6 +44,8 @@
   // the dateset url
   var SC_URL="http://49.232.213.84/single_cell/"
   var GENE_URL="http://49.232.213.84/genes/";
+  var CP_URL="http://49.232.213.84/cell_center/"
+  var GENE_NEW_URL="http://49.232.213.84/newgenes/";
   let conf_gens = require('../confs/genes.js');
   var idvd_conf = require('../confs/individual.js');
 
@@ -99,7 +101,8 @@
           // show loading first
           this.$refs.myecharts.setOption(this.getOption(),true);
           //this.option = this.getOption();
-          var used_url = SC_URL+"/"+name+"/label.json";
+          //var used_url = SC_URL+"/"+name+"/label.json";
+          var used_url = CP_URL+"/"+name+".json";
           // loading data and re-draw graph
           var self = this;
           $.getJSON(used_url,function(_data) {
@@ -134,7 +137,8 @@
         if(this.curr_name != null){
           if(this.curr_gene != item ){
             var self=this;
-            var used_url = GENE_URL+"/"+this.curr_name+"/"+item+".json";
+            var used_url = GENE_NEW_URL+"/"+this.curr_name+"/"+item+".json";
+            //var used_url = GENE_NEW_URL+"/"+this.curr_name+"/SMED30032613.json";
             $.getJSON(used_url,function(_data) {
               self.curr_gene = item;
               self.setGeneData(_data);
