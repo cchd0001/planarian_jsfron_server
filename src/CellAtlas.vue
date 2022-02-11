@@ -45,9 +45,11 @@
       <!-- switch symbol size end -->
       <!-- Cell type configuration menu start ... -->
       <div class='inline_item'>
-        <div class='cellPanel' v-draggable='draggableValue' style='background-color:blue;'>
+        <div class='cellPanel' v-draggable='draggableValue' style='z-index:9999;'>
           <div :ref="handleId">
             <el-button align='right' @click.native="openCTC" style='width:100%;z-index:9999;'>Cell Type Configuration</el-button>
+            </div>
+            </div>
             <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isHidden">
               <hr>
               <!-- 1. cell table content -->
@@ -86,8 +88,6 @@
                 <hr>
               </div> <!-- end of top N buttons -->
             </div> <!-- end of hiden panel -->
-          </div> <!-- end of handle id -->
-        </div> <!-- end of v-draggable -->
       </div> <!-- end of cell type config -->
       <!-- Cell type configuration menu end ... -->
 
@@ -305,6 +305,7 @@
             this.isHidden = true;
       },
       openROI(){
+        console.log("open roi");
         this.isHidden = true;
         if(this.isROIHidden)
            this.isROIHidden = false;
@@ -322,18 +323,18 @@
         console.log("left corner", pos.x);
         console.log("top corner", pos.y);
       },
-      moveStart(){
-        let _this = this;
-        this.timer && this.moveStop();
-        this.timer = setInterval(() => {
-            console.log("mouse long press");
-          }, 100);
-        console.log("touch start");
-      },
-      moveStop() {
-        console.log("touch end");
-        clearInterval(this.timer);
-      },
+//      moveStart(){
+  //      let _this = this;
+    //    this.timer && this.moveStop();
+    //    this.timer = setInterval(() => {
+    //        console.log("mouse long press");
+    //      }, 100);
+    //    console.log("touch start");
+    //  },
+    //  moveStop() {
+    //    console.log("touch end");
+    //    clearInterval(this.timer);
+    //  },
       getRowKey (row) {
         return row.Celltype
       },
@@ -702,17 +703,11 @@
 }
 .parent {
   position: relative;
-  z-index: -1;
-}
-.cellPanel{
-  position: absolute;
-  z-index: 9999;
 }
 .child {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 9999;
 }
 .inline_item_tight {
   display: inline-block;
