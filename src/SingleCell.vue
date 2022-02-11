@@ -197,7 +197,7 @@
 
           var series_list = [];
           var legend_list = [];
-          var legend_color = [];
+          var legend_show = {};
           var curr_color ;
           var curr_alpha;
           var used_color_masks ;
@@ -213,38 +213,29 @@
              used_color_masks = this.colored_cache;
           }
           console.log('start series');
-          // set legend color
+          console.log(used_color_masks);
           for( var i = 0 ; i<used_color_masks.length; i++ )
           {
-            var curr_legend = this.tableData[i].Celltype;
-            legend_list.push(curr_legend);
+            var curr_legend_name = this.tableData[i].Celltype;
+            console.log(curr_legend_name);
+            legend_list.push(curr_legend_name);
+            curr_color = COLOR_ALL[i];
+            curr_alpha = 0.75;
             // console.log('2');
-            if(used_color_masks[i] == 1)
-            {
-              //console.log('2.1');
-              curr_color = COLOR_ALL[i];
-              curr_alpha = 0.9;
+            if(used_color_masks[i] == 0){
+              legend_show[curr_legend_name] = false;
+            } else {
+              legend_show[curr_legend_name] = true;
             }
-            else
-            {
-              //console.log('2.2');
-              curr_color = COLOR_ALL[COLOR_ALL.length-1];
-              curr_alpha = 0.4;
-            }
-             //console.log('1');
-            legend_color.push(curr_color);
             var the_data = this.curr_data[i];
-            //console.log('the data length');
-            //console.log(the_data.length);
             var one_series = {
-                name : legend_list[i],
+                name : curr_legend_name,
                 type : 'scatter3D',
                 dimensions: [ 'x','y','z' ],
                 data: the_data,
                 symbolSize: 2,
                 itemStyle: {
-                  borderWidth: 1,
-                  borderColor: curr_color,
+                  borderWidth: 0,
                   color: curr_color,
                   opacity: curr_alpha,
                 }
@@ -252,6 +243,7 @@
             series_list.push(one_series);
           } // end of for showd_clusters.length
           console.log('end series');
+          console.log(legend_show);
           var xmax = this.getWidth();
           var ymax = this.getHeight();
           var zmax = this.getDepth();
@@ -285,8 +277,8 @@
               max:zmax,
             },
             legend :{
-              color :legend_color,
-              data:legend_list,
+              data: legend_list,
+              selected : legend_show, //{'Gut' : false } ,
               textStyle: {
                  color: '#cccccc'
               },
