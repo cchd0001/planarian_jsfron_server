@@ -2,7 +2,6 @@
   <div id="app">
     <!-- individual and resolution selecting menu start ... -->
     <div  style="margin-left:0%;" align="center">
-      <!--:route="{path: '/area'}" #ffd04b -->
       <el-menu  class="el-menu-demo" mode="horizontal" active-text-color="#409eff">
         <el-menu-item index="1"  @click.native="show_WT"      >WT     </el-menu-item>
         <el-menu-item index="2"  @click.native="show_0hpa1"   >0hpa1  </el-menu-item>
@@ -45,11 +44,9 @@
       <!-- switch symbol size end -->
       <!-- Cell type configuration menu start ... -->
       <div class='inline_item'>
-        <div class='cellPanel' v-draggable='draggableValue' style='z-index:9999;'>
-          <div :ref="handleId">
-            <el-button align='right' @click.native="openCTC" style='width:100%;z-index:9999;'>Cell Type Configuration</el-button>
-            </div>
-            </div>
+        <!-- <div class='cellPanel' v-draggable='draggableValue' style='z-index:9999;'><div :ref="handleId"></div></div> -->
+          <el-button align='right' @click.native="openCTC" style='width:100%;z-index:9999;'>Cell Type Configuration</el-button>
+          <div class='parent' style='width:10px;'>
             <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isHidden">
               <hr>
               <!-- 1. cell table content -->
@@ -88,6 +85,7 @@
                 <hr>
               </div> <!-- end of top N buttons -->
             </div> <!-- end of hiden panel -->
+          </div>  <!-- end of empty parent of hiden panel -->
       </div> <!-- end of cell type config -->
       <!-- Cell type configuration menu end ... -->
 
@@ -140,7 +138,7 @@
     </div> <!-- end of inline block -->
 
     <!-- main window -->
-    <div class='parent'>
+    <div>
       <!-- I. chart content -->
       <v-chart class="chart" ref="myecharts" :option="option" style="width:100%;height:800px;" />
     </div>
@@ -153,7 +151,7 @@
   import * as echarts from 'echarts';
   import 'echarts-gl';
   import VChart, { THEME_KEY } from "vue-echarts";
-  import { Draggable } from 'draggable-vue-directive';
+  //import { Draggable } from 'draggable-vue-directive';
 
   // the dateset url
   var CT_URL="http://49.232.213.84/celltype/"
@@ -166,9 +164,9 @@
     components: {
         VChart
     },
-    directives: {
-      Draggable,
-    },
+    //directives: {
+      //Draggable,
+    //},
     data(){
       return {
         //------------ui configurations-----------
@@ -179,8 +177,8 @@
         isHidden: true,
         isROIHidden:true,
         // conf table
-        handleId: "handle-id",
-        draggableValue: { },
+        //handleId: "handle-id",
+        //draggableValue: { },
         tableDataClusters: [],
         height:'250px',
         pageSize:5,
@@ -319,10 +317,10 @@
       //-------------switch configuration panel end-------------------------------//
 
       //-------------table like configuration panel start-------------------------------//
-      onPosChanged: function(pos) {
-        console.log("left corner", pos.x);
-        console.log("top corner", pos.y);
-      },
+      //onPosChanged: function(pos) {
+        //console.log("left corner", pos.x);
+        //console.log("top corner", pos.y);
+      //},
 //      moveStart(){
   //      let _this = this;
     //    this.timer && this.moveStop();
@@ -682,10 +680,10 @@
       } // end of function option.
       //-------------drawing function end-------------------//
     },
-    mounted(){
-      this.draggableValue.handle = this.$refs[this.handleId];
-      this.draggableValue.onPositionChange = this.onPosChanged;
-    },
+    //mounted(){
+      //this.draggableValue.handle = this.$refs[this.handleId];
+      //this.draggableValue.onPositionChange = this.onPosChanged;
+    //},
   }; // end of export defaul.
 </script>
 
