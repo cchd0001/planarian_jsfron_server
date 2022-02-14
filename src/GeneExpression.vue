@@ -88,10 +88,10 @@
   //import VChart, { THEME_KEY } from "vue-echarts";
   import VChart from "vue-echarts";
   // the dateset url
-  var SC_URL="http://49.232.213.84/single_cell/"
-  var GENE_URL="http://49.232.213.84/genes/";
-  var CP_URL="http://49.232.213.84/cell_center/"
-  var GENE_NEW_URL="http://49.232.213.84/newgenes/";
+  var SC_URL="http://49.235.68.146/single_cell/"
+  var GENE_URL="http://49.235.68.146/genes/";
+  var CP_URL="http://49.235.68.146/cell_center/"
+  var GENE_NEW_URL="http://49.235.68.146/newgenes/";
   let conf_gens = require('../confs/genes.js');
   var idvd_conf = require('../confs/individual.js');
 

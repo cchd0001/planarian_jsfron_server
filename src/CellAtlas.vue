@@ -154,7 +154,7 @@
   //import { Draggable } from 'draggable-vue-directive';
 
   // the dateset url
-  var CT_URL="http://49.232.213.84/celltype/"
+  var CT_URL="http://49.235.68.146/celltype/"
   var COLOR_ALL = require('../confs/discret_color.js');
   var idvd_conf = require('../confs/individual.js');
 

@@ -52,7 +52,7 @@
   import 'echarts-gl';
   import VChart from "vue-echarts";
   // confs
-  var SC_URL="http://49.232.213.84/single_cell/"
+  var SC_URL="http://49.235.68.146/single_cell/"
   var COLOR_ALL = require('../confs/discret_color.js');
   var sc_conf = require('../confs/single_cell_transfered_type.js');
   var idvd_conf = require('../confs/individual.js');

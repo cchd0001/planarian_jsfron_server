@@ -14,7 +14,7 @@ export default {
   //},
   data() {
     return {
-      url: "http://49.232.213.84/guide/cell_atlas_tutorial.pptx",
+      url: "http://49.235.68.146/guide/cell_atlas_tutorial.pptx",
     }
   },
 }
