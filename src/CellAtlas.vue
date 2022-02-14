@@ -33,58 +33,6 @@
       </el-menu>
     </div>
 
-    <div class='panel'> 
-      <!-- v-on:dragging="onDrag" v-on:resizing="onResize" -->
-      <!--  <el-button @click="changeShow">button2-draggable-directive</el-button> -->
-      <vdr style='width:100%;'  @deactivated="onDeactivated" :draggable='false'>
-        <el-button>test</el-button>
-        <el-button align='right' @click.native="openCTC" style='width:180px;z-index:9999;position:absolute;'>Cell Type Configuration</el-button>
-        <!-- <el-table style='width:130;' v-if="show"></el-table> -->
-        <div class='parent' style='width:10px;'>
-            <vdr @deactivated="onDeactivated" v-on:dragging="onDrag">
-              <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isHidden">
-              <hr>
-              <!-- 1. cell table content -->
-              <el-table class="table" ref="clusterTable" style="width:130;" :show-header='false'
-                :height='height' :row-key="getRowKey" :highlight-current-row='true'
-                :data="tableDataClusters.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-                @selection-change="handleSelectionChange">
-                  <el-table-column :reserve-selection="true" type="selection" width="55"></el-table-column>
-                  <el-table-column property="Celltype" label="Cell Type" width="80"> </el-table-column>
-                  <el-table-column label="Display" width="160">
-                    <template slot-scope="scope">
-                      <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button>
-                    </template>
-                  </el-table-column>
-              </el-table>
-              <el-pagination layout="total,sizes, prev, jumper, next" 
-                :total="this.tableDataClusters.length" :current-page="currentPage" 
-                @current-change="handleCurrentChange" @size-change="handleSizeChange" 
-                :page-sizes="[5,10,15]" :page-size="pageSize" :current-page.sync="currentPage">
-              </el-pagination>
-              <!-- 1. cell table content end-->
-              <div>
-                <el-button @click="applyStatus">Highlight selected </el-button>
-                <el-button @click='clearSelect'>Clear selected</el-button>
-                <hr>
-              </div> <!-- end of buttons -->
-              <div>
-                <p class='inline_item_tight'> Highlight top </p>
-                <el-input class='inline_item_tight' style='width:80px;height:50px;' :min='min_cluster_number' 
-                        :max='max_cluster_number' type='number' v-model="tmp_cluster_num" placeholder="5"></el-input>
-                <p class='inline_item_tight'> clusters.</p>
-                <el-button class='inline_item' @click.native="TopN">Apply</el-button>
-                <hr>
-                <el-button class='inline_item' @click='resetSelect'>Reset all</el-button>
-                <el-button class='inline_item' @click.native="closeCTC">Close Configuration Panel</el-button>
-                <hr>
-              </div> <!-- end of top N buttons -->
-            </div> <!-- end of hiden panel -->
-            </vdr>
-          </div>  <!-- end of empty parent of hiden panel -->
-      </vdr>
-    </div> 
-
     <!-- individual and resolution selecting menu end ... -->
     <!-- Configuration menu start ... -->
     <div class="block" style="margin-left:0%;background-color: rgb(238, 241, 246); border: 3px solid #eee;">
