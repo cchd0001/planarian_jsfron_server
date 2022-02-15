@@ -54,13 +54,27 @@
     <!-- individual and resolution selecting menu end ... -->
     <!-- Configuration menu start ... -->
     <div class="block" style="margin-left:0%;background-color: rgb(238, 241, 246); border: 3px solid #eee;">
+      <!-- 3D umap start -->
+      <div class='inline_item'>
+          <el-button align='right' @click.native="openUMAP" style='width:100%;z-index:9999;'>3D UMAP Panel</el-button>
+          <div class='parent' style='width:10px;'>
+            <div id="umap_panel" class="child" style='width:700px;z-index:9999;background-color:white'  v-if="!isUMAPHidden">
+              <div id="umap_panel_dragMe">
+                <p> UMAP Panel : {{umap_enable_message}}</p>
+              </div>
+              <div style="border: 10px solid #eee;">
+                <v-chart class="chart" ref="my_umap_echarts" :option="umap_option" style="width:660px;height:660px;" />
+                <el-button class='inline_item' @click.native="closeCTC">Close 3D UMAP Panel</el-button>
+              </div>
+            </div> <!-- end of hidden panel -->
+          </div> <!-- end of parent-->
+      </div> <!--end of inline div-->
+      <!-- 3D umap end -->
       <!-- switch background start -->
       <el-switch class='inline_item' active-text="Black theme" inactive-text="White theme" 
         v-model="black_background" @change="refresh" >
       </el-switch>
       <!-- switch background end -->
-      <!-- switch symbol size start -->
-      <!-- switch symbol size end -->
       <!-- Cell type configuration menu start ... -->
       <div class='inline_item'>
           <el-button align='right' @click.native="openCTC" style='width:100%;z-index:9999;'>Cell Type Configuration</el-button>
@@ -177,9 +191,11 @@
 
   // the dateset url
   var CT_URL="http://49.235.68.146/celltype/"
+  var CTU_URL="http://49.235.68.146/celltype_umap/"
   var COLOR_ALL = require('../confs/discret_color.js');
   var idvd_conf = require('../confs/individual.js');
-
+  var drag_x = 0;
+  var drag_y = 0;
   // the loading chart before we cache the real dataset
   export default {
     name : "Planarian",
@@ -191,6 +207,9 @@
     directives: {
       Draggable,
     },
+    //directives: {
+    //  Draggable,
+    //},
     data(){
       return {
         // test color
@@ -212,6 +231,7 @@
         // conf panel
         isHidden: true,
         isROIHidden:true,
+        isUMAPHidden:true,
         // conf table
         //handleId: "handle-id",
         //draggableValue: { },
@@ -222,6 +242,7 @@
         // drawing theme
         black_background:true,
         symbolSize:2,
+        umap_enable_message : '',
         //------------show clusters-----------
         tmp_cluster_num: 0,
         all_clusters: 0,
@@ -255,11 +276,27 @@
               },
           }
         },
+        umap_option: {
+          backgroundColor:'#000000',
+          title : {
+              text : 'Please select a specific individual and resolution to show.',
+              left: "center",
+              top: "center",
+              textStyle: {
+                 color: '#cccccc'
+              },
+          }
+        },
         //------------data selection------
+        // curr selection
         curr_name : null,
         curr_rs : null,
+        // main 3D data
         rawdata:null,
         jsondata : null,
+        // umap 3D data
+        raw_umapdata:null,
+        umapdata:null,
       }; // end of data return
     },
 
@@ -343,12 +380,25 @@
       //-------------3d box conf end -------------------//
 
       //-------------switching individual and resolution start -------------------//
+      load_umap(){
+        if( this.umapdata != null ||  this.curr_name == null || this.curr_rs == null )
+          return;
+        var used_url = CTU_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
+        this.umap_option = this.getUMAPOption();
+        var self = this;
+        $.getJSON(used_url,function(_data) {
+            console.log('...');
+            self.setUMAPJsonData(_data);
+            self.umap_option = self.getUMAPOption();
+        });
+      },
       update_basic(r){
         if (this.curr_rs != r){
           // loading data and re-draw graph
           var self = this;
           this.curr_rs = r;
           var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
+          this.cleanBuffer();
           this.option = this.getOption();
           $.getJSON(used_url,function(_data) {
             console.log("loaded");
@@ -369,8 +419,7 @@
       resetIndividual(name){
           if ( this.curr_name != name ) {
             this.curr_name = name ;
-            this.jsondata = null ;
-            this.rawdata = null;
+            this.cleanBuffer(); 
             this.curr_rs = null ;
             this.resetROIdata();
             this.$refs.myecharts.setOption(this.getOption(),true);
@@ -403,41 +452,80 @@
            this.isHidden = false;
         else 
             this.isHidden = true;
-            if (this.isHiddenColorPalette){
-              this.isHiddenColorPalette = false;
+            if (this.isShowColorsColorPalette){
+              this.isShowColorPalette = false;
             }
+        this.isUMAPHidden = true;
+        this.isHidden = ! this.isHidden;
       },
       openROI(){
         console.log("open roi");
         this.isHidden = true;
-        if(this.isROIHidden)
-           this.isROIHidden = false;
-        else 
-            this.isROIHidden = true;
+        this.isUMAPHidden = true;
+        this.isROIHidden = ! this.isROIHidden;
+      },
+      openUMAP(){
+        this.isHidden = true;
+        this.isROIHidden = true;
+        this.isUMAPHidden = !this.isUMAPHidden;
+        if( this.isUMAPHidden == false ){
+          this.umap_enable_message = '';
+          this.load_umap();
+          var self = this;
+          setTimeout(function(){
+            var ud = document.getElementById('umap_panel_dragMe');
+            var up = document.getElementById('umap_panel');
+            self.DeclareDragable(ud,up);
+            self.umap_enable_message = 'Drag Me';
+          },1000);
+        }
       },
       closeCTC(){
         this.isHidden = true;
         this.isROIHidden = true;
+        this.isUMAPHidden = true;
       },
       //-------------switch configuration panel end-------------------------------//
-
+      DeclareDragable(dragMe, moveMe){
+        const mouseDownHandler = function (e) {
+          // Get the current mouse position
+          drag_x = e.clientX;
+          drag_y = e.clientY;
+          // Attach the listeners to `document`
+          document.addEventListener('mousemove', mouseMoveHandler);
+          document.addEventListener('mouseup', mouseUpHandler);
+        };
+        const mouseMoveHandler = function (e) {
+          const dx = e.clientX - drag_x;
+          const dy = e.clientY - drag_y;
+          moveMe.style.top =  (Number(moveMe.offsetTop)+dy)+'px';
+          moveMe.style.left = (Number(moveMe.offsetLeft)+dx)+'px'
+          drag_x = e.clientX;
+          drag_y = e.clientY;
+        };
+        const mouseUpHandler = function () {
+            document.removeEventListener('mousemove', mouseMoveHandler);
+            document.removeEventListener('mouseup', mouseUpHandler);
+        };
+        dragMe.addEventListener('mousedown', mouseDownHandler);
+      },
       //-------------table like configuration panel start-------------------------------//
       //onPosChanged: function(pos) {
-        //console.log("left corner", pos.x);
-        //console.log("top corner", pos.y);
+      //  console.log("left corner", pos.x);
+      //  console.log("top corner", pos.y);
       //},
-//      moveStart(){
-  //      let _this = this;
-    //    this.timer && this.moveStop();
-    //    this.timer = setInterval(() => {
-    //        console.log("mouse long press");
-    //      }, 100);
-    //    console.log("touch start");
-    //  },
-    //  moveStop() {
-    //    console.log("touch end");
-    //    clearInterval(this.timer);
-    //  },
+      //moveStart(){
+      //  let _this = this;
+      //  this.timer && this.moveStop();
+      //  this.timer = setInterval(() => {
+      //      console.log("mouse long press");
+      //    }, 100);
+      //  console.log("touch start");
+      //},
+      //moveStop() {
+      //  console.log("touch end");
+      //  clearInterval(this.timer);
+      //},
       getRowKey (row) {
         return row.Celltype
       },
@@ -608,6 +696,30 @@
 
 
       //-------------data manager start-------------------//
+      cleanBuffer(){
+        this.jsondata = null ;
+        this.rawdata = null;
+        this.raw_umapdata = null;
+        this.umapdata = null;
+      },
+      setUMAPJsonData(_data){
+        var curr_draw_datas= [];
+        for(var i = 0; i<=300; i++ ){
+            curr_draw_datas.push([['x','y','z']]);
+        }
+        // --------- iterate through real data (long)
+        var left_index = 300;
+        for(var j=0 ; j< _data.length; j++){
+          var curr_item = _data[j];
+          for(var i = 0; i< 300; i++ ){
+            if( curr_item[3] == i ){
+                curr_draw_datas[i].push([curr_item[0],curr_item[1],curr_item[2]]);
+                break;
+            }
+          }
+        } // end of for _data
+        this.umapdata = curr_draw_datas;
+      },
       setJsonData(_data){
         console.log('knowing json loaded');
         var curr_draw_datas= [];
@@ -661,14 +773,20 @@
         this.z_scale = this.tmp_z_scale;
         this.option = this.getOption();
       },
+      getUMAPOption(){
+        return this.getDrawOption(this.umapdata,true);
+      },
       getOption() {
+        return this.getDrawOption(this.jsondata,false);
+      },
+      getDrawOption(curr_draw_datas,max10){
         var bk_color = '#000000';
         var ft_color = '#cccccc';
         if ( this.black_background == false ) {
           bk_color = '#FFFFFF';
           ft_color = '#333333';
         }
-        if ( this.jsondata == null ) {
+        if ( curr_draw_datas == null ) {
           var curr_title = 'Loading data now ...';
           if( this.curr_rs == null ) {
             curr_title = 'Please select a resolution ...';
@@ -687,7 +805,7 @@
         }
         else {
           console.log('knowing json loaded');
-          var curr_draw_datas = this.jsondata;
+          //var curr_draw_datas = this.jsondata;
           var series_list = [];
           var legend_list = [];
           var legend_show = {};
@@ -721,6 +839,21 @@
           console.log('end series');
           //console.log(legend_show);
           //console.log(legend_list);
+          var used_xmin = 0;
+          var used_xmax = this.getWidth();
+          var used_ymin = 0;
+          var used_ymax = this.getHeight();
+          var used_zmin = 0;
+          var used_zmax = this.getDepth();
+          var boxWidth  = used_xmax;
+          var boxHeight = used_zmax*this.z_scale;
+          var boxDepth  = used_ymax;
+          if( max10 == true ){
+            used_xmin = -10; used_xmax = 10; 
+            used_ymin = -10; used_ymax = 10; 
+            used_zmin = -10; used_zmax = 10; 
+            boxWidth = 60; boxHeight = 60; boxDepth = 60;
+          }
           var opt={
             backgroundColor:bk_color,
             title :{
@@ -743,27 +876,27 @@
               name: 'x',
               scale:1,
               type: 'value',
-              min:0,
-              max:this.getWidth(),
+              min: used_xmin,
+              max: used_xmax,
             },
             yAxis3D: {
               name: 'y',
               scale:1,
               type: 'value',
-              min:0,
-              max:this.getHeight(),
+              min: used_ymin,
+              max: used_ymax,
             },
             zAxis3D: {
               name: 'z',
               scale:1,
               type: 'value',
-              min:0,
-              max:this.getDepth(),
+              min: used_zmin,
+              max: used_zmax,
             },
             grid3D: {
-              boxWidth:this.getWidth(),
-              boxHeight:this.getDepth() *this.z_scale,
-              boxDepth:this.getHeight(),
+              boxWidth: boxWidth,
+              boxHeight: boxHeight , //this.getDepth() *this.z_scale,
+              boxDepth: boxDepth ,     //this.getHeight(),
               axisLine: {
                 lineStyle: {
                   color:ft_color,
