@@ -37,16 +37,16 @@
       <!-- Cell type color palette -->
       <div v-if="isShowColorPalette">
         <vdr @deactivated='closeColorPalette'>
-        <el-col class="controls-box" >
-          <!-- <el-col :span="8" class="label-col"><label>pick a color</label></el-col> -->
-          <el-col :span="16">
-            <!-- <div @click="colorInputClick"><el-input :value="color" @click="colorInputClick"></el-input></div> -->
-            <div style='width:200px;' v-show="isShowColors" class="color-select-layer">
-              <sketch-picker v-model="color" @input="colorValueChange"></sketch-picker>
-              <el-button style='align:right;width:100%;' @click='applyColor'>ChangeColor</el-button>
-            </div>
+          <el-col class="controls-box" >
+            <!-- <el-col :span="8" class="label-col"><label>pick a color</label></el-col> -->
+            <el-col :span="16">
+              <!-- <div @click="colorInputClick"><el-input :value="color" @click="colorInputClick"></el-input></div> -->
+              <div style='width:200px;' v-show="isShowColors" class="color-select-layer">
+                <sketch-picker v-model="color" @input="colorValueChange"></sketch-picker>
+                <el-button style='align:right;width:100%;' @click='applyColor'>ChangeColor</el-button>
+              </div>
+            </el-col>
           </el-col>
-        </el-col>
         </vdr>
       </div>
     </div>
@@ -207,9 +207,6 @@
     directives: {
       Draggable,
     },
-    //directives: {
-    //  Draggable,
-    //},
     data(){
       return {
         // test color
@@ -448,18 +445,10 @@
       //-------------switch configuration panel start-------------------------------//
       openCTC(){
         this.isROIHidden = true;
-        if(this.isHidden)
-           this.isHidden = false;
-        else 
-            this.isHidden = true;
-            if (this.isShowColorsColorPalette){
-              this.isShowColorPalette = false;
-            }
         this.isUMAPHidden = true;
         this.isHidden = ! this.isHidden;
       },
       openROI(){
-        console.log("open roi");
         this.isHidden = true;
         this.isUMAPHidden = true;
         this.isROIHidden = ! this.isROIHidden;
