@@ -37,7 +37,7 @@
     <div v-draggable style='width:200px;height:400px;z-index:999;position: absolute; bottom: 300; left: 300;' v-if="isShowColorPalette">
       <p style='padding:0;background-color:white;height:20px;' align='center'>Color Palette</p>
       <sketch-picker v-model="color" @input="colorValueChange"></sketch-picker>
-      <el-button style='align:right;width:100%;' @click='applyColor'>ChangeColor</el-button>
+      <!-- <el-button style='align:right;width:100%;' @click='applyColor'>ChangeColor</el-button> -->
     </div>
     <!-- end of color palette -->
 
@@ -315,16 +315,7 @@
        this.currentCellID = row.ID;
        console.log('current cell id is '+this.currentCellID);
      },
-     //updateValue (){
-       //console.log('this is updatevalue');
-       //console.log(this.color);
-     //},
-     //colorInputClick () {
-       //console.log('this is color input click');
-       //this.isShowColors = !this.isShowColors
-     //},
      colorValueChange (val) {
-         console.log(this.currentCellID);
       this.color = val.hex;
       this.current_color_all[this.currentCellID] = this.color;
       //this.option=this.getOption();
@@ -528,7 +519,7 @@
         //this.$refs.myecharts.setOption(this.getOption(),true);
       },
       handleSelectionChange(val) {
-        console.log(val);
+        this.currentCellID = val[val.length -1].ID;
         var tmp_clusters= new Array(this.all_clusters).fill(0);
         for( var i = 0 ; i < val.length ; i++) {
             tmp_clusters[val[i].ID]=1;
