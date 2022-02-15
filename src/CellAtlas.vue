@@ -40,9 +40,12 @@
       <div class='inline_item'>
           <el-button align='right' @click.native="openUMAP" style='width:100%;z-index:9999;'>3D UMAP Panel</el-button>
           <div class='parent' style='width:10px;'>
-            <div class="child" style='width:600px;z-index:9999;background-color:white'  v-if="!isUMAPHidden">
+            <div id="umap_panel" class="child" style='width:700px;z-index:9999;background-color:white'  v-if="!isUMAPHidden">
+              <div id="umap_panel_dragMe">
+                <p> UMAP Panel : {{umap_enable_message}}</p>
+              </div>
               <div style="border: 10px solid #eee;">
-                <v-chart class="chart" ref="my_umap_echarts" :option="umap_option" style="width:550px;height:550px;" />
+                <v-chart class="chart" ref="my_umap_echarts" :option="umap_option" style="width:660px;height:660px;" />
                 <el-button class='inline_item' @click.native="closeCTC">Close 3D UMAP Panel</el-button>
               </div>
             </div> <!-- end of hidden panel -->
@@ -172,16 +175,17 @@
   var CTU_URL="http://49.235.68.146/celltype_umap/"
   var COLOR_ALL = require('../confs/discret_color.js');
   var idvd_conf = require('../confs/individual.js');
-
+  var drag_x = 0;
+  var drag_y = 0;
   // the loading chart before we cache the real dataset
   export default {
     name : "Planarian",
     components: {
-        VChart,
-        vdr
+      VChart,
+      vdr
     },
     //directives: {
-      //Draggable,
+    //  Draggable,
     //},
     data(){
       return {
@@ -209,6 +213,7 @@
         // drawing theme
         black_background:true,
         symbolSize:2,
+        umap_enable_message : '',
         //------------show clusters-----------
         tmp_cluster_num: 0,
         all_clusters: 0,
@@ -302,12 +307,13 @@
 
       //-------------switching individual and resolution start -------------------//
       load_umap(){
-        if( this.raw_umapdata != null ||  this.curr_name == null || this.curr_rs == null )
+        if( this.umapdata != null ||  this.curr_name == null || this.curr_rs == null )
           return;
         var used_url = CTU_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
         this.umap_option = this.getUMAPOption();
         var self = this;
         $.getJSON(used_url,function(_data) {
+            console.log('...');
             self.setUMAPJsonData(_data);
             self.umap_option = self.getUMAPOption();
         });
@@ -382,7 +388,15 @@
         this.isROIHidden = true;
         this.isUMAPHidden = !this.isUMAPHidden;
         if( this.isUMAPHidden == false ){
+          this.umap_enable_message = '';
           this.load_umap();
+          var self = this;
+          setTimeout(function(){
+            var ud = document.getElementById('umap_panel_dragMe');
+            var up = document.getElementById('umap_panel');
+            self.DeclareDragable(ud,up);
+            self.umap_enable_message = 'Drag Me';
+          },1000);
         }
       },
       closeCTC(){
@@ -391,7 +405,29 @@
         this.isUMAPHidden = true;
       },
       //-------------switch configuration panel end-------------------------------//
-
+      DeclareDragable(dragMe, moveMe){
+        const mouseDownHandler = function (e) {
+          // Get the current mouse position
+          drag_x = e.clientX;
+          drag_y = e.clientY;
+          // Attach the listeners to `document`
+          document.addEventListener('mousemove', mouseMoveHandler);
+          document.addEventListener('mouseup', mouseUpHandler);
+        };
+        const mouseMoveHandler = function (e) {
+          const dx = e.clientX - drag_x;
+          const dy = e.clientY - drag_y;
+          moveMe.style.top =  (Number(moveMe.offsetTop)+dy)+'px';
+          moveMe.style.left = (Number(moveMe.offsetLeft)+dx)+'px'
+          drag_x = e.clientX;
+          drag_y = e.clientY;
+        };
+        const mouseUpHandler = function () {
+            document.removeEventListener('mousemove', mouseMoveHandler);
+            document.removeEventListener('mouseup', mouseUpHandler);
+        };
+        dragMe.addEventListener('mousedown', mouseDownHandler);
+      },
       //-------------table like configuration panel start-------------------------------//
       //onPosChanged: function(pos) {
       //  console.log("left corner", pos.x);
@@ -733,7 +769,7 @@
             used_xmin = -10; used_xmax = 10; 
             used_ymin = -10; used_ymax = 10; 
             used_zmin = -10; used_zmax = 10; 
-            boxWidth = 50; boxHeight = 50; boxDepth = 50;
+            boxWidth = 60; boxHeight = 60; boxDepth = 60;
           }
           var opt={
             backgroundColor:bk_color,
