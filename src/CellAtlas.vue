@@ -33,22 +33,21 @@
       </el-menu>
     </div>
 
-    <div style='z-index:999;position: absolute; bottom: 300; left: 300;'>      
-      <!-- Cell type color palette -->
-      <div v-if="isShowColorPalette">
-        <vdr @deactivated='closeColorPalette'>
-          <el-col class="controls-box" >
-            <!-- <el-col :span="8" class="label-col"><label>pick a color</label></el-col> -->
-            <el-col :span="16">
-              <!-- <div @click="colorInputClick"><el-input :value="color" @click="colorInputClick"></el-input></div> -->
-              <div style='width:200px;' v-show="isShowColors" class="color-select-layer">
-                <sketch-picker v-model="color" @input="colorValueChange"></sketch-picker>
-                <el-button style='align:right;width:100%;' @click='applyColor'>ChangeColor</el-button>
-              </div>
-            </el-col>
+    <!-- Cell type color palette -->
+    <div style='z-index:999;position: absolute; bottom: 300; left: 300;' v-if="isShowColorPalette">
+      <vdr @deactivated='closeColorPalette'>
+        <el-col class="controls-box" >
+          <!-- <el-col :span="8" class="label-col"><label>pick a color</label></el-col> -->
+          <div style="width:100%;"><p style='padding:0;background-color:white;height:20px;' align='center'>Color Palette</p></div> 
+          <el-col :span="16" style='padding:0;'>
+            <!-- <div @click="colorInputClick"><el-input :value="color" @click="colorInputClick"></el-input></div> -->
+            <div style='width:200px;padding:0;' v-show="isShowColors" class="color-select-layer">
+              <sketch-picker v-model="color" @input="colorValueChange"></sketch-picker>
+              <!-- <el-button align='right' style='width:100%;' @click='applyColor'>ChangeColor</el-button> -->
+            </div>
           </el-col>
-        </vdr>
-      </div>
+        </el-col>
+      </vdr>
     </div>
 
     <!-- individual and resolution selecting menu end ... -->
@@ -70,11 +69,13 @@
           </div> <!-- end of parent-->
       </div> <!--end of inline div-->
       <!-- 3D umap end -->
+
       <!-- switch background start -->
       <el-switch class='inline_item' active-text="Black theme" inactive-text="White theme" 
         v-model="black_background" @change="refresh" >
       </el-switch>
       <!-- switch background end -->
+      
       <!-- Cell type configuration menu start ... -->
       <div class='inline_item'>
           <el-button align='right' @click.native="openCTC" style='width:100%;z-index:9999;'>Cell Type Configuration</el-button>
@@ -210,11 +211,14 @@
     data(){
       return {
         // test color
+        current_color_all: COLOR_ALL,
         lastCelltype: '',
         currentCelltype: "",
+        currentCellID: '',
         isShowColorPalette: false,
         isShowColors: true,
-        color: '#3f3f3f',
+        //color: '#3f3f3f',
+        color: '',
         // test drag
         show: true,
         width: 0,
@@ -296,15 +300,16 @@
         umapdata:null,
       }; // end of data return
     },
-
     methods: { 
-      // test color
+      // test color vdr
      closeColorPalette(){
+       console.log('close color');
        this.isShowColorPalette = false;
      },
      applyColor(){
-       var curr_color = this.color;
-       // getOptions();
+       console.log('current cluster is '+this.currentCellID);
+       this.current_color_all[this.currentCellID] = this.color;
+       this.option=this.getOption();
        this.isShowColorPalette = false;
      },
      showColorPalette(){
@@ -327,6 +332,8 @@
          this.lastCelltype = this.currentCelltype;
          this.currentCelltype = row.Celltype;
        }
+       this.currentCellID = row.ID;
+       console.log(this.currentCellID);
      },
      updateValue (){
        console.log('this is updatevalue');
@@ -341,6 +348,9 @@
       //console.log(val)
       this.color = val.hex
       console.log(this.color);
+      this.current_color_all[this.currentCellID] = this.color;
+      //this.option=this.getOption();
+      //this.isShowColorPalette = false;
      },
       // test drag
       onDeactivated(){
@@ -447,6 +457,10 @@
         this.isROIHidden = true;
         this.isUMAPHidden = true;
         this.isHidden = ! this.isHidden;
+        console.log(this.isShowColorPalette);
+        if (this.isShowColorPalette){
+          this.isShowColorPalette = false;
+        }
       },
       openROI(){
         this.isHidden = true;
@@ -473,6 +487,7 @@
         this.isHidden = true;
         this.isROIHidden = true;
         this.isUMAPHidden = true;
+        this.isShowColorPalette = false;
       },
       //-------------switch configuration panel end-------------------------------//
       DeclareDragable(dragMe, moveMe){
@@ -558,9 +573,11 @@
         }
         //this.$refs.myecharts.setOption(this.getOption(),true);
         this.option=this.getOption();
-        this.isHiddenColorPalette = false;
+        this.isShowColorPalette = false;
       },
       resetSelect(){
+        // to do: should reset color here?
+        this.current_color_all=COLOR_ALL;
         this.final_clusters=new Array(this.all_clusters).fill(1);
         this.option=this.getOption();
       },
@@ -572,19 +589,21 @@
         console.log("change cluster showing option");
         this.final_clusters=this.saved_clusters;
         self.option=self.getOption();
-        this.isHiddenColorPalette = false;
+        //this.option=this.getOption();
+        this.isShowColorPalette = false;
         //this.$refs.myecharts.setOption(this.getOption(),true);
       },
       handleSelectionChange(val) {
+        console.log(val);
         var tmp_clusters= new Array(this.all_clusters).fill(0);
         for( var i = 0 ; i < val.length ; i++) {
             tmp_clusters[val[i].ID]=1;
           }
         this.saved_clusters=tmp_clusters;
       },
-      changeColor(){
-        console.log('change color');
-      },
+      //changeColor(){
+        //console.log('change color');
+      //},
       //-------------configure cell type end -------------------//
 
       //-------------configure ROI start -------------------//
@@ -810,6 +829,14 @@
             }
             legend_list.push(curr_legend_name);
             curr_color = COLOR_ALL[i];
+            //if (this.color == ""){
+              //curr_color = COLOR_ALL[i];
+              //console.log('this.color is'+this.color);
+              //console.log('curr_color '+curr_color);
+            //}else {
+              //console.log(this.color);
+              //curr_color = this.color;
+            //}
             var the_data = curr_draw_datas[i];
             var one_series = {
                 name : legend_list[i],
