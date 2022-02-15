@@ -34,21 +34,12 @@
     </div>
 
     <!-- Cell type color palette -->
-    <div style='z-index:999;position: absolute; bottom: 300; left: 300;' v-if="isShowColorPalette">
-      <vdr @deactivated='closeColorPalette'>
-        <el-col class="controls-box" >
-          <!-- <el-col :span="8" class="label-col"><label>pick a color</label></el-col> -->
-          <div style="width:100%;"><p style='padding:0;background-color:white;height:20px;' align='center'>Color Palette</p></div> 
-          <el-col :span="16" style='padding:0;'>
-            <!-- <div @click="colorInputClick"><el-input :value="color" @click="colorInputClick"></el-input></div> -->
-            <div style='width:200px;padding:0;' v-show="isShowColors" class="color-select-layer">
-              <sketch-picker v-model="color" @input="colorValueChange"></sketch-picker>
-              <!-- <el-button align='right' style='width:100%;' @click='applyColor'>ChangeColor</el-button> -->
-            </div>
-          </el-col>
-        </el-col>
-      </vdr>
+    <div v-draggable style='width:200px;height:400px;z-index:999;position: absolute; bottom: 300; left: 300;' v-if="isShowColorPalette">
+      <p style='padding:0;background-color:white;height:20px;' align='center'>Color Palette</p>
+      <sketch-picker v-model="color" @input="colorValueChange"></sketch-picker>
+      <el-button style='align:right;width:100%;' @click='applyColor'>ChangeColor</el-button>
     </div>
+    <!-- end of color palette -->
 
     <!-- individual and resolution selecting menu end ... -->
     <!-- Configuration menu start ... -->
@@ -216,7 +207,7 @@
         currentCelltype: "",
         currentCellID: '',
         isShowColorPalette: false,
-        isShowColors: true,
+        //isShowColors: true,
         //color: '#3f3f3f',
         color: '',
         // test drag
@@ -301,17 +292,7 @@
       }; // end of data return
     },
     methods: { 
-      // test color vdr
-     closeColorPalette(){
-       console.log('close color');
-       this.isShowColorPalette = false;
-     },
-     applyColor(){
-       console.log('current cluster is '+this.currentCellID);
-       this.current_color_all[this.currentCellID] = this.color;
-       this.option=this.getOption();
-       this.isShowColorPalette = false;
-     },
+     //----------- color palette start -------------//
      showColorPalette(){
        if (this.isShowColorPalette){
          this.isShowColorPalette = false;
@@ -322,7 +303,6 @@
        }
      },
      getRowCelltype(row){
-       console.log("this is get details");
        if (row.Celltype == this.currentCelltype){
          this.currentCelltype = row.Celltype;
        } else if (this.currentCelltype == ""){
@@ -333,47 +313,30 @@
          this.currentCelltype = row.Celltype;
        }
        this.currentCellID = row.ID;
-       console.log(this.currentCellID);
+       console.log('current cell id is '+this.currentCellID);
      },
-     updateValue (){
-       console.log('this is updatevalue');
-       console.log(this.color);
-     },
-     colorInputClick () {
-       console.log('this is color input click');
-       this.isShowColors = !this.isShowColors
-     },
+     //updateValue (){
+       //console.log('this is updatevalue');
+       //console.log(this.color);
+     //},
+     //colorInputClick () {
+       //console.log('this is color input click');
+       //this.isShowColors = !this.isShowColors
+     //},
      colorValueChange (val) {
-      console.log('this is color value change');
-      //console.log(val)
-      this.color = val.hex
-      console.log(this.color);
+         console.log(this.currentCellID);
+      this.color = val.hex;
       this.current_color_all[this.currentCellID] = this.color;
       //this.option=this.getOption();
       //this.isShowColorPalette = false;
+      },
+     applyColor(){
+       this.current_color_all[this.currentCellID] = this.color;
+       this.option=this.getOption();
+       this.isShowColorPalette = false;
      },
-      // test drag
-      onDeactivated(){
-        //this.show = false;
-        this.isHidden = true;
-      },
-      changeShow(){
-        if (this.show){
-          this.show = false;
-        } else{
-          this.show = true;
-        }
-      },
-      onResize: function (x, y, width, height) {
-        this.x = x
-        this.y = y
-        this.width = width
-        this.height = height
-      },
-      onDrag: function (x, y) {
-        this.x = x
-        this.y = y
-      },
+      //-------------color palette ends------------------//
+
       //-------------3d box conf start-------------------//
       getWidth(){
         return idvd_conf['label_'+this.curr_name].x ;
@@ -457,7 +420,6 @@
         this.isROIHidden = true;
         this.isUMAPHidden = true;
         this.isHidden = ! this.isHidden;
-        console.log(this.isShowColorPalette);
         if (this.isShowColorPalette){
           this.isShowColorPalette = false;
         }
@@ -514,22 +476,6 @@
         dragMe.addEventListener('mousedown', mouseDownHandler);
       },
       //-------------table like configuration panel start-------------------------------//
-      //onPosChanged: function(pos) {
-      //  console.log("left corner", pos.x);
-      //  console.log("top corner", pos.y);
-      //},
-      //moveStart(){
-      //  let _this = this;
-      //  this.timer && this.moveStop();
-      //  this.timer = setInterval(() => {
-      //      console.log("mouse long press");
-      //    }, 100);
-      //  console.log("touch start");
-      //},
-      //moveStop() {
-      //  console.log("touch end");
-      //  clearInterval(this.timer);
-      //},
       getRowKey (row) {
         return row.Celltype
       },
@@ -538,16 +484,6 @@
       },
       handleCurrentChange (currentpage){
         this.currentPage = currentpage;
-      },
-      getAutoHeight() {
-        let el = document.querySelector("#table"),
-        elParent = el.parentNode,
-        pt = this.getStyle(elParent, "paddingTop"),
-        pb = this.getStyle(elParent, "paddingBottom");
-        // 一定要使用 nextTick 来改变height 不然不会起作用
-        this.$nextTick(() => {
-          this.height = elParent.clientHeight - (pt + pb) + "px";
-        });
       },
       //-------------table like configuration panel end-------------------------------//
 
@@ -571,13 +507,12 @@
         for(var i = 0; i<topn; i++){
             this.final_clusters[i] = 1;
         }
-        //this.$refs.myecharts.setOption(this.getOption(),true);
         this.option=this.getOption();
         this.isShowColorPalette = false;
       },
       resetSelect(){
         // to do: should reset color here?
-        this.current_color_all=COLOR_ALL;
+        this.current_color_all=require('../confs/discret_color.js');
         this.final_clusters=new Array(this.all_clusters).fill(1);
         this.option=this.getOption();
       },
@@ -586,7 +521,6 @@
       },
       applyStatus(){
         var self = this;
-        console.log("change cluster showing option");
         this.final_clusters=this.saved_clusters;
         self.option=self.getOption();
         //this.option=this.getOption();
@@ -601,9 +535,6 @@
           }
         this.saved_clusters=tmp_clusters;
       },
-      //changeColor(){
-        //console.log('change color');
-      //},
       //-------------configure cell type end -------------------//
 
       //-------------configure ROI start -------------------//
@@ -936,10 +867,6 @@
       } // end of function option.
       //-------------drawing function end-------------------//
     },
-    //mounted(){
-      //this.draggableValue.handle = this.$refs[this.handleId];
-      //this.draggableValue.onPositionChange = this.onPosChanged;
-    //},
   }; // end of export defaul.
 </script>
 
