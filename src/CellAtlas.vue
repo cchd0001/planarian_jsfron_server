@@ -33,6 +33,24 @@
       </el-menu>
     </div>
 
+    <div style='z-index:999;position: absolute; bottom: 300; left: 300;'>      
+      <!-- Cell type color palette -->
+      <div v-if="isShowColorPalette">
+        <vdr @deactivated='closeColorPalette'>
+        <el-col class="controls-box" >
+          <!-- <el-col :span="8" class="label-col"><label>pick a color</label></el-col> -->
+          <el-col :span="16">
+            <!-- <div @click="colorInputClick"><el-input :value="color" @click="colorInputClick"></el-input></div> -->
+            <div style='width:200px;' v-show="isShowColors" class="color-select-layer">
+              <sketch-picker v-model="color" @input="colorValueChange"></sketch-picker>
+              <el-button style='align:right;width:100%;' @click='applyColor'>ChangeColor</el-button>
+            </div>
+          </el-col>
+        </el-col>
+        </vdr>
+      </div>
+    </div>
+
     <!-- individual and resolution selecting menu end ... -->
     <!-- Configuration menu start ... -->
     <div class="block" style="margin-left:0%;background-color: rgb(238, 241, 246); border: 3px solid #eee;">
@@ -45,22 +63,22 @@
       <!-- switch symbol size end -->
       <!-- Cell type configuration menu start ... -->
       <div class='inline_item'>
-        <!-- <div class='cellPanel' v-draggable='draggableValue' style='z-index:9999;'><div :ref="handleId"></div></div> -->
           <el-button align='right' @click.native="openCTC" style='width:100%;z-index:9999;'>Cell Type Configuration</el-button>
           <div class='parent' style='width:10px;'>
-            <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isHidden">
+            <div v-draggable class="child" style='width:500px;z-index:9999;background-color:white' v-if="!isHidden">
               <hr>
               <!-- 1. cell table content -->
               <el-table class="table" ref="clusterTable" style="width:130;" :show-header='false'
                 :height='height' :row-key="getRowKey" :highlight-current-row='true'
                 :data="tableDataClusters.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-                @selection-change="handleSelectionChange">
+                @selection-change="handleSelectionChange" @row-click="getRowCelltype">
                   <el-table-column :reserve-selection="true" type="selection" width="55"></el-table-column>
                   <el-table-column property="Celltype" label="Cell Type" width="80"> </el-table-column>
                   <el-table-column label="Display" width="160">
-                    <template slot-scope="scope">
-                      <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button>
-                    </template>
+                    <el-button @click="showColorPalette">color palette</el-button>
+                    <!-- <template slot-scope="scope"> -->
+                      <!-- <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button> -->
+                    <!-- </template> -->
                   </el-table-column>
               </el-table>
               <el-pagination layout="total,sizes, prev, jumper, next" 
@@ -94,7 +112,7 @@
       <div class='inline_item' >
         <el-button align='right' style='width:100%;' @click.native="openROI">ROI Configuration</el-button>
         <div class='parent' style='width:10px; ' >
-          <div class="child" style='width:500px;z-index:9999;background-color:white'  v-if="!isROIHidden">
+          <div class="child" v-draggable style='width:500px;z-index:9999;background-color:white'  v-if="!isROIHidden">
               <hr>
               <p class='inline_item_tight'> Z gap scale : </p>
               <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_z_scale" placeholder="1"></el-input>
@@ -152,9 +170,10 @@
   import * as echarts from 'echarts';
   import 'echarts-gl';
   import VChart, { THEME_KEY } from "vue-echarts";
-  //import { Draggable } from 'draggable-vue-directive';
+  import { Draggable } from 'draggable-vue-directive';
   import vdr from 'vue-draggable-resizable-gorkys'
-  import 'vue-draggable-resizable-gorkys/dist/VueDraggableResizable.css'
+  //import 'vue-draggable-resizable-gorkys/dist/VueDraggableResizable.css'
+  import { Sketch } from 'vue-color'
 
   // the dateset url
   var CT_URL="http://49.235.68.146/celltype/"
@@ -165,14 +184,21 @@
   export default {
     name : "Planarian",
     components: {
-        VChart,
-        vdr
+      VChart,
+      vdr,
+      'sketch-picker': Sketch
     },
-    //directives: {
-      //Draggable,
-    //},
+    directives: {
+      Draggable,
+    },
     data(){
       return {
+        // test color
+        lastCelltype: '',
+        currentCelltype: "",
+        isShowColorPalette: false,
+        isShowColors: true,
+        color: '#3f3f3f',
         // test drag
         show: true,
         width: 0,
@@ -237,7 +263,52 @@
       }; // end of data return
     },
 
-    methods: {
+    methods: { 
+      // test color
+     closeColorPalette(){
+       this.isShowColorPalette = false;
+     },
+     applyColor(){
+       var curr_color = this.color;
+       // getOptions();
+       this.isShowColorPalette = false;
+     },
+     showColorPalette(){
+       if (this.isShowColorPalette){
+         this.isShowColorPalette = false;
+       //}else if (this.lastCelltype != this.currentCelltype){
+         //this.isShowColorPalette = false;
+       }else{
+         this.isShowColorPalette = true;
+       }
+     },
+     getRowCelltype(row){
+       console.log("this is get details");
+       if (row.Celltype == this.currentCelltype){
+         this.currentCelltype = row.Celltype;
+       } else if (this.currentCelltype == ""){
+         this.lastCelltype = row.Celltype;
+         this.currentCelltype = row.Celltype;
+       } else {
+         this.lastCelltype = this.currentCelltype;
+         this.currentCelltype = row.Celltype;
+       }
+     },
+     updateValue (){
+       console.log('this is updatevalue');
+       console.log(this.color);
+     },
+     colorInputClick () {
+       console.log('this is color input click');
+       this.isShowColors = !this.isShowColors
+     },
+     colorValueChange (val) {
+      console.log('this is color value change');
+      //console.log(val)
+      this.color = val.hex
+      console.log(this.color);
+     },
+      // test drag
       onDeactivated(){
         //this.show = false;
         this.isHidden = true;
@@ -332,6 +403,9 @@
            this.isHidden = false;
         else 
             this.isHidden = true;
+            if (this.isHiddenColorPalette){
+              this.isHiddenColorPalette = false;
+            }
       },
       openROI(){
         console.log("open roi");
@@ -407,6 +481,7 @@
         }
         //this.$refs.myecharts.setOption(this.getOption(),true);
         this.option=this.getOption();
+        this.isHiddenColorPalette = false;
       },
       resetSelect(){
         this.final_clusters=new Array(this.all_clusters).fill(1);
@@ -420,6 +495,7 @@
         console.log("change cluster showing option");
         this.final_clusters=this.saved_clusters;
         self.option=self.getOption();
+        this.isHiddenColorPalette = false;
         //this.$refs.myecharts.setOption(this.getOption(),true);
       },
       handleSelectionChange(val) {
