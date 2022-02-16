@@ -37,7 +37,7 @@
     <div v-draggable style='width:200px;height:400px;z-index:999;position: absolute; bottom: 300; left: 300;' v-if="isShowColorPalette">
       <p style='padding:0;background-color:white;height:20px;' align='center'>Color Palette</p>
       <sketch-picker v-model="color" @input="colorValueChange"></sketch-picker>
-      <!-- <el-button style='align:right;width:100%;' @click='applyColor'>ChangeColor</el-button> -->
+      <el-button style='align:right;width:100%;' @click='applyColor'>ChangeColor</el-button>
     </div>
     <!-- end of color palette -->
 
@@ -202,13 +202,10 @@
     data(){
       return {
         // test color
+        
         current_color_all: COLOR_ALL,
-        lastCelltype: '',
-        currentCelltype: "",
         currentCellID: '',
         isShowColorPalette: false,
-        //isShowColors: true,
-        //color: '#3f3f3f',
         color: '',
         // test drag
         show: true,
@@ -225,8 +222,6 @@
         isROIHidden:true,
         isUMAPHidden:true,
         // conf table
-        //handleId: "handle-id",
-        //draggableValue: { },
         tableDataClusters: [],
         height:'250px',
         pageSize:5,
@@ -303,25 +298,19 @@
        }
      },
      getRowCelltype(row){
-       if (row.Celltype == this.currentCelltype){
-         this.currentCelltype = row.Celltype;
-       } else if (this.currentCelltype == ""){
-         this.lastCelltype = row.Celltype;
-         this.currentCelltype = row.Celltype;
-       } else {
-         this.lastCelltype = this.currentCelltype;
-         this.currentCelltype = row.Celltype;
-       }
        this.currentCellID = row.ID;
-       console.log('current cell id is '+this.currentCellID);
+       console.log('getrow '+this.currentCellID);
+       return row.ID;
      },
      colorValueChange (val) {
       this.color = val.hex;
-      this.current_color_all[this.currentCellID] = this.color;
+      //this.current_color_all[this.currentCellID] = this.color;
       //this.option=this.getOption();
       //this.isShowColorPalette = false;
       },
      applyColor(){
+       // change color when click row
+       // only apply changes when click button
        this.current_color_all[this.currentCellID] = this.color;
        this.option=this.getOption();
        this.isShowColorPalette = false;
@@ -503,7 +492,7 @@
       },
       resetSelect(){
         // to do: should reset color here?
-        this.current_color_all=require('../confs/discret_color.js');
+        COLOR_ALL=require('../confs/discret_color.js');
         this.final_clusters=new Array(this.all_clusters).fill(1);
         this.option=this.getOption();
       },
@@ -519,7 +508,11 @@
         //this.$refs.myecharts.setOption(this.getOption(),true);
       },
       handleSelectionChange(val) {
-        this.currentCellID = val[val.length -1].ID;
+        // change color when check box
+        //if (val.length > 0){
+          //this.currentCellID = val[val.length -1].ID;
+        //}
+        //console.log('handle '+this.currentCellID);
         var tmp_clusters= new Array(this.all_clusters).fill(0);
         for( var i = 0 ; i < val.length ; i++) {
             tmp_clusters[val[i].ID]=1;
