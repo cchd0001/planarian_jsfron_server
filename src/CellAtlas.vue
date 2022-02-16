@@ -34,10 +34,10 @@
     </div>
 
     <!-- Cell type color palette -->
-    <div v-draggable style='width:200px;height:400px;z-index:999;position: absolute; bottom: 300; left: 300;' v-if="isShowColorPalette">
-      <p style='padding:0;background-color:white;height:20px;' align='center'>Color Palette</p>
-      <sketch-picker v-model="color" @input="colorValueChange"></sketch-picker>
-      <el-button style='align:right;width:100%;' @click='applyColor'>ChangeColor</el-button>
+    <div v-draggable style='width:300px;height:400px;background-color:white;z-index:999;position:absolute;bottom:300;left:300;' v-if="isShowColorPalette">
+      <sketch-picker align='center' v-model="color" @input="colorValueChange"></sketch-picker>
+      <el-button align='right' style='width:50%;' @click='applyColor'>ChangeColor</el-button>
+      <el-button align='right' style='width:50%;' @click='closeColor'>Close</el-button>
     </div>
     <!-- end of color palette -->
 
@@ -201,9 +201,9 @@
     },
     data(){
       return {
-        // test color
-        
+        // test color 
         current_color_all: COLOR_ALL,
+        COLOR_ALL2: COLOR_ALL,
         currentCellID: '',
         isShowColorPalette: false,
         color: '',
@@ -291,28 +291,26 @@
      showColorPalette(){
        if (this.isShowColorPalette){
          this.isShowColorPalette = false;
-       //}else if (this.lastCelltype != this.currentCelltype){
-         //this.isShowColorPalette = false;
        }else{
          this.isShowColorPalette = true;
        }
      },
      getRowCelltype(row){
+       // 1. get row id when click on row (except for selection box)
        this.currentCellID = row.ID;
        console.log('getrow '+this.currentCellID);
        return row.ID;
      },
      colorValueChange (val) {
       this.color = val.hex;
-      //this.current_color_all[this.currentCellID] = this.color;
-      //this.option=this.getOption();
-      //this.isShowColorPalette = false;
       },
      applyColor(){
        // change color when click row
        // only apply changes when click button
        this.current_color_all[this.currentCellID] = this.color;
        this.option=this.getOption();
+     },
+     closeColor(){
        this.isShowColorPalette = false;
      },
       //-------------color palette ends------------------//
@@ -373,7 +371,6 @@
             this.curr_rs = null ;
             this.resetROIdata();
             this.$refs.myecharts.setOption(this.getOption(),true);
-            //this.option = this.getOption();
           }
       },
       show_WT()     {  this.resetIndividual("WT");     },
@@ -491,32 +488,32 @@
         this.isShowColorPalette = false;
       },
       resetSelect(){
-        // to do: should reset color here?
-        COLOR_ALL=require('../confs/discret_color.js');
+        this.COLOR_ALL2=require('../confs/discret_color.js');
         this.final_clusters=new Array(this.all_clusters).fill(1);
         this.option=this.getOption();
       },
       clearSelect () {
+        this.currentCellID = '';
         this.$refs.clusterTable.clearSelection();
       },
       applyStatus(){
         var self = this;
         this.final_clusters=this.saved_clusters;
         self.option=self.getOption();
-        //this.option=this.getOption();
         this.isShowColorPalette = false;
         //this.$refs.myecharts.setOption(this.getOption(),true);
       },
       handleSelectionChange(val) {
         // change color when check box
-        //if (val.length > 0){
-          //this.currentCellID = val[val.length -1].ID;
-        //}
-        //console.log('handle '+this.currentCellID);
+        // 2. get row id when use click selection box
+        if (val.length > 0){
+          this.currentCellID = val[val.length -1].ID;
+        }
+        // save cluster highlight status in an array
         var tmp_clusters= new Array(this.all_clusters).fill(0);
         for( var i = 0 ; i < val.length ; i++) {
             tmp_clusters[val[i].ID]=1;
-          }
+        }
         this.saved_clusters=tmp_clusters;
       },
       //-------------configure cell type end -------------------//
@@ -743,15 +740,8 @@
               legend_show[curr_legend_name] = true;
             }
             legend_list.push(curr_legend_name);
-            curr_color = COLOR_ALL[i];
-            //if (this.color == ""){
-              //curr_color = COLOR_ALL[i];
-              //console.log('this.color is'+this.color);
-              //console.log('curr_color '+curr_color);
-            //}else {
-              //console.log(this.color);
-              //curr_color = this.color;
-            //}
+            //curr_color = COLOR_ALL[i];
+            curr_color = this.COLOR_ALL2[i];
             var the_data = curr_draw_datas[i];
             var one_series = {
                 name : legend_list[i],
