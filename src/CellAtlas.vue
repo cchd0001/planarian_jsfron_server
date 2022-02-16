@@ -184,6 +184,7 @@
   // the dateset url
   var CT_URL="http://49.235.68.146/celltype/"
   var CTU_URL="http://49.235.68.146/celltype_umap/"
+  var CP_URL="http://49.235.68.146/cell_center/"
   var COLOR_ALL = require('../confs/discret_color.js');
   var idvd_conf = require('../confs/individual.js');
   var drag_x = 0;
@@ -284,6 +285,14 @@
         // umap 3D data
         raw_umapdata:null,
         umapdata:null,
+        // mesh data
+        mesh_json:null,
+        mesh_conf : { 
+          names:    ['Body','Neural','Gut','Pharynx'],
+          legends : ['Body_mesh','Neural_mesh','Gut_mesh','Pharynx_mesh'],
+          colors :  ['#cc6600','#ffff00','#ff0000','#00ff00'],
+          opacity:  [ 0.3, 0.4, 0.4, 0.4],
+        },
       }; // end of data return
     },
     methods: { 
@@ -367,8 +376,9 @@
       resetIndividual(name){
           if ( this.curr_name != name ) {
             this.curr_name = name ;
-            this.cleanBuffer(); 
             this.curr_rs = null ;
+            this.cleanBuffer(); 
+            this.resetMesh();
             this.resetROIdata();
             this.$refs.myecharts.setOption(this.getOption(),true);
           }
@@ -616,11 +626,39 @@
 
 
       //-------------data manager start-------------------//
+      resetMesh(){
+        this.mesh_json = null;
+        if( this.curr_name == "WT" ) {
+          var self = this;
+          var used_url = CP_URL+"/"+this.curr_name+"_mesh.json";
+          $.getJSON(used_url,function(_data) {
+            console.log("mesh loaded");
+            self.setMeshData(_data);
+            self.option = self.getOption();
+          });
+            
+        }
+      },
       cleanBuffer(){
         this.jsondata = null ;
         this.rawdata = null;
         this.raw_umapdata = null;
         this.umapdata = null;
+      },
+      setMeshData(_data) {
+          this.mesh_json = {};
+          this.mesh_json['Body'] = {}
+          this.mesh_json['Body']['xyz'] = _data[0][0];
+          this.mesh_json['Body']['ijk'] = _data[0][1];
+          this.mesh_json['Neural'] = {}
+          this.mesh_json['Neural']['xyz'] = _data[1][0];
+          this.mesh_json['Neural']['ijk'] = _data[1][1];
+          this.mesh_json['Gut'] = {}
+          this.mesh_json['Gut']['xyz'] = _data[2][0];
+          this.mesh_json['Gut']['ijk'] = _data[2][1];
+          this.mesh_json['Pharynx'] = {}
+          this.mesh_json['Pharynx']['xyz'] = _data[3][0];
+          this.mesh_json['Pharynx']['ijk'] = _data[3][1];
       },
       setUMAPJsonData(_data){
         var curr_draw_datas= [];
@@ -694,12 +732,12 @@
         this.option = this.getOption();
       },
       getUMAPOption(){
-        return this.getDrawOption(this.umapdata,true);
+        return this.getDrawOption(this.umapdata,true,false);
       },
       getOption() {
-        return this.getDrawOption(this.jsondata,false);
+        return this.getDrawOption(this.jsondata,false,true);
       },
-      getDrawOption(curr_draw_datas,max10){
+      getDrawOption(curr_draw_datas,max10,mesh){
         var bk_color = '#000000';
         var ft_color = '#cccccc';
         if ( this.black_background == false ) {
@@ -758,8 +796,30 @@
             series_list.push(one_series);
           } // end of for final_clusters.length
           console.log('end series');
+          if(mesh == true && this.mesh_json != null ){
+            console.log('draw mesh');
+            for(var i = 0; i<this.mesh_conf.names.length; i++){
+              var curr_name = this.mesh_conf.names[i];
+              var curr_legend_name = this.mesh_conf.legends[i];
+              var curr_color = this.mesh_conf.colors[i];
+              var curr_opacity = this.mesh_conf.opacity[i];
+              //console.log('curr_legend_name');
+              legend_list.push(curr_legend_name);
+              var one_series = {
+                  name : curr_legend_name,
+                  type : 'surface',
+                  data: this.mesh_json[curr_name]['xyz'],
+                  isMesh :true,
+                  dataShape:[2,3],
+                  indices : this.mesh_json[curr_name]['ijk'],
+                  color: curr_color,
+                  opacity:curr_opacity,
+              };
+              series_list.push(one_series);
+            }
+          }
           //console.log(legend_show);
-          //console.log(legend_list);
+          console.log(legend_list);
           var used_xmin = 0;
           var used_xmax = this.getWidth();
           var used_ymin = 0;
