@@ -58,7 +58,7 @@
   var idvd_conf = require('../confs/individual.js');
 
   export default {
-    name : "SingleCell",
+    name : "singlecell",
     components: {
         VChart
     },

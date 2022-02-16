@@ -12,6 +12,7 @@
         <el-menu-item index="3" disabled>Data Analysis</el-menu-item>
         <el-menu-item index="4">User Guide</a></el-menu-item>
         <el-menu-item index="5" disabled>About Us</a></el-menu-item>
+        <el-menu-item index="6">Developer Debug Page</a></el-menu-item>
       </el-menu>
       <div class="line"></div>
     </header>
@@ -36,6 +37,7 @@ import CellAtlas from "./CellAtlas.vue";
 import GeneExpression from "./GeneExpression.vue";
 import SingleCell from "./SingleCell.vue";
 import UserGuide from "./UserGuide.vue";
+import DevDebug from "./DevDebug.vue";
 
 export default {
   data() {
@@ -49,7 +51,8 @@ export default {
      CellAtlas,
      SingleCell,
      GeneExpression,
-     UserGuide
+     UserGuide,
+     DevDebug,
   },
   methods: {
     handleSelect(key, keyPath) {
@@ -72,6 +75,10 @@ export default {
         else if ( key == "1")
         {
             this.selected = "Home";
+        }
+        else if ( key == "6")
+        {
+            this.selected = "DevDebug";
         }
         else
         {
