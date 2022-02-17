@@ -22,6 +22,23 @@
         </el-menu>
     </div>
     <div style="margin-left:0%;background-color: rgb(238, 241, 246); border: 3px solid #eee;" >
+      <!-- 3D umap start -->
+      <div class='inline_item'>
+          <el-button align='right' @click.native="openUMAP" style='width:100%;z-index:9999;'>3D UMAP Panel</el-button>
+          <div class='parent' style='width:10px;'>
+            <div id="umap_panel" class="child" style='width:700px;z-index:9999;background-color:white'  v-if="!isUMAPHidden">
+              <div id="umap_panel_dragMe">
+                <p> UMAP Panel : {{umap_enable_message}}</p>
+              </div>
+              <div style="border: 10px solid #eee;">
+                <v-chart class="chart" ref="my_umap_echarts" :option="umap_option" style="width:660px;height:660px;" />
+                <el-button class='inline_item' @click.native="closeCTC">Close 3D UMAP Panel</el-button>
+              </div>
+            </div> <!-- end of hidden panel -->
+          </div> <!-- end of parent-->
+      </div> <!--end of inline div-->
+      <!-- 3D umap end -->
+
       <p class="inline_item" > Please select the gene of your interest.</p>
       <el-select class="inline_item" v-model="curr_selected_gene" filterable placeholder="" @change="selectGene" >
         <el-option v-for="item in genes" :key="item.value" 
@@ -88,12 +105,16 @@
   //import VChart, { THEME_KEY } from "vue-echarts";
   import VChart from "vue-echarts";
   // the dateset url
+  var GENE_UMAP_UR="http://49.235.68.146/gene_umap/";
+  var CELL_UMAP_URL="http://49.235.68.146/cell_umap/";
   var SC_URL="http://49.235.68.146/single_cell/"
   var GENE_URL="http://49.235.68.146/genes/";
   var CP_URL="http://49.235.68.146/cell_center/"
   var GENE_NEW_URL="http://49.235.68.146/newgenes/";
   let conf_gens = require('../confs/genes.js');
   var idvd_conf = require('../confs/individual.js');
+  var drag_x = 0;
+  var drag_y = 0;
 
   export default {
     name : "GeneExpression",
@@ -108,6 +129,12 @@
         basic_xyz: null,
         gene_xyz:null,
         gene_xyz_raw:null,
+        // umap 3D data
+        basic_umapdata: null,
+        raw_umapdata:null,
+        umapdata:null,
+        gene_umap_xyz:null,
+
         option: {
            backgroundColor:'#000000',
            title :{
@@ -119,12 +146,25 @@
                },
            }
         },
+        umap_option: {
+          backgroundColor:'#000000',
+          title : {
+              text : 'Please select a specific individual to show.',
+              left: "center",
+              top: "center",
+              textStyle: {
+                 color: '#cccccc'
+              },
+          }
+        },
         curr_selected_gene:'',
         // drawing theme
         black_background:true,
         symbolSize:2,
+        umap_enable_message : '',
         //------------roi confs start ------
         isROIHidden:true,
+        isUMAPHidden:true,
         z_scale:1,
         tmp_z_scale:1,
         // roi
@@ -144,6 +184,242 @@
       }; // end of data return
     },
     methods: {
+      //-------------UMAP conf start---------------------//
+      openUMAP(){
+        this.isHidden = true;
+        this.isROIHidden = true;
+        this.isUMAPHidden = !this.isUMAPHidden;
+        if( this.isUMAPHidden == false ){
+          this.umap_enable_message = '';
+          this.load_umap();
+          var self = this;
+          setTimeout(function(){
+            var ud = document.getElementById('umap_panel_dragMe');
+            var up = document.getElementById('umap_panel');
+            self.DeclareDragable(ud,up);
+            self.umap_enable_message = 'Drag Me';
+          },1000);
+        }
+      },
+      DeclareDragable(dragMe, moveMe){
+        const mouseDownHandler = function (e) {
+          // Get the current mouse position
+          drag_x = e.clientX;
+          drag_y = e.clientY;
+          // Attach the listeners to `document`
+          document.addEventListener('mousemove', mouseMoveHandler);
+          document.addEventListener('mouseup', mouseUpHandler);
+        };
+        const mouseMoveHandler = function (e) {
+          const dx = e.clientX - drag_x;
+          const dy = e.clientY - drag_y;
+          moveMe.style.top = (Number(moveMe.offsetTop)+dy)+'px';
+          moveMe.style.left = (Number(moveMe.offsetLeft)+dx)+'px'
+          drag_x = e.clientX;
+          drag_y = e.clientY;
+        };
+        const mouseUpHandler = function () {
+            document.removeEventListener('mousemove', mouseMoveHandler);
+            document.removeEventListener('mouseup', mouseUpHandler);
+        };
+        dragMe.addEventListener('mousedown', mouseDownHandler);
+      },
+      load_umap(){
+        console.log("load_umap");
+        if( this.umapdata != null ||  this.curr_name == null )
+          return;
+        //var background_url = CELL_UMAP_UR+"/"+this.curr_name+"/"+this.curr_gene+".json";
+        //var gene_url = GENE_UMAP_UR+"/"+this.curr_name+"/"+this.curr_gene+".json";
+        var used_url = "http://49.235.68.146/gene_umap/SMED30035648_umap3d.json";
+        var used_url2 = "http://49.235.68.146/cell_umap/WT_r0.8_umap3d.json";
+        this.umap_option = this.getUMAPOption();
+        var self = this;
+        $.getJSON(used_url2,function(_data) {
+            console.log("basic");
+            self.setBasicUMAPJsonData(_data);
+            self.umap_option = self.getUMAPOption();
+           });
+        $.getJSON(used_url,function(_data) {
+            console.log("gene");
+            self.setUMAPJsonData(_data);
+            self.umap_option = self.getUMAPOption();
+        });
+      },
+      setBasicUMAPJsonData(_data) {
+        console.log('set basic umap data');
+        // load umap background
+        var curr_draw_datas= [];
+        curr_draw_datas.push( ['x','y','z'] );
+        for(var j=0 ; j< _data.length; j++){
+          var curr_item = _data[j];
+          curr_draw_datas.push( [curr_item[0],curr_item[1],curr_item[2]]);
+        }
+        this.basic_umapdata = curr_draw_datas;
+      },
+      setUMAPJsonData(_data) {
+        console.log("set umap gene data");
+        // load selected gene umap data
+        var curr_draw_datas= [];
+        curr_draw_datas.push( ['x','y','z','e'] );
+        for(var j=0 ; j< _data.length; j++){
+          var curr_item = _data[j];
+          curr_draw_datas.push( [curr_item[0],curr_item[1],curr_item[2],curr_item[3]]);
+        }
+        this.umapdata = curr_draw_datas;
+      },
+      getUMAPOption() {
+        console.log("get umap option");
+        if ( this.basic_umapdata == null ) {
+          return {
+             backgroundColor:'#000000',
+             title :{
+              text : 'Loading model now ...\nThis might take a while ...',
+              left: "center",
+              top: "center",
+              textStyle: {
+                 color: '#cccccc'
+              },
+            }
+          };
+        }
+        else {
+          var curr_draw_datas = this.basic_umapdata;
+          console.log('draw background first');
+          var bk_color = "#888888";
+          var one_series = {
+              name : this.curr_name,
+              type : 'scatter3D',
+              dimensions: [ 'x','y','z' ],
+              data: this.basic_umapdata,
+              //data: this.umapdata,
+              symbolSize: 2,
+              itemStyle: {
+                borderWidth: 1,
+                borderColor: bk_color,
+                color : bk_color,
+                opacity: 0.5,
+              },
+          };
+          var series_list = [];
+          var legend_list = [this.curr_name];
+          var legend_color = [bk_color];
+          series_list.push(one_series);
+          if(this.umapdata != null ){
+              var gene_color = "#ff1111"
+              var one_series = {
+                  name : this.curr_gene,
+                  type : 'scatter3D',
+                  dimensions: [ 'x','y','z' ,'e'],
+                  data: this.umapdata,
+                  symbolSize: this.symbolSize+1,
+                  itemStyle: {
+                    borderWidth: 0,
+                    //borderColor: gene_color,
+                    //color : gene_color,
+                  },
+              };
+              series_list.push(one_series);
+          }
+          else{
+              console.log('no gene data');
+              var gene_color = "#ff1111"
+              var one_series = {
+                  name : this.curr_gene,
+                  type : 'scatter3D',
+                  dimensions: [ 'x','y','z' ,'e'],
+                  data: [],
+                  symbolSize: 2,
+                  itemStyle: {
+                    borderWidth: 1,
+                    //borderColor: gene_color,
+                    //color : gene_color,
+                  },
+              };
+              series_list.push(one_series);
+          }
+          // end of for showd_clusters.length
+          var opt= {
+            backgroundColor:'#000000',
+            title :{
+              text : '',
+              left: "center",
+              top : "top"
+            },
+            tooltip: {},
+            xAxis3D: {
+              name: 'x',
+              scale:1,
+              type: 'value',
+              min : -10,
+              max : 10,
+            },
+            yAxis3D: {
+              name: 'y',
+              scale:1,
+              type: 'value',
+              min : -10,
+              max : 10,
+            },
+            zAxis3D: {
+              name: 'z',
+              scale:1,
+              type: 'value',
+              min : -10,
+              max : 10,
+            },
+            legend :{
+              color :legend_color,
+              data:legend_list,
+              textStyle: {
+                 color: '#cccccc'
+              },
+            },
+            grid3D: {
+              boxWidth:60,
+              boxHeight:60,
+              boxDepth:60,
+              axisLine: {
+                lineStyle: {
+                  color: '#fff'
+                }
+              },
+              axisPointer: {
+                lineStyle: {
+                  color: '#ffbd67'
+                }
+              },
+              viewControl: {
+                //autoRotate: true
+                //projection: 'orthographic'
+              }
+            },
+            series: series_list
+          }; // end of var opt
+          if( this.umapdata != null)
+          {
+            opt.visualMap= [
+            {
+               type: 'continuous',
+               min: 1,
+               max: 5,
+               dimension: 3, // the fourth dimension of series.data (i.e. value[3]) is mapped
+               seriesIndex: 1, // The fourth series is mapped.
+               inRange: {
+                  // The ädvisual configuration in the selected range
+                  //color: ['blue', '#121122', 'red'], // A list of colors that defines the graph color mapping
+                  color: ['blue', 'yellow', 'red'], // A list of colors that defines the graph color mapping
+               },
+               textStyle: {
+                  color: '#cccccc'
+               },
+            }];
+          }
+          console.log('reset option');
+          return opt;
+        } // end of else.
+      }, // end of function option.
+      //-------------UMAP conf end-----------------------//
+
       //-------------3d box conf start-------------------//
       getWidth(){
         return idvd_conf['label_'+this.curr_name].x ;
@@ -167,6 +443,7 @@
       closeCTC(){
         //this.isHidden = true;
         this.isROIHidden = true;
+        this.isUMAPHidden = true;
       },
       //-------------roi panel end-------------------//
       //-------------switching individual start -------------------//
@@ -181,6 +458,8 @@
           this.gene_xyz = null;
           this.gene_xyz_raw = null;
           this.curr_selected_gene = null;
+          //this.umapdata = null;
+          //this.basic_umapdata = null;
           // show loading first
           this.$refs.myecharts.setOption(this.getOption(),true);
           //this.option = this.getOption();
@@ -242,7 +521,10 @@
             var curr_item = _data[j];
             basic_xyz.push( [curr_item[0],curr_item[1],curr_item[2]]);
         }
+        console.log(_data[1]);
         this.basic_xyz = basic_xyz;
+        //console.log('basic xyz');
+        //console.log(this.basic_xyz);
         this.resetROIdata();
       },
       setGeneData(_data){
@@ -256,6 +538,7 @@
         }
         this.gene_xyz = gene_xyz;
         this.gene_xyz_raw = gene_xyz ;
+      //  console.log(this.gene_xyz);
       },
       //-------------setting data end -------------------//
       //-------------refresh  -------------------//
