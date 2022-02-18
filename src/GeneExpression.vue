@@ -105,7 +105,7 @@
   //import VChart, { THEME_KEY } from "vue-echarts";
   import VChart from "vue-echarts";
   // the dateset url
-  var GENE_UMAP_UR="http://49.235.68.146/gene_umap/";
+  var GENE_UMAP_URL="http://49.235.68.146/gene_umap/";
   var CELL_UMAP_URL="http://49.235.68.146/cell_umap/";
   var SC_URL="http://49.235.68.146/single_cell/"
   var GENE_URL="http://49.235.68.146/genes/";
@@ -228,22 +228,21 @@
         console.log("load_umap");
         if( this.umapdata != null ||  this.curr_name == null )
           return;
-        //var background_url = CELL_UMAP_UR+"/"+this.curr_name+"/"+this.curr_gene+".json";
-        //var gene_url = GENE_UMAP_UR+"/"+this.curr_name+"/"+this.curr_gene+".json";
-        var used_url = "http://49.235.68.146/gene_umap/SMED30035648_umap3d.json";
-        var used_url2 = "http://49.235.68.146/cell_umap/WT_r0.8_umap3d.json";
+        var background_url = CELL_UMAP_URL+"/"+this.curr_name+"/"+"0.8.json";
+        var gene_url = GENE_UMAP_URL+"/"+this.curr_name+"/"+this.curr_gene+".json";
         this.umap_option = this.getUMAPOption();
         var self = this;
-        $.getJSON(used_url2,function(_data) {
+        $.getJSON(background_url,function(_data) {
             console.log("basic");
             self.setBasicUMAPJsonData(_data);
             self.umap_option = self.getUMAPOption();
            });
-        $.getJSON(used_url,function(_data) {
+        $.getJSON(gene_url,function(_data) {
             console.log("gene");
             self.setUMAPJsonData(_data);
             self.umap_option = self.getUMAPOption();
         });
+        //self.umap_option = self.getUMAPOption();
       },
       setBasicUMAPJsonData(_data) {
         console.log('set basic umap data');
@@ -311,7 +310,7 @@
                   type : 'scatter3D',
                   dimensions: [ 'x','y','z' ,'e'],
                   data: this.umapdata,
-                  symbolSize: this.symbolSize+1,
+                  symbolSize: this.symbolSize,
                   itemStyle: {
                     borderWidth: 0,
                     //borderColor: gene_color,
@@ -433,7 +432,6 @@
       //-------------3d box conf end-------------------//
       //-------------roi panel start-------------------//
       openROI(){
-        //console.log("open roi");
         this.isHidden = true;
         if(this.isROIHidden)
            this.isROIHidden = false;
@@ -462,14 +460,11 @@
           this.basic_umapdata = null;
           // show loading first
           this.$refs.myecharts.setOption(this.getOption(),true);
-          //this.option = this.getOption();
-          //var used_url = SC_URL+"/"+name+"/label.json";
           var used_url = CP_URL+"/"+name+".json";
           // loading data and re-draw graph
           var self = this;
           $.getJSON(used_url,function(_data) {
             self.setBasicData(_data);
-            //self.option = self.getOption();
             self.$refs.myecharts.setOption(self.getOption(),true);
           });
         }
@@ -495,17 +490,25 @@
 
       //-------------switching gene start -------------------//
       selectGene(item){
-        console.log(item);
         if(this.curr_name != null){
           if(this.curr_gene != item ){
+            this.umapdata = null;
             var self=this;
             var used_url = GENE_NEW_URL+"/"+this.curr_name+"/"+item+".json";
-            //var used_url = GENE_NEW_URL+"/"+this.curr_name+"/SMED30032613.json";
             $.getJSON(used_url,function(_data) {
               self.curr_gene = item;
               self.setGeneData(_data);
               self.option = self.getOption();
             });
+            // if umap panel is still open
+            if (!this.isUMAPHidden){
+              var used_url2 = GENE_UMAP_URL+"/"+this.curr_name+"/"+item+".json";
+              $.getJSON(used_url2, function(_data){
+                self.curr_gene = item;
+                self.setUMAPJsonData(_data);
+                self.umap_option = self.getUMAPOption();
+              });
+            }
           }
         }
       },
@@ -521,10 +524,7 @@
             var curr_item = _data[j];
             basic_xyz.push( [curr_item[0],curr_item[1],curr_item[2]]);
         }
-        console.log(_data[1]);
         this.basic_xyz = basic_xyz;
-        //console.log('basic xyz');
-        //console.log(this.basic_xyz);
         this.resetROIdata();
       },
       setGeneData(_data){
@@ -538,12 +538,12 @@
         }
         this.gene_xyz = gene_xyz;
         this.gene_xyz_raw = gene_xyz ;
-      //  console.log(this.gene_xyz);
       },
       //-------------setting data end -------------------//
       //-------------refresh  -------------------//
       refresh(){
         this.option=this.getOption();
+        this.umap_option=this.getUMAPOption();
       },
       //-------------refresh  -------------------//
 
@@ -659,8 +659,6 @@
           };
         }
         else {
-          //console.log('knowing json loaded');
-          //console.log('01');
           var curr_draw_datas = this.basic_xyz;
           console.log('draw background first');
           var bk_color = "#888888";
