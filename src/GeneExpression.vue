@@ -458,8 +458,8 @@
           this.gene_xyz = null;
           this.gene_xyz_raw = null;
           this.curr_selected_gene = null;
-          //this.umapdata = null;
-          //this.basic_umapdata = null;
+          this.umapdata = null;
+          this.basic_umapdata = null;
           // show loading first
           this.$refs.myecharts.setOption(this.getOption(),true);
           //this.option = this.getOption();
