@@ -124,7 +124,8 @@
   import { Sketch } from 'vue-color'
 
   // confs
-  var SC_URL="http://49.235.68.146/single_cell/"
+  var CP_URL="http://49.235.68.146/cell_center/";
+  var SC_URL="http://49.235.68.146/single_cell/";
   var COLOR_ALL = require('../confs/discret_color.js');
   var sc_conf = require('../confs/single_cell_transfered_type.js');
   var idvd_conf = require('../confs/individual.js');
@@ -185,6 +186,14 @@
         curr_name : null,
         curr_data : null,
         rawdata: null,
+        // mesh data
+        mesh_json:null,
+        mesh_conf : {
+          names:    ['Body','Neural','Gut','Pharynx'],
+          legends : ['Body_mesh','Neural_mesh','Gut_mesh','Pharynx_mesh'],
+          colors :  ['#cc6600','#ffff00','#ff0000','#00ff00'],
+          opacity:  [ 0.3, 0.4, 0.4, 0.4],
+        },
       }; // end of data return
     },
     methods: {
@@ -203,7 +212,6 @@
      getRowCelltype(row){
        // 1. get row id when click on row (except for selection box)
        this.currentCellID = row.ID;
-       console.log('getrow '+this.currentCellID);
        return row.ID;
      },
      colorValueChange (val) {
@@ -341,7 +349,37 @@
         this.option = this.getOption();
       },
       //-------------configure ROI end -------------------//
-
+      
+      //-------------mesh start-------------------//
+      resetMesh(){
+        console.log("reset mesh");
+        this.mesh_json = null;
+        if( this.curr_name == "WT" ) {
+          var self = this;
+          var used_url = CP_URL+"/"+this.curr_name+"_mesh.json";
+          $.getJSON(used_url,function(_data) {
+            console.log("mesh loaded");
+            self.setMeshData(_data);
+            self.option = self.getOption();
+          });
+            
+        }
+      },
+      setMeshData(_data) {
+          this.mesh_json = {};
+          this.mesh_json['Body'] = {}
+          this.mesh_json['Body']['xyz'] = _data[0][0];
+          this.mesh_json['Body']['ijk'] = _data[0][1];
+          this.mesh_json['Neural'] = {}
+          this.mesh_json['Neural']['xyz'] = _data[1][0];
+          this.mesh_json['Neural']['ijk'] = _data[1][1];
+          this.mesh_json['Gut'] = {}
+          this.mesh_json['Gut']['xyz'] = _data[2][0];
+          this.mesh_json['Gut']['ijk'] = _data[2][1];
+          this.mesh_json['Pharynx'] = {}
+          this.mesh_json['Pharynx']['xyz'] = _data[3][0];
+          this.mesh_json['Pharynx']['ijk'] = _data[3][1];
+      },
       //-------------3d box conf start-------------------//
       getWidth(){
         return idvd_conf['label_'+this.curr_name].x ;
@@ -380,15 +418,17 @@
 
       //-------------switching individual start -------------------//
       update_basic(name){
+        console.log("update basic");
         if( this.curr_name != name)
         {
           // set new name
           this.curr_name = name;
           //clean buffer
           this.curr_data = null;
+          this.resetROIdata();
+          this.resetMesh();
           // show loading first
           this.$refs.myecharts.setOption(this.getOption(),true);
-          //this.option = this.getOption();
           var used_url = SC_URL+"/"+name+"/label.json";
           // loading data and re-draw graph
           var self = this;
@@ -450,7 +490,6 @@
         }
         else {
           console.log('knowing json loaded');
-
           var series_list = [];
           var legend_list = [];
           var legend_show = {};
@@ -469,13 +508,10 @@
              used_color_masks = this.colored_cache;
           }
           console.log('start series');
-          //console.log(used_color_masks);
           for( var i = 0 ; i<used_color_masks.length; i++ )
           {
             var curr_legend_name = this.tableData[i].Celltype;
-            //console.log(curr_legend_name);
             legend_list.push(curr_legend_name);
-            //curr_color = COLOR_ALL[i];
             curr_color = this.current_color_all[i];
             curr_alpha = 0.75;
             // console.log('2');
@@ -500,10 +536,29 @@
             series_list.push(one_series);
           } // end of for showd_clusters.length
           console.log('end series');
+          if(this.mesh_json != null ){
+            console.log('draw mesh');
+            for(var i = 0; i<this.mesh_conf.names.length; i++){
+              var curr_name = this.mesh_conf.names[i];
+              var curr_legend_name = this.mesh_conf.legends[i];
+              var curr_color = this.mesh_conf.colors[i];
+              var curr_opacity = this.mesh_conf.opacity[i];
+              //console.log('curr_legend_name');
+              legend_list.push(curr_legend_name);
+              var one_series = {
+                  name : curr_legend_name,
+                  type : 'surface',
+                  data: this.mesh_json[curr_name]['xyz'],
+                  isMesh :true,
+                  dataShape:[2,3],
+                  indices : this.mesh_json[curr_name]['ijk'],
+                  color: curr_color,
+                  opacity:curr_opacity,
+              };
+              series_list.push(one_series);
+            }
+          }
           //console.log(legend_show);
-          //var xmax = this.getWidth();
-          //var ymax = this.getHeight();
-          //var zmax = this.getDepth();
           var used_xmin = 0;
           var used_xmax = this.getWidth();
           var used_ymin = 0;
