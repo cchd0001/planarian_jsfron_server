@@ -433,10 +433,11 @@
       //-------------roi panel start-------------------//
       openROI(){
         this.isHidden = true;
-        if(this.isROIHidden)
-           this.isROIHidden = false;
-        else 
-            this.isROIHidden = true;
+        this.isROIHidden = !this.isROIHidden;
+        //if(this.isROIHidden)
+           //this.isROIHidden = false;
+        //else 
+            //this.isROIHidden = true;
       },
       closeCTC(){
         //this.isHidden = true;
@@ -458,6 +459,7 @@
           this.curr_selected_gene = null;
           this.umapdata = null;
           this.basic_umapdata = null;
+          this.isUMAPHidden = true;
           // show loading first
           this.$refs.myecharts.setOption(this.getOption(),true);
           var used_url = CP_URL+"/"+name+".json";
