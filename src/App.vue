@@ -9,10 +9,13 @@
             <el-menu-item index="2-2">Gene Expression Atlas</el-menu-item>
             <el-menu-item index="2-3">Single-cell-label-transfered Cell Atlas</el-menu-item>
         </el-submenu>
-        <el-menu-item index="3" disabled>Data Analysis</el-menu-item>
+        <el-menu-item index="3" disabled></el-menu-item>
+        <el-submenu index="3" active-text-color="#409eff">
+          <template slot="title">Data Analysis</template>
+            <el-menu-item index="3-1">Multi-gene-pattern</el-menu-item>
+        </el-submenu>
         <el-menu-item index="4">User Guide</a></el-menu-item>
         <el-menu-item index="5" disabled>About Us</a></el-menu-item>
-        <el-menu-item index="6">Developer Debug Page</a></el-menu-item>
       </el-menu>
       <div class="line"></div>
     </header>
@@ -35,6 +38,7 @@
 import Home from "./Home.vue";
 import CellAtlas from "./CellAtlas.vue";
 import GeneExpression from "./GeneExpression.vue";
+import GeneCoExpression from "./GeneCoExpression.vue";
 import SingleCell from "./SingleCell.vue";
 import UserGuide from "./UserGuide.vue";
 import DevDebug from "./DevDebug.vue";
@@ -53,6 +57,7 @@ export default {
      GeneExpression,
      UserGuide,
      DevDebug,
+     GeneCoExpression,
   },
   methods: {
     handleSelect(key, keyPath) {
@@ -76,9 +81,9 @@ export default {
         {
             this.selected = "Home";
         }
-        else if ( key == "6")
+        else if ( key == "3-1")
         {
-            this.selected = "DevDebug";
+            this.selected = "GeneCoExpression";
         }
         else
         {
