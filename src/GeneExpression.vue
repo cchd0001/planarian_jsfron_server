@@ -83,6 +83,12 @@
         </div>
       </div>
       <!-- ROI configuration menu end ... -->
+      <div class='inline_item' >
+        <el-select v-model="version_value" placeholder=""  @change="changeVersion" >
+          <el-option v-for="item in version_conf" :key="item.value" :label="item.label" :value="item.value">
+          </el-option>
+        </el-select>
+      </div>
       <!-- switch symbol size start -->
       <div class="inline_item">
         <span class="inline_item" style="z-index:1;">Symbol size :</span>
@@ -105,14 +111,14 @@
   //import VChart, { THEME_KEY } from "vue-echarts";
   import VChart from "vue-echarts";
   // the dateset url
-  var GENE_UMAP_URL="http://49.235.68.146/gene_umap/";
-  var CELL_UMAP_URL="http://49.235.68.146/cell_umap/";
-  var SC_URL="http://49.235.68.146/single_cell/"
-  var GENE_URL="http://49.235.68.146/genes/";
-  var CP_URL="http://49.235.68.146/cell_center/"
-  var GENE_NEW_URL="http://49.235.68.146/newgenes/";
-  let conf_gens = require('../confs/genes.js');
+  //var GENE_UMAP_URL="http://49.235.68.146/gene_umap/";
+  //var CELL_UMAP_URL="http://49.235.68.146/cell_umap/";
+  //var CP_URL="http://49.235.68.146/cell_center/"
+  //var GENE_NEW_URL="http://49.235.68.146/newgenes/";
+  var conf_gens = require('../confs/genes.js');
   var idvd_conf = require('../confs/individual.js');
+  var url_manager = require('../confs/urls.js');
+  var gene_url_conf = url_manager.GENE_URL;
   var drag_x = 0;
   var drag_y = 0;
 
@@ -124,6 +130,15 @@
     data(){
       return {
         genes : conf_gens,
+        // ---------- url version -----------------------
+        version_conf : gene_url_conf.select_conf,
+        version_value : gene_url_conf.default_version,
+        GENE_UMAP_URL : gene_url_conf[gene_url_conf.default_version]['url_umap_expression'],
+        CELL_UMAP_URL : gene_url_conf[gene_url_conf.default_version]['url_umap'],
+        CP_URL : gene_url_conf[gene_url_conf.default_version].url_model,
+        GENE_NEW_URL: gene_url_conf[gene_url_conf.default_version].url_model_expression,
+        // ---------- url version -----------------------
+
         curr_name: "",
         curr_gene: "",
         basic_xyz: null,
@@ -131,9 +146,9 @@
         gene_xyz_raw:null,
         // umap 3D data
         basic_umapdata: null,
-        raw_umapdata:null,
+        //raw_umapdata:null,
         umapdata:null,
-        gene_umap_xyz:null,
+        //gene_umap_xyz:null,
 
         option: {
            backgroundColor:'#000000',
@@ -184,6 +199,18 @@
       }; // end of data return
     },
     methods: {
+      //-------------version control start --------------//
+      changeVersion(value) {
+        this.GENE_UMAP_URL = gene_url_conf[value]['url_umap_expression'];
+        this.CELL_UMAP_URL = gene_url_conf[value]['url_umap'];
+        this.CP_URL = gene_url_conf[value].url_model;
+        this.GENE_NEW_URL = gene_url_conf[value].url_model_expression;
+        // todo update mode if necessary
+        // update gene data now.
+        this.refreshGene(this.curr_gene,true);
+
+      },
+      //-------------version control end ----------------//
       //-------------UMAP conf start---------------------//
       openUMAP(){
         this.isHidden = true;
@@ -228,8 +255,8 @@
         console.log("load_umap");
         if( this.umapdata != null ||  this.curr_name == null )
           return;
-        var background_url = CELL_UMAP_URL+"/"+this.curr_name+"/"+"0.8.json";
-        var gene_url = GENE_UMAP_URL+"/"+this.curr_name+"/"+this.curr_gene+".json";
+        var background_url = this.CELL_UMAP_URL+"/"+this.curr_name+"/"+"0.8.json";
+        var gene_url = this.GENE_UMAP_URL+"/"+this.curr_name+"/"+this.curr_gene+".json";
         this.umap_option = this.getUMAPOption();
         var self = this;
         $.getJSON(background_url,function(_data) {
@@ -462,7 +489,7 @@
           this.isUMAPHidden = true;
           // show loading first
           this.$refs.myecharts.setOption(this.getOption(),true);
-          var used_url = CP_URL+"/"+name+".json";
+          var used_url = this.CP_URL+"/"+name+".json";
           // loading data and re-draw graph
           var self = this;
           $.getJSON(used_url,function(_data) {
@@ -492,19 +519,26 @@
 
       //-------------switching gene start -------------------//
       selectGene(item){
+        this.refreshGene(item,false);
+      },
+      refreshGene(gname, force){
         if(this.curr_name != null){
-          if(this.curr_gene != item ){
+          if(this.curr_gene != gname || force ){
             this.umapdata = null;
+            this.gene_xyz = null;
+            this.gene_xyz_raw = null;
+            this.$refs.myecharts.setOption(this.getOption(),true);
+
             var self=this;
-            var used_url = GENE_NEW_URL+"/"+this.curr_name+"/"+item+".json";
+            var used_url = this.GENE_NEW_URL+"/"+this.curr_name+"/"+gname+".json";
             $.getJSON(used_url,function(_data) {
-              self.curr_gene = item;
+              self.curr_gene = gname;
               self.setGeneData(_data);
               self.option = self.getOption();
             });
             // if umap panel is still open
             if (!this.isUMAPHidden){
-              var used_url2 = GENE_UMAP_URL+"/"+this.curr_name+"/"+item+".json";
+              var used_url2 = this.GENE_UMAP_URL+"/"+this.curr_name+"/"+gname+".json";
               $.getJSON(used_url2, function(_data){
                 self.curr_gene = item;
                 self.setUMAPJsonData(_data);
