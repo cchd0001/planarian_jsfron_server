@@ -2,17 +2,17 @@ module.exports = {
     label_WT :  {
         y: 205,
         x: 468,
-        z: 27
+        z: 35
     },
     label_0hpa1 : {
         y: 184,
         x: 229,
-        z:32
+        z:35
     },
     label_0hpa2 : {
         y: 163,
         x: 216,
-        z:29
+        z:35
     },
     label_12hpa1 : {
         y: 185,
@@ -27,12 +27,12 @@ module.exports = {
     label_36hpa1 : {
         y: 167,
         x: 220,
-        z: 29
+        z: 35
     },
     label_36hpa2 : {
         y: 210,
         x: 207,
-        z: 29
+        z: 35
     },
     label_3dpa1 : {
         y: 180,
@@ -57,22 +57,22 @@ module.exports = {
     label_7dpa1 : {
         y: 126,
         x: 204,
-        z: 23
+        z: 35
     },
     label_7dpa2 : {
         y: 145,
         x: 236,
-        z: 26
+        z: 35
     },
     label_10dpa1: {
         y: 213,
         x: 320,
-        z: 14
+        z: 21
     },
     label_10dpa2: {
         y: 159,
         x: 269,
-        z: 11
+        z: 21
     },
     label_12dpa1: {
         y: 185,
@@ -87,11 +87,11 @@ module.exports = {
     label_14dpa1: {
         y: 121,
         x: 253,
-        z: 17
+        z: 35
     },
     label_14dpa2: {
         y: 164,
         x: 307,
-        z: 17
+        z: 35
     }
 };

@@ -92,11 +92,19 @@
       <!-- switch symbol size start -->
       <div class="inline_item">
         <span class="inline_item" style="z-index:1;">Symbol size :</span>
-        <el-slider class="inline_item" style="width:200px;z-index:1;" v-model="symbolSize"
-           :step="1" :min="2" :max="10" @change="refresh" show-stops>
+        <el-slider class="inline_item" style="width:120px;z-index:1;" v-model="symbolSize"
+           :step="1" :min="1" :max="5" @change="refresh" show-stops>
          </el-slider>
       </div>
       <!-- switch symbol size end -->
+      <!-- lowest cutoff start-->
+      <div class="inline_item">
+        <span class="inline_item" style="z-index:1;">Lowest expression :</span>
+        <el-slider class="inline_item" style="width:220px;z-index:1;" v-model="smallestExpression"
+           :step="0.5" :min="0" :max="6" @change="changeSmallest" show-stops>
+        </el-slider>
+      </div>
+      <!-- lowest cutoff end -->
     </div>
     <div>
       <v-chart ref="myecharts"  :option="option" style="width:100%;height:700px;" />
@@ -176,6 +184,7 @@
         // drawing theme
         black_background:true,
         symbolSize:2,
+        smallestExpression:0,
         umap_enable_message : '',
         //------------roi confs start ------
         isROIHidden:true,
@@ -457,6 +466,14 @@
         return idvd_conf['label_'+this.curr_name].y ;
       },
       //-------------3d box conf end-------------------//
+
+      //-------------smallest expression start---------//
+      changeSmallest(){
+        this.updateJsonData();
+        this.option=this.getOption();
+      },
+      //-------------smallest expression end-----------//
+
       //-------------roi panel start-------------------//
       openROI(){
         this.isHidden = true;
@@ -607,6 +624,7 @@
           if( info[0]>this.x_max) continue;
           if( info[1]>this.y_max) continue;
           if( info[2]>this.z_max) continue;
+          if( info[3]<this.smallestExpression)continue;
           curr_draw_datas.push(info)
         }
         this.gene_xyz= curr_draw_datas;
@@ -614,8 +632,8 @@
       changeXMin(){
         if(this.x_min != this.tmp_x_min){
           if(this.tmp_x_min<0)                          this.x_min = 0;
-          else if (this.tmp_x_min>this.x_max-1)         this.x_min = this.x_max-1;
-          else if (this.tmp_x_min>this.getWidth()-1)    this.x_min = this.getWidth()-1;
+          else if (this.tmp_x_min>this.x_max)           this.x_min = this.x_max;
+          else if (this.tmp_x_min>this.getWidth())      this.x_min = this.getWidth();
           else                                          this.x_min = this.tmp_x_min;
           this.updateJsonData();
           this.option=this.getOption();
@@ -623,8 +641,8 @@
       },
       changeXMax(){
         if(this.x_max != this.tmp_x_max){
-          if(this.tmp_x_max<1)                          this.x_max = 1;
-          else if (this.tmp_x_max<Number(this.x_min)+1) this.x_max = Number(this.x_min) +1;
+          if(this.tmp_x_max<0)                          this.x_max = 0;
+          else if (this.tmp_x_max<Number(this.x_min))   this.x_max = Number(this.x_min);
           else if (this.tmp_x_max>this.getWidth())      this.x_max = this.getWidth();
           else                                          this.x_max = this.tmp_x_max;
           console.log(this.x_max);
@@ -635,8 +653,8 @@
       changeYMin(){
         if(this.y_min != this.tmp_y_min){
           if(this.tmp_y_min<0)                          this.y_min = 0;
-          else if (this.tmp_y_min>this.y_max-1)         this.y_min = this.y_max-1;
-          else if (this.tmp_y_min>this.getHeight()-1)   this.y_min = this.getHeight()-1;
+          else if (this.tmp_y_min>this.y_max)           this.y_min = this.y_max;
+          else if (this.tmp_y_min>this.getHeight())     this.y_min = this.getHeight();
           else                                          this.y_min = this.tmp_y_min;
           console.log(this.y_min);
           this.updateJsonData();
@@ -645,8 +663,8 @@
       },
       changeYMax(){
         if(this.y_max != this.tmp_y_max){
-          if(this.tmp_y_max<1)                          this.y_max = 1;
-          else if (this.tmp_y_max<Number(this.y_min)+1) this.y_max = Number(this.y_min) +1;
+          if(this.tmp_y_max<0)                          this.y_max = 0;
+          else if (this.tmp_y_max<Number(this.y_min))   this.y_max = Number(this.y_min);
           else if (this.tmp_y_max>this.getHeight())     this.y_max = this.getHeight();
           else                                          this.y_max = this.tmp_y_max;
           console.log(this.y_max);
@@ -657,8 +675,8 @@
       changeZMin(){
         if(this.z_min != this.tmp_z_min){
           if(this.tmp_z_min<0)                          this.z_min = 0;
-          else if (this.tmp_z_min>this.z_max-1)         this.z_min = this.z_max-1;
-          else if (this.tmp_z_min>this.getDepth()-1)    this.z_min = this.getDepth()-1;
+          else if (this.tmp_z_min>this.z_max)           this.z_min = this.z_max;
+          else if (this.tmp_z_min>this.getDepth())      this.z_min = this.getDepth();
           else                                          this.z_min = this.tmp_z_min;
           this.updateJsonData();
           this.option=this.getOption();
@@ -666,8 +684,8 @@
       },
       changeZMax(){
         if(this.z_max != this.tmp_z_max){
-          if(this.tmp_z_max<1)                          this.z_max = 1;
-          else if (this.tmp_z_max<Number(this.z_min)+1) this.z_max = Number(this.z_min) +1;
+          if(this.tmp_z_max<0)                          this.z_max = 0;
+          else if (this.tmp_z_max<Number(this.z_min))   this.z_max = Number(this.z_min);
           else if (this.tmp_z_max>this.getDepth())      this.z_max = this.getDepth();
           else                                          this.z_max = this.tmp_z_max;
           this.updateJsonData();
