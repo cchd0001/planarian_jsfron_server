@@ -92,8 +92,8 @@
       <!-- switch symbol size start -->
       <div class="inline_item">
         <span class="inline_item" style="z-index:1;">Symbol size :</span>
-        <el-slider class="inline_item" style="width:120px;z-index:1;" v-model="symbolSize"
-           :step="1" :min="1" :max="5" @change="refresh" show-stops>
+        <el-slider class="inline_item" style="width:200px;z-index:1;" v-model="symbolSize"
+           :step="1" :min="1" :max="8" @change="refresh" show-stops>
          </el-slider>
       </div>
       <!-- switch symbol size end -->
@@ -101,7 +101,13 @@
       <div class="inline_item">
         <span class="inline_item" style="z-index:1;">Lowest expression :</span>
         <el-slider class="inline_item" style="width:220px;z-index:1;" v-model="smallestExpression"
-           :step="0.5" :min="0" :max="6" @change="changeSmallest" show-stops>
+           :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
+        </el-slider>
+      </div>
+      <div class="inline_item">
+        <span class="inline_item" style="z-index:1;">Highest expression :</span>
+        <el-slider class="inline_item" style="width:220px;z-index:1;" v-model="largestExpression"
+           :step="0.5" :min="0" :max="10" @change="changeExpression" show-stops>
         </el-slider>
       </div>
       <!-- lowest cutoff end -->
@@ -156,6 +162,7 @@
         basic_umapdata: null,
         //raw_umapdata:null,
         umapdata:null,
+        raw_umapdata:null,
         //gene_umap_xyz:null,
 
         option: {
@@ -185,6 +192,7 @@
         black_background:true,
         symbolSize:2,
         smallestExpression:0,
+        largestExpression:10,
         umap_enable_message : '',
         //------------roi confs start ------
         isROIHidden:true,
@@ -262,7 +270,7 @@
       },
       load_umap(){
         console.log("load_umap");
-        if( this.umapdata != null ||  this.curr_name == null )
+        if( this.raw_umapdata != null ||  this.curr_name == null )
           return;
         var background_url = this.CELL_UMAP_URL+"/"+this.curr_name+"/"+"0.8.json";
         var gene_url = this.GENE_UMAP_URL+"/"+this.curr_name+"/"+this.curr_gene+".json";
@@ -300,7 +308,25 @@
           var curr_item = _data[j];
           curr_draw_datas.push( [curr_item[0],curr_item[1],curr_item[2],curr_item[3]]);
         }
+        this.raw_umapdata = curr_draw_datas;
         this.umapdata = curr_draw_datas;
+      },
+      updateUMAPJsonData(){
+        var curr_draw_datas = [];
+        curr_draw_datas.push(['x','y','z']);
+        for(var j =1;j<this.raw_umapdata.length; j++){
+          var info = this.raw_umapdata[j];
+          //if( info[0]<this.x_min) continue;
+          //if( info[1]<this.y_min) continue;
+          //if( info[2]<this.z_min) continue;
+          //if( info[0]>this.x_max) continue;
+          //if( info[1]>this.y_max) continue;
+          //if( info[2]>this.z_max) continue;
+          if( info[3]<this.smallestExpression)continue;
+          if( info[3]>this.largestExpression)continue;
+          curr_draw_datas.push(info)
+        }
+        this.umapdata= curr_draw_datas;
       },
       getUMAPOption() {
         console.log("get umap option");
@@ -332,7 +358,7 @@
                 borderWidth: 1,
                 borderColor: bk_color,
                 color : bk_color,
-                opacity: 0.5,
+                opacity: 0.05,
               },
           };
           var series_list = [];
@@ -468,9 +494,13 @@
       //-------------3d box conf end-------------------//
 
       //-------------smallest expression start---------//
-      changeSmallest(){
+      changeExpression(){
         this.updateJsonData();
         this.option=this.getOption();
+        if(this.raw_umapdata != null){
+          this.updateUMAPJsonData();
+          this.umap_option = this.getUMAPOption();
+        }
       },
       //-------------smallest expression end-----------//
 
@@ -502,6 +532,7 @@
           this.gene_xyz_raw = null;
           this.curr_selected_gene = null;
           this.umapdata = null;
+          this.raw_umapdata = null;
           this.basic_umapdata = null;
           this.isUMAPHidden = true;
           // show loading first
@@ -542,6 +573,7 @@
         if(this.curr_name != null){
           if(this.curr_gene != gname || force ){
             this.umapdata = null;
+            this.raw_umapdata = null;
             this.gene_xyz = null;
             this.gene_xyz_raw = null;
             this.$refs.myecharts.setOption(this.getOption(),true);
@@ -625,6 +657,7 @@
           if( info[1]>this.y_max) continue;
           if( info[2]>this.z_max) continue;
           if( info[3]<this.smallestExpression)continue;
+          if( info[3]>this.largestExpression)continue;
           curr_draw_datas.push(info)
         }
         this.gene_xyz= curr_draw_datas;
