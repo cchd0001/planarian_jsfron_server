@@ -583,6 +583,7 @@
             $.getJSON(used_url,function(_data) {
               self.curr_gene = gname;
               self.setGeneData(_data);
+              self.updateJsonData();
               self.option = self.getOption();
             });
             // if umap panel is still open

@@ -20,9 +20,7 @@
       <div class="line"></div>
     </header>
     <article>
-      <keep-alive>
         <component v-bind:is="selected"></component>
-      </keep-alive>
     </article>
     <hr>
     <footer>
