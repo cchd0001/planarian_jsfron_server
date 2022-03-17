@@ -39,12 +39,18 @@
       </div> <!--end of inline div-->
       <!-- 3D umap end -->
 
-      <p class="inline_item" > Please select the gene of your interest.</p>
+      <!-- select gene start -->
+      <p class="inline_item" > Please select the marker gene:</p>
       <el-select class="inline_item" v-model="curr_selected_gene" filterable placeholder="" @change="selectGene" >
         <el-option v-for="item in genes" :key="item.value" 
            :label="item.label" :value="item.value">
         </el-option>
       </el-select>
+      <p class="inline_item" > Or type any SMEDID:</p>
+      <el-input  class="inline_item" style='width:150px;' v-model="input_smedid" placeholder=""></el-input>
+      <el-button class='inline_item' @click.native="UseSMED">Display</el-button>
+      <!-- select gene end -->
+
       <!-- ROI configuration menu start ... -->
       <div class='inline_item' >
         <el-button align='right' style='width:100%;' @click.native="openROI">ROI Configuration</el-button>
@@ -89,6 +95,7 @@
           </el-option>
         </el-select>
       </div>
+      <hr>
       <!-- switch symbol size start -->
       <div class="inline_item">
         <span class="inline_item" style="z-index:1;">Symbol size :</span>
@@ -110,6 +117,7 @@
            :step="0.5" :min="0" :max="10" @change="changeExpression" show-stops>
         </el-slider>
       </div>
+      <hr>
       <!-- lowest cutoff end -->
     </div>
     <div>
@@ -125,17 +133,13 @@
   //import VChart, { THEME_KEY } from "vue-echarts";
   import VChart from "vue-echarts";
   // the dateset url
-  //var GENE_UMAP_URL="http://49.235.68.146/gene_umap/";
-  //var CELL_UMAP_URL="http://49.235.68.146/cell_umap/";
-  //var CP_URL="http://49.235.68.146/cell_center/"
-  //var GENE_NEW_URL="http://49.235.68.146/newgenes/";
   var conf_gens = require('../confs/genes.js');
   var idvd_conf = require('../confs/individual.js');
   var url_manager = require('../confs/urls.js');
   var gene_url_conf = url_manager.GENE_URL;
   var drag_x = 0;
   var drag_y = 0;
-
+  //var all_genes_conf='http://49.235.68.146/newgenes/all_genes.json'
   export default {
     name : "GeneExpression",
     components: {
@@ -152,7 +156,7 @@
         CP_URL : gene_url_conf[gene_url_conf.default_version].url_model,
         GENE_NEW_URL: gene_url_conf[gene_url_conf.default_version].url_model_expression,
         // ---------- url version -----------------------
-
+        input_smedid:"",
         curr_name: "",
         curr_gene: "",
         basic_xyz: null,
@@ -215,6 +219,21 @@
         //------------roi confs end------
       }; // end of data return
     },
+    //mounted() {
+    //   var self = this;$                            
+    //   $.getJSON(all_genes_conf,function(_data) {
+    //      console.log("all genes loaded");
+    //      var all_genes = []
+    //      for(var i = 0; i < _data.length; i++ ){
+    //         var curr_item = _data[i];
+    //         var curr_gene_obj = {};
+    //         curr_gene_obj['value'] = curr_item[0];
+    //         curr_gene_obj['label'] = curr_item[1];
+    //         all_genes.push(curr_gene_obj);
+    //      }
+    //      self.genes = all_genes;
+    //   });
+    //},
     methods: {
       //-------------version control start --------------//
       changeVersion(value) {
@@ -566,6 +585,9 @@
       //-------------switching individual end-------------------//
 
       //-------------switching gene start -------------------//
+      UseSMED(){
+        this.selectGene(this.input_smedid);
+      },
       selectGene(item){
         this.refreshGene(item,false);
       },

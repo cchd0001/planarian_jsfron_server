@@ -1,6 +1,6 @@
 module.exports = {
   GENE_URL : {
-    default_version : 'v202201', 
+    default_version : 'v202202', 
     select_conf : [
         { value: 'v202201' , label:'version 2022/01' },
         { value: 'v202202' , label:'version 2022/02' },
