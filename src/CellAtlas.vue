@@ -31,6 +31,7 @@
         <el-menu-item index="7"  @click.native ="use_r1_5">r1.5</el-menu-item>
         <el-menu-item index="8"  @click.native ="use_r2_0">r2.0</el-menu-item>
         <el-menu-item index="9"  @click.native ="use_all_tg">all together</el-menu-item>
+        <el-menu-item index="10"  @click.native ="use_all_tg_smes">all together smes</el-menu-item>
       </el-menu>
     </div>
 
@@ -374,6 +375,7 @@
       use_r1_5(){this.update_basic('1.5');},
       use_r2_0(){this.update_basic('2.0');},
       use_all_tg(){this.update_basic('all_tg_v0.1');},
+      use_all_tg_smes(){this.update_basic('all_tg_smes_v0.1');},
 
       resetIndividual(name){
           if ( this.curr_name != name ) {
