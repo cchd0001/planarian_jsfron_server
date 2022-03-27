@@ -354,16 +354,14 @@
       resetMesh(){
         console.log("reset mesh");
         this.mesh_json = null;
-        if( this.curr_name == "WT" ) {
-          var self = this;
-          var used_url = CP_URL+"/"+this.curr_name+"_mesh.json";
-          $.getJSON(used_url,function(_data) {
-            console.log("mesh loaded");
-            self.setMeshData(_data);
-            self.option = self.getOption();
-          });
-            
-        }
+        var self = this;
+        var used_url = CP_URL+"/"+this.curr_name+"_mesh.json";
+        console.log(used_url);
+        $.getJSON(used_url,function(_data) {
+          console.log("mesh loaded");
+          self.setMeshData(_data);
+          self.option = self.getOption();
+        });
       },
       setMeshData(_data) {
           this.mesh_json = {};
@@ -544,6 +542,8 @@
               var curr_color = this.mesh_conf.colors[i];
               var curr_opacity = this.mesh_conf.opacity[i];
               //console.log('curr_legend_name');
+              if( this.mesh_json[curr_name]['xyz'].length == 0 )
+                  continue;
               legend_list.push(curr_legend_name);
               var one_series = {
                   name : curr_legend_name,

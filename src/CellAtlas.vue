@@ -632,7 +632,7 @@
       //-------------data manager start-------------------//
       resetMesh(){
         this.mesh_json = null;
-        if( this.curr_name == "WT" ) {
+        //if( this.curr_name == "WT" ) {
           var self = this;
           var used_url = CP_URL+"/"+this.curr_name+"_mesh.json";
           $.getJSON(used_url,function(_data) {
@@ -640,8 +640,7 @@
             self.setMeshData(_data);
             self.option = self.getOption();
           });
-            
-        }
+        //}
       },
       cleanBuffer(){
         this.jsondata = null ;
@@ -807,6 +806,8 @@
               var curr_legend_name = this.mesh_conf.legends[i];
               var curr_color = this.mesh_conf.colors[i];
               var curr_opacity = this.mesh_conf.opacity[i];
+              if ( this.mesh_json[curr_name]['xyz'].length == 0 ) 
+                  continue;
               //console.log('curr_legend_name');
               legend_list.push(curr_legend_name);
               var one_series = {
