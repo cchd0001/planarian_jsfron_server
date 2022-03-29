@@ -22,13 +22,30 @@
         </el-menu>
     </div>
     <div style="margin-left:0%;background-color: rgb(238, 241, 246); border: 3px solid #eee;" >
+      <!-- Pseudo FISH image start -->
+      <div class='inline_item'>
+          <el-button align='right' @click.native="openFISH" style='width:100%;z-index:9999;'>Pseudo FISH</el-button>
+          <div class='parent' style='width:10px;'>
+            <div id="fish_panel" class="child" style='width:700px;z-index:9999;background-color:white'  v-if="!isFISHHidden">
+              <div id="fish_panel_dragMe">
+                <p> Pseudo FISH {{umap_enable_message}}</p>
+              </div>
+              <div style="border: 10px solid #eee;">
+                <img :src=fish_url >
+                <hr>
+                <el-button class='inline_item' @click.native="closeCTC">Close Pseudo FISH</el-button>
+              </div>
+            </div> <!-- end of hidden panel -->
+          </div> <!-- end of parent-->
+      </div> <!--end of inline div-->
+      <!-- Pseudo FISH image end -->
       <!-- 3D umap start -->
       <div class='inline_item'>
           <el-button align='right' @click.native="openUMAP" style='width:100%;z-index:9999;'>3D UMAP Panel</el-button>
           <div class='parent' style='width:10px;'>
             <div id="umap_panel" class="child" style='width:700px;z-index:9999;background-color:white'  v-if="!isUMAPHidden">
               <div id="umap_panel_dragMe">
-                <p> UMAP Panel : {{umap_enable_message}}</p>
+                <p> UMAP Panel {{umap_enable_message}}</p>
               </div>
               <div style="border: 10px solid #eee;">
                 <v-chart class="chart" ref="my_umap_echarts" :option="umap_option" style="width:660px;height:660px;" />
@@ -137,9 +154,9 @@
   var idvd_conf = require('../confs/individual.js');
   var url_manager = require('../confs/urls.js');
   var gene_url_conf = url_manager.GENE_URL;
+  var pseudo_fish_base_url = url_manager.PSEUDO_FISH_URL.base_url;
   var drag_x = 0;
   var drag_y = 0;
-  //var all_genes_conf='http://49.235.68.146/newgenes/all_genes.json'
   export default {
     name : "GeneExpression",
     components: {
@@ -198,8 +215,11 @@
         smallestExpression:0,
         largestExpression:10,
         umap_enable_message : '',
+        //------------fish url
+        fish_url: '',
         //------------roi confs start ------
         isROIHidden:true,
+        isFISHHidden:true,
         isUMAPHidden:true,
         z_scale:1,
         tmp_z_scale:1,
@@ -247,10 +267,28 @@
 
       },
       //-------------version control end ----------------//
+
+      //-------------Pseudo FISH start ------------------//
+      openFISH(){
+        //this.isHidden = true;
+        this.isROIHidden = true;
+        this.isUMAPHidden = true;
+        this.isFISHHidden = !this.isFISHHidden;
+        if( this.isFISHHidden == false ) {
+          if( this.curr_name != null && this.curr_name != '' && this.curr_gene != '' &&this.curr_gene != null ) {
+            this.fish_url = pseudo_fish_base_url + '/' + this.curr_name+'/'+this.curr_name+'_'+this.curr_gene+".green.MIR.png";
+          } else {
+            this.fish_url = pseudo_fish_base_url + '/black.png';
+          }
+          //console.log(this.fish_url);
+        }
+      },
+      //-------------Pseudo FISH end --------------------//
       //-------------UMAP conf start---------------------//
       openUMAP(){
-        this.isHidden = true;
+        //this.isHidden = true;
         this.isROIHidden = true;
+        this.isFISHHidden = true;
         this.isUMAPHidden = !this.isUMAPHidden;
         if( this.isUMAPHidden == false ){
           this.umap_enable_message = '';
@@ -525,17 +563,16 @@
 
       //-------------roi panel start-------------------//
       openROI(){
-        this.isHidden = true;
+        //this.isHidden = true;
+        this.isFISHHidden = true;
+        this.isUMAPHidden = true;
         this.isROIHidden = !this.isROIHidden;
-        //if(this.isROIHidden)
-           //this.isROIHidden = false;
-        //else 
-            //this.isROIHidden = true;
       },
       closeCTC(){
         //this.isHidden = true;
         this.isROIHidden = true;
         this.isUMAPHidden = true;
+        this.isFISHHidden = true;
       },
       //-------------roi panel end-------------------//
       //-------------switching individual start -------------------//
