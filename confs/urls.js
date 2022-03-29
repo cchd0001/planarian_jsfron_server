@@ -18,4 +18,7 @@ module.exports = {
       url_umap_expression  : 'http://49.235.68.146/gene_umap/v20220221/',
     },
   },
+  PSEUDO_FISH_URL : {
+    base_url : 'http://49.235.68.146/pseudo_fish/',
+  },
 };
