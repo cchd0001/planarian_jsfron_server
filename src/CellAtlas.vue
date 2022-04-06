@@ -22,16 +22,8 @@
         <el-menu-item index="17" @click.native="show_14dpa2"  >14dpa2 </el-menu-item>
       </el-menu>
       <el-menu  class="el-menu-demo" mode="horizontal" active-text-color="#409eff">
-        <el-menu-item index="1"  @click.native ="use_r0_1">r0.1</el-menu-item>
-        <el-menu-item index="2"  @click.native ="use_r0_2">r0.2</el-menu-item>
-        <el-menu-item index="3"  @click.native ="use_r0_3">r0.3</el-menu-item>
-        <el-menu-item index="4"  @click.native ="use_r0_5">r0.5</el-menu-item>
-        <el-menu-item index="5"  @click.native ="use_r0_8">r0.8</el-menu-item>
-        <el-menu-item index="6"  @click.native ="use_r1_2">r1.2</el-menu-item>
-        <el-menu-item index="7"  @click.native ="use_r1_5">r1.5</el-menu-item>
-        <el-menu-item index="8"  @click.native ="use_r2_0">r2.0</el-menu-item>
-        <el-menu-item index="9"  @click.native ="use_all_tg">all together</el-menu-item>
-        <el-menu-item index="10"  @click.native ="use_all_tg_smes">all together smes</el-menu-item>
+        <el-menu-item index="10"  @click.native ="use_all_tg_smes_raw">Original posture</el-menu-item>
+        <el-menu-item index="11"  @click.native ="use_all_tg_smes_corrected">Corrected posture</el-menu-item>
       </el-menu>
     </div>
 
@@ -123,28 +115,28 @@
           <div class="child" v-draggable style='width:500px;z-index:9999;background-color:white'  v-if="!isROIHidden">
               <hr>
               <p class='inline_item_tight'> Z gap scale : </p>
-              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_z_scale" placeholder="1"></el-input>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;'  v-model="tmp_z_scale" placeholder="1"></el-input>
               <el-button class='inline_item' @click.native="changeZScale">Apply</el-button>
               <hr>
               <p class='inline_item_tight'> X min : </p>
-              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_x_min" placeholder="0"></el-input>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;'  v-model="tmp_x_min" placeholder="0"></el-input>
               <el-button class='inline_item_tight' @click.native="changeXMin">Apply</el-button>
               <p class='inline_item'> X max : </p>
-              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_x_max" placeholder="300"></el-input>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;'  v-model="tmp_x_max" placeholder="300"></el-input>
               <el-button class='inline_item_tight' @click.native="changeXMax">Apply</el-button>
               <hr>
               <p class='inline_item_tight'> Y min : </p>
-              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_y_min" placeholder="0"></el-input>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;'  v-model="tmp_y_min" placeholder="0"></el-input>
               <el-button class='inline_item_tight' @click.native="changeYMin">Apply</el-button>
               <p class='inline_item'> Y max : </p>
-              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_y_max" placeholder="300"></el-input>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;'  v-model="tmp_y_max" placeholder="300"></el-input>
               <el-button class='inline_item_tight' @click.native="changeYMax">Apply</el-button>
               <hr>
               <p class='inline_item_tight'> Z min : </p>
-              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_z_min" placeholder="0"></el-input>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;'  v-model="tmp_z_min" placeholder="0"></el-input>
               <el-button class='inline_item_tight' @click.native="changeZMin">Apply</el-button>
               <p class='inline_item'> Z max : </p>
-              <el-input class='inline_item_tight' style='width:80px;height:50px;' type='number' v-model="tmp_z_max" placeholder="300"></el-input>
+              <el-input class='inline_item_tight' style='width:80px;height:50px;'  v-model="tmp_z_max" placeholder="300"></el-input>
               <el-button class='inline_item_tight' @click.native="changeZMax">Apply</el-button>
               <hr>
               <el-button class='inline_item' @click.native="resetROI">Reset ROI</el-button>
@@ -189,6 +181,7 @@
   var CP_URL="http://49.235.68.146/cell_center/"
   var COLOR_ALL = require('../confs/discret_color.js');
   var idvd_conf = require('../confs/individual.js');
+  var idvd_conf_corrected = require('../confs/individual_corrected.js');
   var drag_x = 0;
   var drag_y = 0;
   // the loading chart before we cache the real dataset
@@ -204,6 +197,8 @@
     },
     data(){
       return {
+        // coordinate tag
+        coord_tag : 'raw',
         // test color 
         current_color_all: COLOR_ALL,
         COLOR_ALL2: COLOR_ALL,
@@ -319,7 +314,7 @@
        // change color when click row
        // only apply changes when click button
        this.current_color_all[this.currentCellID] = this.color;
-       this.option=this.getOption();
+       this.option=this.getOption()  ;
      },
      closeColor(){
        this.isShowColorPalette = false;
@@ -327,14 +322,38 @@
       //-------------color palette ends------------------//
 
       //-------------3d box conf start-------------------//
+      getXMin(){
+        if( this.coord_tag == "raw" ) return 0;
+        else return idvd_conf_corrected['label_'+this.curr_name].xmin/10;
+      },
+      getXMax(){
+        if( this.coord_tag == "raw" ) return idvd_conf['label_'+this.curr_name].x;
+        else return idvd_conf_corrected['label_'+this.curr_name].xmax/10;
+      },
+      getYMin(){
+        if( this.coord_tag == "raw" ) return 0;
+        else return idvd_conf_corrected['label_'+this.curr_name].ymin/10;
+      },
+      getYMax(){
+        if( this.coord_tag == "raw" ) return idvd_conf['label_'+this.curr_name].y;
+        else return idvd_conf_corrected['label_'+this.curr_name].ymax/10;
+      },
+      getZMin(){
+        if( this.coord_tag == "raw" ) return 0;
+        else return idvd_conf_corrected['label_'+this.curr_name].zmin/10;
+      },
+      getZMax(){
+        if( this.coord_tag == "raw" ) return idvd_conf['label_'+this.curr_name].z;
+        else return idvd_conf_corrected['label_'+this.curr_name].zmax/10;
+      },
       getWidth(){
-        return idvd_conf['label_'+this.curr_name].x ;
+        return this.getXMax()-this.getXMin()+2;   //idvd_conf['label_'+this.curr_name].x ;
       },
       getDepth() {
-        return idvd_conf['label_'+this.curr_name].z ;
+        return this.getZMax()-this.getZMin()+2;   //idvd_conf['label_'+this.curr_name].z ;
       },
       getHeight() {
-        return idvd_conf['label_'+this.curr_name].y ;
+        return this.getYMax()-this.getYMin()+2;  //idvd_conf['label_'+this.curr_name].y ;
       },
       //-------------3d box conf end -------------------//
 
@@ -366,24 +385,33 @@
           });
         }
       },
-      use_r0_1(){this.update_basic('0.1');}, 
-      use_r0_2(){this.update_basic('0.2');},
-      use_r0_3(){this.update_basic('0.3');},
-      use_r0_5(){this.update_basic('0.5');},
-      use_r0_8(){this.update_basic('0.8');},
-      use_r1_2(){this.update_basic('1.2');},
-      use_r1_5(){this.update_basic('1.5');},
-      use_r2_0(){this.update_basic('2.0');},
-      use_all_tg(){this.update_basic('all_tg_v0.1');},
-      use_all_tg_smes(){this.update_basic('all_tg_smes_v0.1');},
+      //use_r0_1(){this.update_basic('0.1');}, 
+      //use_r0_2(){this.update_basic('0.2');},
+      //use_r0_3(){this.update_basic('0.3');},
+      //use_r0_5(){this.update_basic('0.5');},
+      //use_r0_8(){this.update_basic('0.8');},
+      //use_r1_2(){this.update_basic('1.2');},
+      //use_r1_5(){this.update_basic('1.5');},
+      //use_r2_0(){this.update_basic('2.0');},
+      //use_all_tg(){this.update_basic('all_tg_v0.1');},
+      use_all_tg_smes_raw(){   
+          this.coord_tag = 'raw';
+          this.resetROIdata();
+          this.resetMesh();
+          this.update_basic('all_tg_smes_v0.1');
+      },
+      use_all_tg_smes_corrected(){
+          this.coord_tag = 'corrected';
+          this.resetROIdata();
+          this.resetMesh();
+          this.update_basic('all_tg_smes_apdv_corrected');
+      },
 
       resetIndividual(name){
           if ( this.curr_name != name ) {
             this.curr_name = name ;
             this.curr_rs = null ;
             this.cleanBuffer(); 
-            this.resetMesh();
-            this.resetROIdata();
             this.$refs.myecharts.setOption(this.getOption(),true);
           }
       },
@@ -536,9 +564,18 @@
       resetROIdata(){
         // reset-roi
         this.z_scale = 1;this.tmp_z_scale=1;
-        this.x_min = 0;this.y_min = 0;this.z_min = 0;this.tmp_x_min=0;this.tmp_y_min=0;this.tmp_z_min=0;
-        this.x_max = this.getWidth();this.y_max = this.getHeight(); this.z_max = this.getDepth();
-        this.tmp_x_max = this.x_max; this.tmp_y_max = this.y_max; this.tmp_z_max = this.z_max;
+        this.x_min = this.getXMin();
+        this.y_min = this.getYMin();
+        this.z_min = this.getZMin();
+        this.tmp_x_min=this.x_min;
+        this.tmp_y_min=this.y_min;
+        this.tmp_z_min=this.z_min;
+        this.x_max = this.getXMax();
+        this.y_max = this.getYMax();
+        this.z_max = this.getZMax();
+        this.tmp_x_max = this.x_max; 
+        this.tmp_y_max = this.y_max;
+        this.tmp_z_max = this.z_max;
       },
       resetROI(){
         this.resetROIdata();
@@ -564,64 +601,70 @@
         this.jsondata = curr_draw_datas;
       },
       changeXMin(){
-        if(this.x_min != this.tmp_x_min){
-          if(this.tmp_x_min<0)                          this.x_min = 0;
-          else if (this.tmp_x_min>this.x_max-1)         this.x_min = this.x_max-1;
-          else if (this.tmp_x_min>this.getWidth()-1)    this.x_min = this.getWidth()-1;
-          else                                          this.x_min = this.tmp_x_min;
+        var txmin = Number(this.tmp_x_min);
+        if(this.x_min != txmin){
+          if(txmin<this.getXMin())                      this.x_min = this.getXMin();
+          else if (txmin>this.x_max-1)                  this.x_min = this.x_max-1;
+          else if (txmin>this.getXMax()-1)              this.x_min = this.getXMax()-1;
+          else                                          this.x_min = txmin;
           this.updateJsonData();
           this.option=this.getOption();
         }
       },
       changeXMax(){
-        if(this.x_max != this.tmp_x_max){
-          if(this.tmp_x_max<1)                          this.x_max = 1;
-          else if (this.tmp_x_max<Number(this.x_min)+1) this.x_max = Number(this.x_min) +1;
-          else if (this.tmp_x_max>this.getWidth())      this.x_max = this.getWidth();
-          else                                          this.x_max = this.tmp_x_max;
+        var txmax = Number(this.tmp_x_max);
+        if(this.x_max != txmax){
+          if(txmax<this.getXMin()+1)                    this.x_max = this.getXMin()+1;
+          else if (txmax<Number(this.x_min)+1)          this.x_max = Number(this.x_min) +1;
+          else if (txmax>this.getXMax())                this.x_max = this.getXMax();
+          else                                          this.x_max = txmax;
           console.log(this.x_max);
           this.updateJsonData();
           this.option=this.getOption();
         }
       },
       changeYMin(){
-        if(this.y_min != this.tmp_y_min){
-          if(this.tmp_y_min<0)                          this.y_min = 0;
-          else if (this.tmp_y_min>this.y_max-1)         this.y_min = this.y_max-1;
-          else if (this.tmp_y_min>this.getHeight()-1)   this.y_min = this.getHeight()-1;
-          else                                          this.y_min = this.tmp_y_min;
+        var tymin = Number(this.tmp_y_min);
+        if(this.y_min != tymin){
+          if(tymin<this.getYMin())                      this.y_min = this.getYMin();
+          else if (tymin>this.y_max-1)                  this.y_min = this.y_max-1;
+          else if (tymin>this.getYMax()-1)              this.y_min = this.getYMax()-1;
+          else                                          this.y_min = tymin;
           console.log(this.y_min);
           this.updateJsonData();
           this.option=this.getOption();
         }
       },
       changeYMax(){
-        if(this.y_max != this.tmp_y_max){
-          if(this.tmp_y_max<1)                          this.y_max = 1;
-          else if (this.tmp_y_max<Number(this.y_min)+1) this.y_max = Number(this.y_min) +1;
-          else if (this.tmp_y_max>this.getHeight())     this.y_max = this.getHeight();
-          else                                          this.y_max = this.tmp_y_max;
+        var tymax = Number(this.tmp_y_max);
+        if(this.y_max != tymax) {
+          if(tymax<this.getYMin()+1)                    this.y_max = this.getYMin()+1;
+          else if (tymax<Number(this.y_min)+1)          this.y_max = Number(this.y_min) +1;
+          else if (tymax>this.getYMax())                this.y_max = this.getYMax();
+          else                                          this.y_max = tymax;
           console.log(this.y_max);
           this.updateJsonData();
           this.option=this.getOption();
         }
       },
       changeZMin(){
-        if(this.z_min != this.tmp_z_min){
-          if(this.tmp_z_min<0)                          this.z_min = 0;
-          else if (this.tmp_z_min>this.z_max-1)         this.z_min = this.z_max-1;
-          else if (this.tmp_z_min>this.getDepth()-1)    this.z_min = this.getDepth()-1;
-          else                                          this.z_min = this.tmp_z_min;
+        var tzmin = Number(this.tmp_z_min);
+        if(this.z_min != tzmin){
+          if(tzmin<this.getZMin())                      this.z_min = this.getZMin();
+          else if (tzmin>this.z_max-1)                  this.z_min = this.z_max-1;
+          else if (tzmin>this.getZMax()-1)              this.z_min = this.getZMax()-1;
+          else                                          this.z_min = tzmin;
           this.updateJsonData();
           this.option=this.getOption();
         }
       },
       changeZMax(){
-        if(this.z_max != this.tmp_z_max){
-          if(this.tmp_z_max<1)                          this.z_max = 1;
-          else if (this.tmp_z_max<Number(this.z_min)+1) this.z_max = Number(this.z_min) +1;
-          else if (this.tmp_z_max>this.getDepth())      this.z_max = this.getDepth();
-          else                                          this.z_max = this.tmp_z_max;
+        var tzmax = Number(this.tmp_z_max);
+        if(this.z_max != tzmax){
+          if(tzmax<this.getZMin()+1)                    this.z_max = this.getZMin()+1;
+          else if (tzmax<Number(this.z_min)+1)          this.z_max = Number(this.z_min) +1;
+          else if (tzmax>this.getZMax())                this.z_max = this.getZMax();
+          else                                          this.z_max = tzmax;
           this.updateJsonData();
           this.option=this.getOption();
         }
@@ -634,7 +677,12 @@
         this.mesh_json = null;
         //if( this.curr_name == "WT" ) {
           var self = this;
-          var used_url = CP_URL+"/"+this.curr_name+"_mesh.json";
+          var used_url = '';
+          if( this.coord_tag == 'raw' ) {
+            used_url = CP_URL+"/"+this.curr_name+"_mesh.json";
+          } else {
+            used_url = CP_URL+"/"+this.curr_name+"_mesh.apdv.json";
+          }
           $.getJSON(used_url,function(_data) {
             console.log("mesh loaded");
             self.setMeshData(_data);
@@ -825,15 +873,15 @@
           }
           //console.log(legend_show);
           console.log(legend_list);
-          var used_xmin = 0;
-          var used_xmax = this.getWidth();
-          var used_ymin = 0;
-          var used_ymax = this.getHeight();
-          var used_zmin = 0;
-          var used_zmax = this.getDepth();
-          var boxWidth  = used_xmax;
-          var boxHeight = used_zmax*this.z_scale;
-          var boxDepth  = used_ymax;
+          var used_xmin = this.getXMin();
+          var used_xmax = this.getXMax();
+          var used_ymin = this.getYMin();
+          var used_ymax = this.getYMax();
+          var used_zmin = this.getZMin();
+          var used_zmax = this.getZMax();
+          var boxWidth  = this.getWidth();
+          var boxHeight = this.getDepth()*this.z_scale;
+          var boxDepth  = this.getHeight();
           if( max10 == true ){
             used_xmin = -10; used_xmax = 10; 
             used_ymin = -10; used_ymax = 10; 
@@ -881,8 +929,8 @@
             },
             grid3D: {
               boxWidth: boxWidth,
-              boxHeight: boxHeight , //this.getDepth() *this.z_scale,
-              boxDepth: boxDepth ,     //this.getHeight(),
+              boxHeight: boxHeight ,
+              boxDepth: boxDepth , 
               axisLine: {
                 lineStyle: {
                   color:ft_color,
