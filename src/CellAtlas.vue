@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- individual and resolution selecting menu start ... -->
-    <div  style="margin-left:0%;" align="center">
+    <div style="margin-left:0%;" align="center">
       <el-menu  class="el-menu-demo" mode="horizontal" active-text-color="#409eff">
         <el-menu-item index="1"  @click.native="show_WT"      >WT     </el-menu-item>
         <el-menu-item index="2"  @click.native="show_0hpa1"   >0hpa1  </el-menu-item>
@@ -21,9 +21,9 @@
         <el-menu-item index="16" @click.native="show_14dpa1"  >14dpa1 </el-menu-item>
         <el-menu-item index="17" @click.native="show_14dpa2"  >14dpa2 </el-menu-item>
       </el-menu>
-      <el-menu  class="el-menu-demo" mode="horizontal" active-text-color="#409eff">
-        <el-menu-item index="10"  @click.native ="use_all_tg_smes_raw">Original posture</el-menu-item>
-        <el-menu-item index="11"  @click.native ="use_all_tg_smes_corrected">Corrected posture</el-menu-item>
+      <el-menu default-active="selected_rs_index" class="el-menu-demo" mode="horizontal" active-text-color="#409eff">
+        <el-menu-item index="1"  @click.native ="use_all_tg_smes_anno">Cell Types</el-menu-item>
+        <el-menu-item index="2"  @click.native ="use_all_tg_smes_major_ct">Clusters</el-menu-item>
       </el-menu>
     </div>
 
@@ -55,12 +55,48 @@
       </div> <!--end of inline div-->
       <!-- 3D umap end -->
 
-      <!-- switch background start -->
-      <el-switch class='inline_item' active-text="Black theme" inactive-text="White theme" 
-        v-model="black_background" @change="refresh" >
-      </el-switch>
-      <!-- switch background end -->
-      
+      <!-- Display configuration menu start ... -->
+      <div class='inline_item'>
+          <el-button align='right' @click.native="openDisplay" style='width:100%;z-index:9999;'>Display Configuration</el-button>
+          <div class='parent' style='width:10px;'>
+            <div v-draggable class="child" style='width:500px;z-index:9999;background-color:white' v-if="!isDisplayHidden">
+              <!-- switch background start -->
+              <hr>
+              <el-switch  active-text="Black theme" inactive-text="White theme" 
+                v-model="black_background" @change="refresh" >
+              </el-switch>
+              <!-- switch background end -->
+              <!-- Posture select start -->
+              <hr>
+              <el-switch  active-text="Adjusted posture" inactive-text="Original posture" 
+                v-model="adjusted_posture" @change="update_coord" >
+              </el-switch>
+              <!-- Posture select end -->
+              <!-- Draw legend start -->
+              <hr>
+              <el-switch  active-text="Draw legends" inactive-text="Ignore legends" 
+                v-model="draw_legends" @change="refresh" >
+              </el-switch>
+              <!-- Draw grid start -->
+              <hr>
+              <el-switch  active-text="Draw grids" inactive-text="Ignore grids" 
+                v-model="draw_grids" @change="refresh" >
+              </el-switch>
+              <!-- Draw grid end -->
+              <!-- switch symbol size start-->
+              <hr>
+              <div>
+                <span class="inline_item" style="z-index:1;">Symbol size :</span>
+                <el-slider class="inline_item" style="width:200px;z-index:1;" v-model="symbolSize"
+                   :step="1" :min="2" :max="10" @change="refresh" show-stops>
+                 </el-slider>
+              </div>
+              <hr>
+              <!-- switch symbol size end -->
+            </div>
+          </div>
+      </div>
+      <!-- Display configuration menu end ... -->
       <!-- Cell type configuration menu start ... -->
       <div class='inline_item'>
           <el-button align='right' @click.native="openCTC" style='width:100%;z-index:9999;'>Cell Type Configuration</el-button>
@@ -146,14 +182,6 @@
         </div>
       </div>
       <!-- ROI configuration menu end ... -->
-      <!-- switch symbol size start -->
-      <div class="inline_item">
-        <span class="inline_item" style="z-index:1;">Symbol size :</span>
-        <el-slider class="inline_item" style="width:200px;z-index:1;" v-model="symbolSize"
-           :step="1" :min="2" :max="10" @change="refresh" show-stops>
-         </el-slider>
-      </div>
-      <!-- switch symbol size end -->
     </div> <!-- end of inline block -->
 
     <!-- main window -->
@@ -176,12 +204,14 @@
   import { Sketch } from 'vue-color'
 
   // the dateset url
-  var CT_URL="http://49.235.68.146/celltype/"
-  var CTU_URL="http://49.235.68.146/celltype_umap/"
-  var CP_URL="http://49.235.68.146/cell_center/"
+  var CT_URL = "http://49.235.68.146/celltype/"
+  var CTU_URL = "http://49.235.68.146/celltype_umap/"
+  var CP_URL = "http://49.235.68.146/cell_center/"
   var COLOR_ALL = require('../confs/discret_color.js');
-  var idvd_conf = require('../confs/individual.js');
+  //var idvd_conf = require('../confs/individual.js');
   var idvd_conf_corrected = require('../confs/individual_corrected.js');
+  var idvd_conf_rotate = require('../confs/individual_rotated.js');
+  var celltype_legend = require('../confs/CellType.js');
   var drag_x = 0;
   var drag_y = 0;
   // the loading chart before we cache the real dataset
@@ -198,7 +228,7 @@
     data(){
       return {
         // coordinate tag
-        coord_tag : 'raw',
+        coord_tag : 'adjusted',
         // test color 
         current_color_all: COLOR_ALL,
         COLOR_ALL2: COLOR_ALL,
@@ -219,6 +249,7 @@
         isHidden: true,
         isROIHidden:true,
         isUMAPHidden:true,
+        isDisplayHidden:true,
         // conf table
         tableDataClusters: [],
         height:'250px',
@@ -226,6 +257,9 @@
         currentPage:1,
         // drawing theme
         black_background:true,
+        draw_legends:true,
+        draw_grids:true,
+        adjusted_posture:true,
         symbolSize:2,
         umap_enable_message : '',
         //------------show clusters-----------
@@ -276,6 +310,7 @@
         // curr selection
         curr_name : null,
         curr_rs : null,
+        selected_rs_index:"0",
         // main 3D data
         rawdata:null,
         jsondata : null,
@@ -323,37 +358,49 @@
 
       //-------------3d box conf start-------------------//
       getXMin(){
-        if( this.coord_tag == "raw" ) return 0;
-        else return idvd_conf_corrected['label_'+this.curr_name].xmin/10;
+        if( this.coord_tag == "raw" ) 
+            return idvd_conf_rotate['label_'+this.curr_name].xmin/10;
+        else 
+            return idvd_conf_corrected['label_'+this.curr_name].xmin/10;
       },
       getXMax(){
-        if( this.coord_tag == "raw" ) return idvd_conf['label_'+this.curr_name].x;
-        else return idvd_conf_corrected['label_'+this.curr_name].xmax/10;
+        if( this.coord_tag == "raw" ) 
+            return idvd_conf_rotate['label_'+this.curr_name].xmax/10;
+        else 
+            return idvd_conf_corrected['label_'+this.curr_name].xmax/10;
       },
       getYMin(){
-        if( this.coord_tag == "raw" ) return 0;
-        else return idvd_conf_corrected['label_'+this.curr_name].ymin/10;
+        if( this.coord_tag == "raw" ) 
+            return idvd_conf_rotate['label_'+this.curr_name].ymin/10;
+        else 
+            return idvd_conf_corrected['label_'+this.curr_name].ymin/10;
       },
       getYMax(){
-        if( this.coord_tag == "raw" ) return idvd_conf['label_'+this.curr_name].y;
-        else return idvd_conf_corrected['label_'+this.curr_name].ymax/10;
+        if( this.coord_tag == "raw" ) 
+            return idvd_conf_rotate['label_'+this.curr_name].ymax/10;
+        else 
+            return idvd_conf_corrected['label_'+this.curr_name].ymax/10;
       },
       getZMin(){
-        if( this.coord_tag == "raw" ) return 0;
-        else return idvd_conf_corrected['label_'+this.curr_name].zmin/10;
+        if( this.coord_tag == "raw" ) 
+            return idvd_conf_rotate['label_'+this.curr_name].zmin/10;
+        else 
+            return idvd_conf_corrected['label_'+this.curr_name].zmin/10;
       },
       getZMax(){
-        if( this.coord_tag == "raw" ) return idvd_conf['label_'+this.curr_name].z;
-        else return idvd_conf_corrected['label_'+this.curr_name].zmax/10;
+        if( this.coord_tag == "raw" ) 
+            return idvd_conf_rotate['label_'+this.curr_name].zmax/10;
+        else 
+            return idvd_conf_corrected['label_'+this.curr_name].zmax/10;
       },
       getWidth(){
-        return this.getXMax()-this.getXMin()+2;   //idvd_conf['label_'+this.curr_name].x ;
+        return this.getXMax()-this.getXMin()+2;
       },
       getDepth() {
-        return this.getZMax()-this.getZMin()+2;   //idvd_conf['label_'+this.curr_name].z ;
+        return this.getZMax()-this.getZMin()+2;
       },
       getHeight() {
-        return this.getYMax()-this.getYMin()+2;  //idvd_conf['label_'+this.curr_name].y ;
+        return this.getYMax()-this.getYMin()+2;
       },
       //-------------3d box conf end -------------------//
 
@@ -370,49 +417,59 @@
             self.umap_option = self.getUMAPOption();
         });
       },
-      update_basic(r){
-        if (this.curr_rs != r){
-          // loading data and re-draw graph
-          var self = this;
-          this.curr_rs = r;
-          var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
-          this.cleanBuffer();
-          this.option = this.getOption();
-          $.getJSON(used_url,function(_data) {
-            console.log("loaded");
-            self.setJsonData(_data);
-            self.option = self.getOption();
-          });
-        }
-      },
-      //use_r0_1(){this.update_basic('0.1');}, 
-      //use_r0_2(){this.update_basic('0.2');},
-      //use_r0_3(){this.update_basic('0.3');},
-      //use_r0_5(){this.update_basic('0.5');},
-      //use_r0_8(){this.update_basic('0.8');},
-      //use_r1_2(){this.update_basic('1.2');},
-      //use_r1_5(){this.update_basic('1.5');},
-      //use_r2_0(){this.update_basic('2.0');},
-      //use_all_tg(){this.update_basic('all_tg_v0.1');},
-      use_all_tg_smes_raw(){   
-          this.coord_tag = 'raw';
-          this.resetROIdata();
-          this.resetMesh();
-          this.update_basic('all_tg_smes_v0.1');
-      },
-      use_all_tg_smes_corrected(){
-          this.coord_tag = 'corrected';
-          this.resetROIdata();
-          this.resetMesh();
-          this.update_basic('all_tg_smes_apdv_corrected');
+      
+      update_basic() {
+        //deep clean buffer
+        this.cleanBuffer();
+        this.$refs.myecharts.setOption(this.getOption(),true);
+        // reset mesh and ROI data
+        this.resetROIdata();
+        this.resetMesh();
+        // download main data
+        var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+"."+this.coord_tag+".json";
+        var data_tag = this.curr_rs;
+        var self = this;
+        $.getJSON(used_url,function(_data) {
+          console.log("loaded");
+          self.setJsonData(_data,data_tag);
+          self.option = self.getOption();
+        });
       },
 
+      use_all_tg_smes_anno() {
+          if (this.curr_rs != "major_anno"){
+            this.curr_rs = "major_anno";
+            this.update_basic();
+          }
+      },
+      use_all_tg_smes_major_ct() {
+          if (this.curr_rs != "major_celltype"){
+            this.curr_rs = "major_celltype";
+            this.update_basic();
+          }
+      },
+      update_coord() {
+        if( this.adjusted_posture ){
+            this.coord_tag = "adjusted";
+            this.update_basic();
+        } else {
+            this.coord_tag = "raw";
+            this.update_basic();
+        }
+      },
       resetIndividual(name){
           if ( this.curr_name != name ) {
-            this.curr_name = name ;
+            // reset re 
             this.curr_rs = null ;
+            this.selected_rs_index="0";
+            // reset coord
+            this.coord_tag == "adjusted";
+            this.adjusted_posture = true;
+            // clean buffer
             this.cleanBuffer(); 
             this.$refs.myecharts.setOption(this.getOption(),true);
+            // set new name
+            this.curr_name = name ;
           }
       },
       show_WT()     {  this.resetIndividual("WT");     },
@@ -435,7 +492,14 @@
       //-------------switching individual and resolution end-------------------//
 
       //-------------switch configuration panel start-------------------------------//
+      openDisplay(){
+        this.isROIHidden = true;
+        this.isUMAPHidden = true;
+        this.isHidden = true;
+        this.isDisplayHidden = ! this.isDisplayHidden;
+      },
       openCTC(){
+        this.isDisplayHidden = true;
         this.isROIHidden = true;
         this.isUMAPHidden = true;
         this.isHidden = ! this.isHidden;
@@ -445,11 +509,13 @@
       },
       openROI(){
         this.isHidden = true;
+        this.isDisplayHidden = true;
         this.isUMAPHidden = true;
         this.isROIHidden = ! this.isROIHidden;
       },
       openUMAP(){
         this.isHidden = true;
+        this.isDisplayHidden = true;
         this.isROIHidden = true;
         this.isUMAPHidden = !this.isUMAPHidden;
         if( this.isUMAPHidden == false ){
@@ -679,7 +745,7 @@
           var self = this;
           var used_url = '';
           if( this.coord_tag == 'raw' ) {
-            used_url = CP_URL+"/"+this.curr_name+"_mesh.json";
+            used_url = CP_URL+"/"+this.curr_name+"_mesh.rotate.json";
           } else {
             used_url = CP_URL+"/"+this.curr_name+"_mesh.apdv.json";
           }
@@ -729,46 +795,32 @@
         } // end of for _data
         this.umapdata = curr_draw_datas;
       },
-      setJsonData(_data){
-        console.log('knowing json loaded');
+      setJsonData(_data,data_tag){
+        console.log('json loaded');
         var curr_draw_datas= [];
-        this.final_clusters = new Array(301).fill(0);
-        this.all_clusters = 301;
+        var total_cluster_number = celltype_legend[data_tag].LegendsNum;
+        this.final_clusters = new Array(total_cluster_number).fill(0);
+        this.all_clusters = total_cluster_number;
         // ---------- iterate through clusters setting (short)
-        for(var i = 0; i<=300; i++ ){
+        for(var i = 0; i<=total_cluster_number; i++ ){
             curr_draw_datas.push([['x','y','z']]);
         }
         // --------- iterate through real data (long)
-        var left_index = 300;
         for(var j=0 ; j< _data.length; j++){
           var curr_item = _data[j];
-          var found=0;
-          for(var i = 0; i< 300; i++ ){
-            if( curr_item[3] == i ){
-                curr_draw_datas[i].push([curr_item[0],curr_item[1],curr_item[2]]);
-                found=1;
-                break;
-            }
-          }
-          if( found == 0 ){
-            curr_draw_datas[left_index].push([curr_item[0],curr_item[1],curr_item[2]]);
-          }
+          curr_draw_datas[curr_item[3]].push([curr_item[0],curr_item[1],curr_item[2]]);
         } // end of for _data
-
-        // --------- check if any cluster has only one element aka the header
-        console.log(curr_draw_datas.length);
-        for (var i = 0; i < curr_draw_datas.length; i++){
+        // -------- mark empty group
+        for (var i = 0; i < total_cluster_number; i++){
           if (curr_draw_datas[i].length == 1) {
-            this.all_clusters = this.all_clusters-1;
+            this.final_clusters[i] = 0;
           }else{
             this.final_clusters[i] = 1;
           }
         }
-        console.log('before create tabledata, all_clsuters length is ');
-        console.log(this.all_clusters);
         var new_tableDataClusters = [];
         for (var i=0; i < this.all_clusters; i++){
-            new_tableDataClusters.push({ID: i, Celltype: 'Cluster'+i});
+            new_tableDataClusters.push({ID: i, Celltype:celltype_legend[data_tag].Legends[i] });
         }
         this.tableDataClusters = new_tableDataClusters;
         //console.log(this.tableDataClusters);
@@ -822,7 +874,7 @@
           console.log('start series');
           for( var i = 0 ; i<this.all_clusters; i++ )
           {
-            var curr_legend_name = "CellType"+i;
+            var curr_legend_name = celltype_legend[this.curr_rs].Legends[i];
             if(this.final_clusters[i] == 0){
               legend_show[curr_legend_name] = false;
             } else {
@@ -899,10 +951,17 @@
               },
             },
             legend :{
+              show: this.draw_legends,
               data:legend_list,
               selected: legend_show,
               textStyle: {
                 color:ft_color,
+              }
+            },
+            toolbox: {
+              show: true,
+              feature: {
+                saveAsImage: {},
               }
             },
             tooltip: {},
@@ -928,6 +987,7 @@
               max: used_zmax,
             },
             grid3D: {
+              show: this.draw_grids,
               boxWidth: boxWidth,
               boxHeight: boxHeight ,
               boxDepth: boxDepth , 
@@ -942,8 +1002,9 @@
                 }
               },
             viewControl: {
-                // autoRotate: true
+                // autoRotate: true,
                 //projection: 'orthographic'
+                projection: 'perspective'
               }
             },
             series: series_list
