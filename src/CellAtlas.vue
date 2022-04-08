@@ -40,7 +40,7 @@
     <div class="block" style="margin-left:0%;background-color: rgb(238, 241, 246); border: 3px solid #eee;">
       <!-- 3D umap start -->
       <div class='inline_item'>
-          <el-button align='right' @click.native="openUMAP" style='width:100%;z-index:9999;'>3D UMAP Panel</el-button>
+          <el-button disabled align='right' @click.native="openUMAP" style='width:100%;z-index:9999;'>3D UMAP Panel</el-button>
           <div class='parent' style='width:10px;'>
             <div id="umap_panel" class="child" style='width:700px;z-index:9999;background-color:white'  v-if="!isUMAPHidden">
               <div id="umap_panel_dragMe">
