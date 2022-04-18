@@ -40,7 +40,7 @@
     <div class="block" style="margin-left:0%;background-color: rgb(238, 241, 246); border: 3px solid #eee;">
       <!-- 3D umap start -->
       <div class='inline_item'>
-          <el-button disabled align='right' @click.native="openUMAP" style='width:100%;z-index:9999;'>3D UMAP Panel</el-button>
+          <el-button  align='right' @click.native="openUMAP" style='width:100%;z-index:9999;'>3D UMAP Panel</el-button>
           <div class='parent' style='width:10px;'>
             <div id="umap_panel" class="child" style='width:700px;z-index:9999;background-color:white'  v-if="!isUMAPHidden">
               <div id="umap_panel_dragMe">
@@ -408,7 +408,7 @@
       load_umap(){
         if( this.umapdata != null ||  this.curr_name == null || this.curr_rs == null )
           return;
-        var used_url = CTU_URL+"/"+this.curr_name+"/"+this.curr_rs+".json";
+        var used_url = CTU_URL+"/"+this.curr_name+"/"+this.curr_rs+".umap9.json";
         this.umap_option = this.getUMAPOption();
         var self = this;
         $.getJSON(used_url,function(_data) {
