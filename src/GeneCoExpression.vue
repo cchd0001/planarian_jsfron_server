@@ -456,6 +456,12 @@
               min : 0,
               max : this.getDepth(),
             },
+            toolbox: {
+              show: true,
+              feature: {
+                saveAsImage: {},
+              }
+            },
             legend :{
               data:legend_list,
               textStyle: {

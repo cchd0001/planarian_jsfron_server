@@ -485,6 +485,12 @@
               min : -10,
               max : 10,
             },
+            toolbox: {
+              show: true,
+              feature: {
+                saveAsImage: {},
+              }
+            },
             legend :{
               color :legend_color,
               data:legend_list,

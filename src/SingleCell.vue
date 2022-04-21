@@ -597,6 +597,12 @@
               min: used_zmin,
               max: used_zmax,
             },
+            toolbox: {
+              show: true,
+              feature: {
+                saveAsImage: {},
+              }
+            },
             legend :{
               data: legend_list,
               selected : legend_show, //{'Gut' : false } ,
