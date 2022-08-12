@@ -22,8 +22,10 @@
         <el-menu-item index="17" @click.native="show_14dpa2"  >14dpa2 </el-menu-item>
       </el-menu>
       <el-menu default-active="selected_rs_index" class="el-menu-demo" mode="horizontal" active-text-color="#409eff">
-        <el-menu-item index="1"  @click.native ="use_all_tg_smes_anno">Cell Types</el-menu-item>
-        <el-menu-item index="2"  @click.native ="use_all_tg_smes_major_ct">Clusters</el-menu-item>
+        <el-menu-item index="1"  @click.native ="use_all_tg_smes_anno">Annotated 9 Cell Types</el-menu-item>
+        <el-menu-item index="2"  @click.native ="use_all_tg_smes_major_ct">Annotated 27 Clusters</el-menu-item>
+        <el-menu-item index="3"  @click.native ="use_all_tg_smes_subcluster" >Annotated 117 SubClusters</el-menu-item>
+        <el-menu-item index="4"  @click.native ="use_all_tg_smes_neighborcell" disabled>Annotated Neighbor-cell Cell Type</el-menu-item>
       </el-menu>
     </div>
 
@@ -287,7 +289,7 @@
         option: {
           backgroundColor:'#000000',
           title : {
-              text : 'Please select a specific individual and resolution to show.',
+              text : 'Please select a specific individual and atlas type to show.',
               left: "center",
               top: "center",
               textStyle: {
@@ -298,7 +300,7 @@
         umap_option: {
           backgroundColor:'#000000',
           title : {
-              text : 'Please select a specific individual and resolution to show.',
+              text : 'Please select a specific individual and atlas to show.',
               left: "center",
               top: "center",
               textStyle: {
@@ -439,6 +441,12 @@
       use_all_tg_smes_anno() {
           if (this.curr_rs != "major_anno"){
             this.curr_rs = "major_anno";
+            this.update_basic();
+          }
+      },
+      use_all_tg_smes_subcluster() {
+          if (this.curr_rs != "sc_subcluster"){
+            this.curr_rs = "sc_subcluster";
             this.update_basic();
           }
       },
@@ -808,7 +816,7 @@
         // --------- iterate through real data (long)
         for(var j=0 ; j< _data.length; j++){
           var curr_item = _data[j];
-          curr_draw_datas[curr_item[3]].push([curr_item[0],curr_item[1],curr_item[2]]);
+          curr_draw_datas[parseInt(curr_item[3])].push([curr_item[0],curr_item[1],curr_item[2]]);
         } // end of for _data
         // -------- mark empty group
         for (var i = 0; i < total_cluster_number; i++){
