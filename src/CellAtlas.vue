@@ -25,7 +25,7 @@
         <el-menu-item index="1"  @click.native ="use_all_tg_smes_anno">Annotated 9 Cell Types</el-menu-item>
         <el-menu-item index="2"  @click.native ="use_all_tg_smes_major_ct">Annotated 27 Clusters</el-menu-item>
         <el-menu-item index="3"  @click.native ="use_all_tg_smes_subcluster" >Annotated 117 SubClusters</el-menu-item>
-        <el-menu-item index="4"  @click.native ="use_all_tg_smes_neighborcell" disabled>Annotated Neighbor-cell Cell Type</el-menu-item>
+        <el-menu-item index="4"  @click.native ="use_all_tg_smes_neighborcell" >Annotated Neighbor-cell 36 Cell Type</el-menu-item>
       </el-menu>
     </div>
 
@@ -324,8 +324,9 @@
         mesh_conf : { 
           names:    ['Body','Neural','Gut','Pharynx'],
           legends : ['Body_mesh','Neural_mesh','Gut_mesh','Pharynx_mesh'],
-          colors :  ['#cc6600','#ffff00','#ff0000','#00ff00'],
-          opacity:  [ 0.3, 0.4, 0.4, 0.4],
+          //colors :  ['#cc6600','#ffff00','#ff0000','#00ff00'],
+          colors :  ['#7d6a43','#b6b6b6','#a871a7','#609148'],
+          opacity:  [ 0.3, 0.55, 0.55, 0.55],
         },
       }; // end of data return
     },
@@ -441,6 +442,12 @@
       use_all_tg_smes_anno() {
           if (this.curr_rs != "major_anno"){
             this.curr_rs = "major_anno";
+            this.update_basic();
+          }
+      },
+      use_all_tg_smes_neighborcell() {
+          if (this.curr_rs != "nc_cluster36"){
+            this.curr_rs = "nc_cluster36";
             this.update_basic();
           }
       },
@@ -858,7 +865,7 @@
         if ( curr_draw_datas == null ) {
           var curr_title = 'Loading data now ...';
           if( this.curr_rs == null ) {
-            curr_title = 'Please select a resolution ...';
+            curr_title = 'Please select a type ...';
           }
           return {
             backgroundColor:bk_color,
@@ -999,6 +1006,17 @@
               boxWidth: boxWidth,
               boxHeight: boxHeight ,
               boxDepth: boxDepth , 
+              light: {
+                main: {
+                   shadow: false,
+                   intensity: 3,
+                   quality: 'high'
+                },
+                ambientCubemap: {
+                   exposure: 0,
+                   diffuseIntensity: 10
+                },
+              },
               axisLine: {
                 lineStyle: {
                   color:ft_color,
