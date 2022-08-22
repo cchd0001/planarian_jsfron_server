@@ -26,6 +26,8 @@
         <el-menu-item index="2"  @click.native ="use_all_tg_smes_major_ct">Annotated 27 Clusters</el-menu-item>
         <el-menu-item index="3"  @click.native ="use_all_tg_smes_subcluster" >Annotated 117 SubClusters</el-menu-item>
         <el-menu-item index="4"  @click.native ="use_all_tg_smes_neighborcell" >Annotated Neighbor-cell 36 Cell Type</el-menu-item>
+        <el-menu-item index="5"  @click.native ="use_WT_smes_anno">Annotated 9 Type(WT standalone)</el-menu-item>
+        <el-menu-item index="6"  @click.native ="use_WT_smes_cluster">Annotated 27 Clusters(WT standalone)</el-menu-item>
       </el-menu>
     </div>
 
@@ -210,6 +212,8 @@
   var CTU_URL = "http://49.235.68.146/celltype_umap/"
   var CP_URL = "http://49.235.68.146/cell_center/"
   var COLOR_ALL = require('../confs/discret_color.js');
+  var COLOR_default = COLOR_ALL.default_colors;
+  var COLOR_9 = COLOR_ALL.color_9;
   //var idvd_conf = require('../confs/individual.js');
   var idvd_conf_corrected = require('../confs/individual_corrected.js');
   var idvd_conf_rotate = require('../confs/individual_rotated.js');
@@ -232,8 +236,8 @@
         // coordinate tag
         coord_tag : 'adjusted',
         // test color 
-        current_color_all: COLOR_ALL,
-        COLOR_ALL2: COLOR_ALL,
+        current_color_all: COLOR_default,
+        COLOR_ALL2: COLOR_default,
         currentCellID: '',
         isShowColorPalette: false,
         color: '',
@@ -438,27 +442,44 @@
           self.option = self.getOption();
         });
       },
-
+      use_WT_smes_cluster() {
+          if (this.curr_rs != "SA_cluster"){
+            this.COLOR_ALL2 = COLOR_default;
+            this.curr_rs = "SA_cluster";
+            this.update_basic();
+          }
+      },
+      use_WT_smes_anno() {
+          if (this.curr_rs != "SA_anno"){
+            this.curr_rs = "SA_anno";
+            this.COLOR_ALL2 = COLOR_9;
+            this.update_basic();
+          }
+      },
       use_all_tg_smes_anno() {
           if (this.curr_rs != "major_anno"){
+            this.COLOR_ALL2 = COLOR_default;
             this.curr_rs = "major_anno";
             this.update_basic();
           }
       },
       use_all_tg_smes_neighborcell() {
           if (this.curr_rs != "nc_cluster36"){
+            this.COLOR_ALL2 = COLOR_default;
             this.curr_rs = "nc_cluster36";
             this.update_basic();
           }
       },
       use_all_tg_smes_subcluster() {
           if (this.curr_rs != "sc_subcluster"){
+            this.COLOR_ALL2 = COLOR_default;
             this.curr_rs = "sc_subcluster";
             this.update_basic();
           }
       },
       use_all_tg_smes_major_ct() {
           if (this.curr_rs != "major_celltype"){
+            this.COLOR_ALL2 = COLOR_default;
             this.curr_rs = "major_celltype";
             this.update_basic();
           }
@@ -611,7 +632,12 @@
         this.isShowColorPalette = false;
       },
       resetSelect(){
-        this.COLOR_ALL2=require('../confs/discret_color.js');
+        if (this.curr_rs == "SA_anno"){
+            this.COLOR_ALL2=require('../confs/discret_color.js').color_9;
+        }
+        else {
+            this.COLOR_ALL2=require('../confs/discret_color.js').default_colors;
+        }
         this.final_clusters=new Array(this.all_clusters).fill(1);
         this.option=this.getOption();
       },
@@ -823,6 +849,7 @@
         // --------- iterate through real data (long)
         for(var j=0 ; j< _data.length; j++){
           var curr_item = _data[j];
+          //console.log(curr_item);
           curr_draw_datas[parseInt(curr_item[3])].push([curr_item[0],curr_item[1],curr_item[2]]);
         } // end of for _data
         // -------- mark empty group

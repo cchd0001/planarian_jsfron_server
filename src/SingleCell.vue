@@ -126,7 +126,7 @@
   // confs
   var CP_URL="http://49.235.68.146/cell_center/";
   var SC_URL="http://49.235.68.146/single_cell/";
-  var COLOR_ALL = require('../confs/discret_color.js');
+  var COLOR_ALL = require('../confs/discret_color.js').default_colors;
   var sc_conf = require('../confs/single_cell_transfered_type.js');
   var idvd_conf = require('../confs/individual.js');
 
