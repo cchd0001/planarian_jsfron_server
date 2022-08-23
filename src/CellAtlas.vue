@@ -96,6 +96,13 @@
                  </el-slider>
               </div>
               <hr>
+              <div>
+                <span class="inline_item" style="z-index:1;">Symbol alpha :</span>
+                <el-slider class="inline_item" style="width:200px;z-index:1;" v-model="symbolAlpha"
+                   :step="0.03" :min="0.01" :max="1" @change="refresh" show-stops>
+                 </el-slider>
+              </div>
+              <hr>
               <!-- switch symbol size end -->
             </div>
           </div>
@@ -267,6 +274,7 @@
         draw_grids:true,
         adjusted_posture:true,
         symbolSize:2,
+        symbolAlpha:1.0,
         umap_enable_message : '',
         //------------show clusters-----------
         tmp_cluster_num: 0,
@@ -931,11 +939,13 @@
                 type : 'scatter3D',
                 dimensions: [ 'x','y','z' ],
                 data: the_data,
+                symbol:'circle',
                 symbolSize: this.symbolSize,
                 itemStyle: {
-                  borderWidth: 1,
-                  borderColor: curr_color,
-                  color: curr_color
+                  //borderColor: curr_color,
+                  borderWidth: 0,
+                  color: curr_color,
+                  opacity: this.symbolAlpha,
                 },
             };
             series_list.push(one_series);
@@ -960,6 +970,7 @@
                   dataShape:[2,3],
                   indices : this.mesh_json[curr_name]['ijk'],
                   color: curr_color,
+                  borderWidth :1,
                   opacity:curr_opacity,
               };
               series_list.push(one_series);
