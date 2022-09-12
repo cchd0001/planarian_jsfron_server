@@ -27,7 +27,7 @@
         <el-menu-item index="3"  @click.native ="use_all_tg_smes_subcluster" >Annotated 117 SubClusters</el-menu-item>
         <el-menu-item index="4"  @click.native ="use_all_tg_smes_neighborcell" >Annotated Neighbor-cell 36 Cell Type</el-menu-item>
         <el-menu-item index="5"  @click.native ="use_WT_smes_anno">Annotated 9 Type(WT standalone)</el-menu-item>
-        <el-menu-item index="6"  @click.native ="use_WT_smes_cluster">Annotated 27 Clusters(WT standalone)</el-menu-item>
+        <el-menu-item index="6"  @click.native ="use_WT_smes_cluster">Annotated 29 Clusters(WT standalone)</el-menu-item>
       </el-menu>
     </div>
 
