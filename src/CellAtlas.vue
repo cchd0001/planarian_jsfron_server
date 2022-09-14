@@ -87,6 +87,12 @@
                 v-model="draw_grids" @change="refresh" >
               </el-switch>
               <!-- Draw grid end -->
+              <!-- Draw box start -->
+              <hr>
+              <el-switch  active-text="Draw box" inactive-text="Ignore box" 
+                v-model="draw_box" @change="refresh" >
+              </el-switch>
+              <!-- Draw box end -->
               <!-- switch symbol size start-->
               <hr>
               <div>
@@ -271,7 +277,8 @@
         // drawing theme
         black_background:true,
         draw_legends:true,
-        draw_grids:true,
+        draw_grids:false,
+        draw_box :true,
         adjusted_posture:true,
         symbolSize:2,
         symbolAlpha:1.0,
@@ -976,6 +983,7 @@
               series_list.push(one_series);
             }
           }
+
           //console.log(legend_show);
           console.log(legend_list);
           var used_xmin = this.getXMin();
@@ -992,6 +1000,47 @@
             used_ymin = -10; used_ymax = 10; 
             used_zmin = -10; used_zmax = 10; 
             boxWidth = 60; boxHeight = 60; boxDepth = 60;
+          }
+          if (max10 == false && this.draw_box == true) {
+              var box_series = {
+                  type: 'line3D',
+                  lineStyle: {
+                      width: 3,
+                      color: '#aaaaaa',
+                  },
+                  data: [
+                      [used_xmin, used_ymin, used_zmin],
+                      [used_xmax, used_ymin, used_zmin],
+                      [used_xmax, used_ymax, used_zmin],
+                      [used_xmin, used_ymax, used_zmin],
+                      [used_xmin, used_ymin, used_zmin], // rect01
+                      [used_xmin, used_ymin, used_zmax],
+                      [used_xmax, used_ymin, used_zmax],
+                      [used_xmax, used_ymin, used_zmin],
+                      [used_xmin, used_ymin, used_zmin], // rect02
+                      [used_xmax, used_ymin, used_zmin],
+                      [used_xmax, used_ymax, used_zmin],
+                      [used_xmax, used_ymax, used_zmax], 
+                      [used_xmax, used_ymin, used_zmax],// rect 03
+                      [used_xmin, used_ymin, used_zmax],
+                      [used_xmin, used_ymax, used_zmax],
+                      [used_xmax, used_ymax, used_zmax],// rect 04
+                      [used_xmax, used_ymax, used_zmin],
+                      [used_xmin, used_ymax, used_zmin],
+                      [used_xmin, used_ymax, used_zmax],
+                  ]
+              };
+              series_list.push(box_series);
+          } else {
+              var box_series = {
+                  type: 'line3D',
+                  lineStyle: {
+                      width: 3,
+                      color: '#aaaaaa',
+                  },
+                  data: []
+              }
+              series_list.push(box_series);
           }
           var opt={
             backgroundColor:bk_color,

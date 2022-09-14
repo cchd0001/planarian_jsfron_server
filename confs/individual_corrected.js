@@ -2,8 +2,8 @@ module.exports = {
   label_0hpa1 : {
     xmin : -132,
     xmax : 1565,
-    ymin : -507,
-    ymax : 739,
+    ymax : -739,
+    ymin : 507,
     zmin : -75,
     zmax : 284
   },
@@ -18,8 +18,8 @@ module.exports = {
   label_10dpa1 : {
     xmin : -43,
     xmax : 2156,
-    ymin : -409,
-    ymax : 378,
+    ymin : -378,
+    ymax : 409,
     zmin : -37,
     zmax : 105
   },
@@ -34,8 +34,8 @@ module.exports = {
   label_12hpa1 : {
     xmin : -98,
     xmax : 1506,
-    ymin : -613,
-    ymax : 566,
+    ymin : -566,
+    ymax : 613,
     zmin : -5,
     zmax : 200
   },
@@ -58,8 +58,8 @@ module.exports = {
   label_14dpa2 : {
     xmin : -24,
     xmax : 2344,
-    ymin : -437,
-    ymax : 395,
+    ymin : -395,
+    ymax : 437,
     zmin : -29,
     zmax : 159
   },
@@ -98,8 +98,8 @@ module.exports = {
   label_5dpa1 : {
     xmin : -7,
     xmax : 1580,
-    ymin : -503,
-    ymax : 419,
+    ymin : -419,
+    ymax : 503,
     zmin : -44,
     zmax : 170
   },
@@ -114,8 +114,8 @@ module.exports = {
   label_7dpa1 : {
     xmin : -15,
     xmax : 1667,
-    ymin : -297,
-    ymax : 392,
+    ymin : -392,
+    ymax : 297,
     zmin : -71,
     zmax : 156
   },
