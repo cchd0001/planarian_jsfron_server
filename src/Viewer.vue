@@ -8,52 +8,91 @@
           <!-- ----------The setting panel begin --------------------------------------------------------------- -->
           <transition name="el-zoom-in-center"  >
             <div v-show="display_setting" class="transition-box" align='center' style="margin:3px; border: 3px solid #ffffff;"> 
+                 <div align="center"  style="margin:3px;  border: 3px solid #ccc;" > 
+                     <!-- ----------Choose mode begin --------------------------------------------------------------- -->
+                     <el-row>
+                         <el-col :span="8" >
+                            <span  class='mspan'>Mode:</span>
+                         </el-col>
+                         <el-col :span="16" >
+                             <el-select  v-model="curr_mode" placeholder="curr_mode" @change="OnChangeMode">
+                               <el-option
+                                 v-for="item in all_modes"
+                                 :key="item"
+                                 :label="item"
+                                 :value="item">
+                               </el-option>
+                             </el-select>
+                         </el-col>
+                     </el-row>
+                     <hr class="dhr">
+                     <el-row>
+                         <el-col :span="8" >
+                            <span  class='mspan'>Data:</span>
+                         </el-col>
+                         <el-col :span="16" >
+                             <el-select v-model="curr_sample" placeholder="curr_sample" @change="OnChangeSample">
+                               <el-option
+                                 v-for="item in all_sample"
+                                 :key="item"
+                                 :label="item"
+                                 :value="item">
+                               </el-option>
+                             </el-select>
+                         </el-col>
+                     </el-row>
+                     <!-- ----------Choose mode end --------------------------------------------------------------- -->
+                     <hr class="dhr">
+                 </div>
+                 <!-- ----------The Baisc settings end -------------------------------------------------------------- -->
               <el-collapse v-model='collapseName'>
                  <!-- ----------The Baisc settings begin --------------------------------------------------------------- -->
-                  <el-collapse-item title="Baisc settings:" name="1">
-                      <div align="center"  style="margin:3px;  border: 3px solid #ccc;" > 
-                          <!-- ----------Choose mode begin --------------------------------------------------------------- -->
-                          <h3>Display Mode : {{curr_mode}}</h3>
-                            <el-select v-model="curr_mode" placeholder="curr_mode" @change="OnChangeMode">
-                              <el-option
-                                v-for="item in all_modes"
-                                :key="item"
-                                :label="item"
-                                :value="item">
-                              </el-option>
-                            </el-select>
-                          <hr class="dhr">
-                          <h3>Display data: {{curr_sample}}</h3>
-                            <el-select v-model="curr_sample" placeholder="curr_sample" @change="OnChangeSample">
-                              <el-option
-                                v-for="item in all_sample"
-                                :key="item"
-                                :label="item"
-                                :value="item">
-                              </el-option>
-                            </el-select>
-                          <!-- ----------Choose mode end --------------------------------------------------------------- -->
-                          <hr class="dhr">
-                      </div>
-                  </el-collapse-item>
-                 <!-- ----------The Baisc settings end -------------------------------------------------------------- -->
-                  <el-collapse-item :title="mode_title" name="2" >
+                  <el-collapse-item :title="mode_title" name="1" >
                      <!-- ----------mode setting begin --------------------------------------------------------------- -->
-                     <div  align="center"  v-show="is_ct_mode" style="border: 1px solid #ccc;">
-                        <h3>Cell type mode conf:</h3>
+                     <div  align="center"  v-show="is_ct_mode" style="margin:3px;   border: 1px solid #ccc;">
+                        <el-row>
+                            <el-col :span="8" >
+                               <span  class='mspan'>Annotation:</span>
+                            </el-col>
+                            <el-col :span="16" >
+                                <el-select  v-model="curr_anno" placeholder="curr_anno" @change="OnChangeAnno">
+                                  <el-option
+                                    v-for="item in anno_array"
+                                    :key="item"
+                                    :label="item"
+                                    :value="item">
+                                  </el-option>
+                                </el-select>
+                            </el-col>
+                        </el-row>
                         <hr class="dhr">
+                        <el-row>
+                            <el-col :span="8" >
+                               <span  class='mspan'>Corrdinate:</span>
+                            </el-col>
+                            <el-col :span="16" >
+                                <el-select  v-model="curr_coord" placeholder="curr_coord" @change="OnChangeCoord">
+                                  <el-option
+                                    v-for="item in coord_array"
+                                    :key="item"
+                                    :label="item"
+                                    :value="item">
+                                  </el-option>
+                                </el-select>
+                            </el-col>
+                        </el-row>
                      </div>
-                     <div  align="center"  v-show="is_ge_mode" >
+                     <div  align="center"  v-show="is_ge_mode" style="margin:3px;   border: 1px solid #ccc;">
                         <h3>Gene Expression mode conf:</h3>
                         <hr class="dhr">
                      </div>
-                     <div  align="center"  v-show="is_gc_mode" >
+                     <div  align="center"  v-show="is_gc_mode" style="margin:3px;   border: 1px solid #ccc;">
                         <h3>Gene Colocalization mode conf:</h3>
                         <hr class="dhr">
                      </div>
                      <!-- ----------mode setting end --------------------------------------------------------------- -->
                   </el-collapse-item>
-                  <el-collapse-item title="ROI details:" name="3">
+                  <el-collapse-item title="ROI details:" name="2">
                      <!-- ----------roi setting begin --------------------------------------------------------------- -->
                       <div align="center"   style="margin:3px;  border: 3px solid #ccc;">
                           <p class='inline_item'>Z scale:</p>
@@ -89,7 +128,7 @@
                       </div>
                      <!-- ----------roi setting end--------------------------------------------------------------- -->
                   </el-collapse-item>
-                  <el-collapse-item title="Display details:" name="4">
+                  <el-collapse-item title="Display details:" name="3">
                       <!-- ----------display setting begin --------------------------------------------------------------- -->
                       <div  align="center"  style="margin:3px;  border: 3px solid #ccc;">
                           <!-- switch background start -->
@@ -97,12 +136,6 @@
                             v-model="black_background" @change="refresh" >
                           </el-switch>
                           <!-- switch background end -->
-                          <!-- Posture select start -->
-                          <hr class="dhr">
-                          <el-switch  active-text="Adjusted posture" inactive-text="Original posture"
-                            v-model="adjusted_posture" @change="update_coord" >
-                          </el-switch>
-                          <!-- Posture select end -->
                           <!-- Draw legend start -->
                           <hr class="dhr">
                           <el-switch  active-text="Draw legends" inactive-text="Ignore legends"
@@ -140,7 +173,6 @@
                       <!-- ----------display setting end--------------------------------------------------------------- -->
                   </el-collapse-item>
               </el-collapse>
-              <el-button type="success" @click.native="OnChangeSample">Apply</el-button>
             </div>
           </transition>
           <!-- ----------The setting panel end --------------------------------------------------------------- -->
@@ -152,7 +184,8 @@
     <!-- main window -->
     <div ref="main"  style="border: 3px solid #eee;">
       <!-- I. chart content -->
-      <v-chart class="chart" resizeable=true :width="chartWidth"  ref="myecharts" :option="option" style="height:800px;" />
+      <v-chart v-show="model_only" class="chart" resizeable=true :width="chartWidth"  ref="myecharts_model" :option="option_mo" style="height:800px;" />
+      <v-chart v-show="data_valid" class="chart" resizeable=true :width="chartWidth"  ref="myecharts" :option="option" style="height:800px;" />
     </div>
     <!-- end of the main window -->
   </el-col>
@@ -170,15 +203,16 @@ import VChart, { THEME_KEY } from "vue-echarts";
 var CT_URL = "http://49.235.68.146/celltype/"
 var CTU_URL = "http://49.235.68.146/celltype_umap/"
 var CP_URL = "http://49.235.68.146/cell_center/"
-// legend and the color conf --------------------------------
-var COLOR_ALL = require('../confs/discret_color.js');
-var COLOR_default = COLOR_ALL.default_colors;
-var COLOR_9 = COLOR_ALL.color_9;
-var celltype_legend = require('../confs/CellType.js');
 // axis limitation conf --------------------------------
 var idvd_conf_corrected = require('../confs/individual_corrected.js');
 var idvd_conf_rotate = require('../confs/individual_rotated.js');
-
+// cell type details conf --------------------------------
+var CT_CONFS = require('../confs/individual_conf.js')
+// cell type legend and the color conf --------------------------------
+var COLOR_ALL = require('../confs/discret_color.js');
+var celltype_legend = require('../confs/CellType.js');
+var COLOR_default = COLOR_ALL.default_colors;
+var COLOR_9 = COLOR_ALL.color_9;
 
 export default {
 components: {
@@ -271,15 +305,17 @@ data() {
       draw_grids:false,
       draw_box :true,
       adjusted_posture:true,
-      symbolSize:2,
+      symbolSize:1,
       symbolAlpha:1.0,
       // drawing details conf end----------
-      // echarts option
+      // echarts option begin -------------
       chartWidth:'100%',
-      option: {
+      model_only:true,
+      data_valid:false,
+      option_mo: {
         backgroundColor:'#000000',
         title : {
-            text : 'Please select a specific individual and atlas type to show.',
+            text : 'Loading data now ...',
             left: "center",
             top: "center",
             textStyle: {
@@ -287,14 +323,35 @@ data() {
             },
         }
       },
+      option: {
+        backgroundColor:'#000000',
+        title : {
+            text : 'Loading data now ...',
+            left: "center",
+            top: "center",
+            textStyle: {
+               color: '#cccccc'
+            },
+        }
+      },
+      // main 3D data begin------------------------------------
+      rawdata:null,
+      jsondata : null,
+      // main 3D data end--------------------------------------
       //------------data selection for cell type begin ------
       // curr selection
       curr_name : null,
       curr_rs : null,
+      final_clusters: [],
+      tmp_cluster_num: 0,
+      all_clusters: 0,
+      saved_clusters:[], // the selection cache
       selected_rs_index:"0",
-      // main 3D data
-      rawdata:null,
-      jsondata : null,
+      coord_array : CT_CONFS.label_WT.pos,
+      anno_array : CT_CONFS.label_WT.anno,
+      curr_anno : null,
+      curr_coord : null,
+      
       //------------data selection for cell type end ------
       //------------model data : mesh begin ------
       mesh_json:null,
@@ -313,6 +370,7 @@ data() {
     resize_option(){
        this.$nextTick(() => {
            this.$refs.myecharts.resize();
+           this.$refs.myecharts_model.resize();
        });
     },
     span_setting(){
@@ -331,11 +389,34 @@ data() {
         }
     },
     // ------------------ resize page end----------------------
+    // ------------------ functions for update echarts begin -----------------
+    update_option(){
+        if( this.data_valid == true)
+            this.option = this.getOption();
+        else
+            this.option_mo = this.getOption();
+        this.resize_option();
+    },
+    update_option_deep(){
+        if( this.data_valid == true)
+            this.option = this.getOption();
+        else
+            this.option_mo = this.getOption();
+        if( this.data_valid ){
+            this.$refs.myecharts.clear();
+            this.$refs.myecharts.setOption(this.getOption(),true,false);
+        }else {
+            this.$refs.myecharts_model.clear();
+            this.$refs.myecharts_model.setOption(this.getOption(),true,false);
+        }
+        this.resize_option();
+    },
+    // ------------------ functions for update echarts end -----------------
     // ------------------ basic conf functions begin----------------------
     OnChangeMode(){
         this.mode_title = this.curr_mode+" setting";
         console.log(this.curr_mode)
-        if( this.curr_mode == "CellType") {
+        if( this.curr_mode == "CellTypes") {
             this.is_ct_mode = true;
             this.is_gc_mode = false;
             this.is_ge_mode = false;
@@ -349,17 +430,61 @@ data() {
             this.is_ge_mode = false;
         }
     },
+    setCoordTag(){
+        if(this.curr_coord == "Raw posture" || this.curr_coord == "Adjusted posture" ) {
+            if (this.curr_coord == "Raw posture"){
+                this.coord_tag = "raw";
+            } else {
+                this.coord_tag = "adjusted";
+            }
+        }
+    },
+    resetSampleConf(){
+        this.resetCellTypeSampleConf();
+        this.setCoordTag();
+    },
+
     OnChangeSample(){
-      this.curr_name = this.curr_sample;
-      //deep clean buffer
-      this.cleanBuffer();
-      //this.$refs.myecharts.setOption(this.getOption(),true);
-      // reset mesh and ROI data
-      this.resetROIdata();
-      this.resetMesh();
+        this.curr_name = this.curr_sample;
+        this.resetSampleConf();
+        //deep clean buffer
+        this.cleanMesh();
+        this.cleanBuffer();
+        this.update_option_deep();
+        // reset mesh and ROI data
+        this.resetROIdata();
+        this.resetMesh();
+        if(this.curr_mode == "CellTypes"){
+            this.resetAnno();
+        }
     },
     // ------------------ basic conf functions end----------------------
-
+    // --------------cell type detail confs begin ----------------------------
+    resetCellTypeSampleConf(){
+        this.anno_array = CT_CONFS["label_"+this.curr_sample].anno;
+        this.coord_array = CT_CONFS["label_"+this.curr_sample].pos;
+        this.curr_anno = this.anno_array[0];
+        this.curr_coord = this.coord_array[0];
+    },
+    OnChangeAnno(){
+        this.cleanBuffer();
+        this.resetAnno();
+        this.update_option_deep();
+    },
+    OnChangeCoord(){
+        //deep clean buffer
+        this.cleanMesh();
+        this.cleanBuffer();
+        this.update_option_deep();
+        // reset mesh and ROI data
+        this.setCoordTag();
+        this.resetROIdata();
+        this.resetMesh();
+        if(this.curr_mode == "CellTypes"){
+            this.resetAnno();
+        }
+    },
+    // --------------cell type detail confs end ----------------------------
     //-------------3d box conf start-------------------//
     getXMin(){
       if( this.coord_tag == "raw" ) 
@@ -408,11 +533,15 @@ data() {
     },
     //-------------3d box conf end -------------------//
     //-------------mesh managerment start -------------------//
-    resetMesh(){
+    cleanMesh(){
       this.mesh_json = null;
+    },
+    resetMesh(){
+      this.cleanMesh();
+      // loading new mesh
       var self = this;
       var used_url = '';
-      if( this.coord_tag == 'raw' ) {
+      if( this.coord_tag == "raw" ) {
         used_url = CP_URL+"/"+this.curr_name+"_mesh.rotate.json";
       } else {
         used_url = CP_URL+"/"+this.curr_name+"_mesh.apdv.json";
@@ -421,9 +550,7 @@ data() {
       $.getJSON(used_url,function(_data) {
         console.log("mesh loaded");
         self.setMeshData(_data);
-        //self.$nextTick(() => {
-        self.option = self.getOption();
-        //});
+        self.update_option_deep();
       });
     },
     setMeshData(_data) {
@@ -437,9 +564,11 @@ data() {
         this.mesh_json['Gut'] = {}
         this.mesh_json['Gut']['xyz'] = _data[2][0];
         this.mesh_json['Gut']['ijk'] = _data[2][1];
-        this.mesh_json['Pharynx'] = {}
-        this.mesh_json['Pharynx']['xyz'] = _data[3][0];
-        this.mesh_json['Pharynx']['ijk'] = _data[3][1];
+        if(_data.length>3){
+            this.mesh_json['Pharynx'] = {}
+            this.mesh_json['Pharynx']['xyz'] = _data[3][0];
+            this.mesh_json['Pharynx']['ijk'] = _data[3][1];
+        }
     },
     //-------------mesh managerment end -------------------//
     //-------------data managerment start -------------------//
@@ -448,29 +577,71 @@ data() {
       this.rawdata = null;
     },
     
-    update_basic() {
-      //deep clean buffer
-      this.cleanBuffer();
-      this.$refs.myecharts.clear();
-      //this.$refs.myecharts.setOption(this.getOption(),true);
-      // reset mesh and ROI data
-      this.resetROIdata();
-      this.resetMesh();
-      // download main data
-      var used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+"."+this.coord_tag+".json";
+    resetAnno(){
+      var used_url="";
+      if(this.curr_anno == "Single Cell WT lineage" ){
+          this.curr_rs = "SA_anno";
+      } else if ( this.curr_anno == "Single Cell WT cluster"){
+          this.curr_rs = "SA_cluster";
+      } else if ( this.curr_anno == "Single Cell lineage"){
+          this.curr_rs = "major_anno";
+      } else if ( this.curr_anno == "Single Cell cluster"){
+          this.curr_rs = "major_celltype";
+      } else if ( this.curr_anno == "Single Cell sub cluster"){
+          this.curr_rs = "sc_subcluster";
+      } else if ( this.curr_anno == "SPC lineage"){
+          this.curr_rs = "nc_cluster36";
+      }
+      if(this.curr_coord == "Raw posture" || this.curr_coord == "Adjusted posture" ) {
+          used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+"."+this.coord_tag+".json";
+      } else {
+
+      }
       var data_tag = this.curr_rs;
       var self = this;
       $.getJSON(used_url,function(_data) {
         console.log("loaded");
-        self.setJsonData(_data,data_tag);
-        self.option = self.getOption();
+        self.setAnnoData(_data,data_tag);
+        self.update_option_deep();
       });
     },
-
+    setAnnoData(_data,data_tag){
+      console.log('json loaded');
+      var curr_draw_datas= [];
+      var total_cluster_number = celltype_legend[data_tag].LegendsNum;
+      this.final_clusters = new Array(total_cluster_number).fill(0);
+      this.all_clusters = total_cluster_number;
+      // ---------- iterate through clusters setting (short)
+      for(var i = 0; i<=total_cluster_number; i++ ){
+          curr_draw_datas.push([]);
+      }
+      // --------- iterate through real data (long)
+      for(var j=0 ; j< _data.length; j++){
+        var curr_item = _data[j];
+        //console.log(curr_item);
+        curr_draw_datas[parseInt(curr_item[3])].push([curr_item[0],curr_item[1],curr_item[2]]);
+      } // end of for _data
+      // -------- mark empty group
+      for (var i = 0; i < total_cluster_number; i++){
+        if (curr_draw_datas[i].length == 0) {
+          this.final_clusters[i] = 0;
+        }else{
+          this.final_clusters[i] = 1;
+        }
+      }
+      var new_tableDataClusters = [];
+      for (var i=0; i < this.all_clusters; i++){
+          new_tableDataClusters.push({ID: i, Celltype:celltype_legend[data_tag].Legends[i] });
+      }
+      this.tableDataClusters = new_tableDataClusters;
+      //console.log(this.tableDataClusters);
+      this.rawdata = curr_draw_datas;
+      this.jsondata = curr_draw_datas;
+    },
     //-------------configure ROI start -------------------//
     changeZScale(){
       this.z_scale = this.tmp_z_scale;
-      this.option = this.getOption();
+      this.update_option();
     },
     resetROIdata(){
       // reset-roi
@@ -491,7 +662,7 @@ data() {
     resetROI(){
       this.resetROIdata();
       this.jsondata = this.rawdata;
-      this.option=this.getOption();
+      this.update_option();
     },
     updateJsonData(){
       var curr_draw_datas = [];
@@ -519,7 +690,7 @@ data() {
         else if (txmin>this.getXMax()-1)              this.x_min = this.getXMax()-1;
         else                                          this.x_min = txmin;
         this.updateJsonData();
-        this.option=this.getOption();
+        this.update_option();
       }
     },
     changeXMax(){
@@ -531,7 +702,7 @@ data() {
         else                                          this.x_max = txmax;
         console.log(this.x_max);
         this.updateJsonData();
-        this.option=this.getOption();
+        this.update_option();
       }
     },
     changeYMin(){
@@ -543,7 +714,7 @@ data() {
         else                                          this.y_min = tymin;
         console.log(this.y_min);
         this.updateJsonData();
-        this.option=this.getOption();
+        this.update_option();
       }
     },
     changeYMax(){
@@ -555,7 +726,7 @@ data() {
         else                                          this.y_max = tymax;
         console.log(this.y_max);
         this.updateJsonData();
-        this.option=this.getOption();
+        this.update_option();
       }
     },
     changeZMin(){
@@ -566,7 +737,7 @@ data() {
         else if (tzmin>this.getZMax()-1)              this.z_min = this.getZMax()-1;
         else                                          this.z_min = tzmin;
         this.updateJsonData();
-        this.option=this.getOption();
+        this.update_option()
       }
     },
     changeZMax(){
@@ -577,29 +748,17 @@ data() {
         else if (tzmax>this.getZMax())                this.z_max = this.getZMax();
         else                                          this.z_max = tzmax;
         this.updateJsonData();
-        this.option=this.getOption();
+        this.update_option();
       }
     },
     //-------------configure ROI end -------------------//
     //-------------configure display_setting begin -------------------//
-    update_coord() {
-      if( this.adjusted_posture ){
-          this.coord_tag = "adjusted";
-          this.update_basic();
-      } else {
-          this.coord_tag = "raw";
-          this.update_basic();
-      }
-    },
     refresh(){
-      this.option=this.getOption();
+      this.update_option();
     },
     //-------------configure display_setting end-------------------//
     getLoadingOption(bk_color,ft_color){
         var curr_title = 'Loading data now ...';
-        if( this.curr_rs == null ) {
-          curr_title = 'Please select a type ...';
-        }
         return {
           backgroundColor:bk_color,
            title :{
@@ -631,11 +790,14 @@ data() {
                 type : 'surface',
                 data: this.mesh_json[curr_name]['xyz'],
                 isMesh :true,
+                //zlevel: -10,
+                shading:'lambert',
                 dataShape:[2,3],
                 indices : this.mesh_json[curr_name]['ijk'],
                 color: curr_color,
                 borderWidth :1,
                 opacity:curr_opacity,
+                silent:true,
             };
             series_list.push(one_series);
           }
@@ -673,9 +835,9 @@ data() {
           var one_series = {
               name : legend_list[i],
               type : 'scatter3D',
-              dimensions: [ 'x','y','z' ],
               data: the_data,
               symbol:'circle',
+              //zlevel: -20,
               symbolSize: this.symbolSize,
               itemStyle: {
                 //borderColor: curr_color,
@@ -683,6 +845,8 @@ data() {
                 color: curr_color,
                 opacity: this.symbolAlpha,
               },
+              //blendMode:'lighter',
+              silent : true,
           };
           series_list.push(one_series);
         } // end of for final_clusters.length
@@ -742,28 +906,41 @@ data() {
       scatter_series = this.getScatterSeries();
       // Draw loading if necessary
       if ( mesh_serie == null && scatter_series ==null ) {
+          this.data_valid = false;
+          this.model_only = true;
           return this.getLoadingOption(bk_color,ft_color);
       }
       else {
-        // Draw mesh
         var series_list = [];
         var legend_list = [];
         var legend_show = {};
         //Draw scatters
         var tips = '';
-        if(scatter_series != null){
-             for(var i = 0; i< scatter_series.series_list.length; i++){
-                 series_list.append(scatter_series.series_list[i])
+        if( scatter_series != null ){
+             for(var i = 0; i < scatter_series.series_list.length; i++){
+                 series_list.push(scatter_series.series_list[i])
              }
-             legend_list = series_list.legend_list;
-             for(var i = 0; i< scatter_series.legend_list.length; i++){
+             for(var i = 0; i < scatter_series.legend_list.length; i++){
                  legend_list.push(scatter_series.legend_list[i]);
              }
-             legend_show = series_list.legend_show;
+             legend_show = scatter_series.legend_show;
+             this.data_valid = true;
+             this.model_only = false;
         } else {
+             this.data_valid = false;
+             this.model_only = true;
              tips = 'Model done, still loading scatters ...';
         }
         console.log('end series');
+        // Draw mesh
+        if(mesh_serie != null){
+            for(var i = 0;i< mesh_serie.series_list.length; i++){
+                series_list.push(mesh_serie.series_list[i]);
+            }
+            for(var i = 0;i< mesh_serie.legend_list.length; i++){
+                legend_list.push(mesh_serie.legend_list[i]);
+            }
+        }
         // set 3D space 
         var used_xmin = this.getXMin();
         var used_xmax = this.getXMax();
@@ -784,20 +961,13 @@ data() {
         if(box_series!= null){
             series_list.push(box_series)
         }
-        if(mesh_serie != null){
-            for(var i = 0;i< mesh_serie.series_list.length; i++){
-                series_list.push(mesh_serie.series_list[i]);
-            }
-            for(var i = 0;i< mesh_serie.legend_list.length; i++){
-                legend_list.push(mesh_serie.legend_list[i]);
-            }
-        }
         //if( max10 == true ){
         //  used_xmin = -10; used_xmax = 10; 
         //  used_ymin = -10; used_ymax = 10; 
         //  used_zmin = -10; used_zmax = 10; 
         //  boxWidth = 60; boxHeight = 60; boxDepth = 60;
         //}
+        console.log(legend_list);
         var opt={
           backgroundColor:bk_color,
           title :{
@@ -824,21 +994,21 @@ data() {
           },
           tooltip: {},
           xAxis3D: {
-            name: 'x',
+            name: 'AP',
             scale:1,
             type: 'value',
             min: used_xmin,
             max: used_xmax,
           },
           yAxis3D: {
-            name: 'y',
+            name: 'ML',
             scale:1,
             type: 'value',
             min: used_ymin,
             max: used_ymax,
           },
           zAxis3D: {
-            name: 'z',
+            name: 'DV',
             scale:1,
             type: 'value',
             min: used_zmin,
@@ -885,7 +1055,7 @@ data() {
   },
   mounted() {
     window.addEventListener("resize", this.resize_option,true);
-    //this.OnChangeSample();
+    this.OnChangeSample();
   },
 };
 </script>
@@ -898,7 +1068,13 @@ data() {
     top: 70;
 }
 .dhr{
-    border:1px dashed #ccc;
+    border:1px dashed #888;
+}
+.mspan{
+  display: inline-block;
+  margin-top: 15px;
+  vertical-align: middle;
+  text-align:center;
 }
 .inline_item {
   display: inline-block;
