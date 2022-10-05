@@ -11,6 +11,7 @@
     "draggable-vue-directive": "^2.1.0",
     "echarts": "^5.2.2",
     "echarts-gl": "^2.0.8",
+    "element-theme-dark": "^1.0.3",
     "element-ui": "^2.3.4",
     "jquery": "^3.6.0",
     "vue": "^2.6.14",
