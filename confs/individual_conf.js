@@ -3,8 +3,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap2D',
-            'Umap3D',
         ],
         anno :[
             'Single Cell WT lineage',
@@ -19,7 +17,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -32,7 +29,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -44,7 +40,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -56,7 +51,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -69,7 +63,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -81,7 +74,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -94,7 +86,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -106,7 +97,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -119,7 +109,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -132,7 +121,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -144,7 +132,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -156,7 +143,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -169,7 +155,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -182,7 +167,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -194,7 +178,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',
@@ -207,7 +190,6 @@ module.exports = {
         pos : [
             'Raw posture',
             'Adjusted posture',
-            'Umap3D',
         ],
         anno :[
             'Single Cell lineage',

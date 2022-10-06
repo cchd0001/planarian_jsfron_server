@@ -44,7 +44,7 @@
       <!-- end of color palette -->
     </div>
     <el-row>
-      <el-button  class="floatsetting" v-show="!display_setting" type="primary" icon="el-icon-setting"  @click="span_setting" >{{setting_title}}</el-button>
+      <el-button class="floatsetting" v-show="!display_setting" type="primary" icon="el-icon-setting"  @click="span_setting" >{{setting_title}}</el-button>
       <!-- ----------The setting grid begin --------------------------------------------------------------- -->
       <el-col :span="setting_w" style="height:100%">
           <div class="grid-content bg-purple">
@@ -84,6 +84,21 @@
                                  </el-select>
                              </el-col>
                          </el-row>
+                         <el-row style="margin-top:3px;margin-bottom:2px">
+                             <el-col :span="8" >
+                                <span  class='mspan'>Corrdinate:</span>
+                             </el-col>
+                             <el-col :span="16" >
+                                 <el-select  v-model="curr_coord" placeholder="curr_coord" @change="OnChangeCoord">
+                                   <el-option
+                                     v-for="item in coord_array"
+                                     :key="item"
+                                     :label="item"
+                                     :value="item">
+                                   </el-option>
+                                 </el-select>
+                             </el-col>
+                         </el-row>
                          <!-- ----------Choose mode end --------------------------------------------------------------- -->
                      </div>
                      <!-- ----------The Baisc settings end -------------------------------------------------------------- -->
@@ -92,7 +107,7 @@
                       <el-collapse-item :title="mode_title" name="1" >
                       <!-- ----------mode setting begin --------------------------------------------------------------- -->
                          <!-- ----------cell type mode begin--------------------------------------------------------------- -->
-                         <div  align="center"  v-show="is_ct_mode" style="margin:3px;   border: 3px solid #ccc;">
+                         <div align="center"  v-show="is_ct_mode" style="margin:3px;   border: 3px solid #ccc;">
                             <el-row style="margin-top:3px;margin-bottom:2px">
                                 <el-col :span="8" >
                                    <span  class='mspan'>Annotation:</span>
@@ -101,21 +116,6 @@
                                     <el-select  v-model="curr_anno" placeholder="curr_anno" @change="OnChangeAnno">
                                       <el-option
                                         v-for="item in anno_array"
-                                        :key="item"
-                                        :label="item"
-                                        :value="item">
-                                      </el-option>
-                                    </el-select>
-                                </el-col>
-                            </el-row>
-                            <el-row style="margin-top:3px;margin-bottom:2px">
-                                <el-col :span="8" >
-                                   <span  class='mspan'>Corrdinate:</span>
-                                </el-col>
-                                <el-col :span="16" >
-                                    <el-select  v-model="curr_coord" placeholder="curr_coord" @change="OnChangeCoord">
-                                      <el-option
-                                        v-for="item in coord_array"
                                         :key="item"
                                         :label="item"
                                         :value="item">
@@ -132,14 +132,227 @@
                             <!-- ----------cell type selection table end--------------------------------------------------------------- -->
                          </div>
                          <!-- ----------cell type mode end--------------------------------------------------------------- -->
-                         <div  align="center"  v-show="is_ge_mode" style="margin:3px;   border: 1px solid #ccc;">
-                            <h3>Gene Expression mode conf:</h3>
+                         <!-- ----------gene selection mode start--------------------------------------------------------------- -->
+                         <div align="center"  v-show="is_ge_mode" style="margin:3px;   border: 3px solid #ccc;">
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="8" >
+                                   <span  class='mspan'>Type:</span>
+                                </el-col>
+                                <el-col :span="16" >
+                                    <el-select  v-model="curr_genename_system" placeholder="curr_genename_system" @change="OnGeneNameSystemChange">
+                                      <el-option
+                                        v-for="item in genename_array"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                      </el-option>
+                                    </el-select>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="8" >
+                                   <span  class='mspan'>Normed:</span>
+                                </el-col>
+                                <el-col :span="16" >
+                                    <el-select  v-model="curr_norm" placeholder="curr_norm" @change="OnGeneNormChange">
+                                      <el-option
+                                        v-for="item in normed_array"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                      </el-option>
+                                    </el-select>
+                                </el-col>
+                            </el-row>
                             <hr class="dhr">
+                            <div align="left" style="margin-left:10px;">
+                                <el-row style="margin-top:1px;margin-bottom:1px">
+                                    <span class='mspan'>Please choose an DEG:</span>
+                                </el-row>
+                                <el-row style="margin-top:3px;margin-bottom:2px">
+                                    <el-col :span="24" >
+                                        <el-select v-model="curr_selected_gene" filterable placeholder="" @change="selectMarkerGene" >
+                                          <el-option v-for="item in genes" :key="item.value" 
+                                             :label="item.label" :value="item.value">
+                                          </el-option>
+                                        </el-select>
+                                    </el-col>
+                                </el-row>
+                                <el-row style="margin-top:3px;margin-bottom:2px">
+                                    <el-tag :key="tag" v-for="tag in markerTags" closable :disable-transitions="false" @close="handleMarkerTagClose(tag)">
+                                      {{tag}}
+                                    </el-tag>
+                                </el-row>
+                                <el-row style="margin-top:1px;margin-bottom:1px">
+                                    <span class='mspan'>Or please type a {{curr_genename_system}} ID:</span>
+                                </el-row>
+                                <el-row style="margin-top:3px;margin-bottom:2px">
+                                    <el-col :span="16" >
+                                        <el-input  v-model="input_gene_id" placeholder=""></el-input>
+                                    </el-col>
+                                    <el-col :span="8" >
+                                        <el-button type="success" @click.native="UseGeneID">Display</el-button>
+                                    </el-col>
+                                </el-row>
+                                <el-row style="margin-top:3px;margin-bottom:2px">
+                                    <el-tag :key="tag" v-for="tag in inputIDTags" closable :disable-transitions="false" @close="handleInputIDTagClose(tag)" >
+                                      {{tag}}
+                                    </el-tag>
+                                </el-row>
+                                <el-row style="margin-top:3px;margin-bottom:2px">
+                                    <el-col :span="8" >
+                                        <span class='mspan'>Min Exp:</span>
+                                    </el-col>
+                                    <el-col :span="16" >
+                                        <el-slider  v-model="smallestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
+                                        </el-slider>
+                                    </el-col>
+                                </el-row>
+                                <el-row style="margin-top:3px;margin-bottom:2px">
+                                    <el-col :span="8" >
+                                        <span class='mspan'>Max Exp:</span>
+                                    </el-col>
+                                    <el-col :span="16" >
+                                        <el-slider  v-model="largestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
+                                        </el-slider>
+                                    </el-col>
+                                </el-row>
+                            </div>
+                            <el-row style="margin-top:2px;margin-bottom:3px">
+                                <el-button type="success"  @click.native="OnOpenFISH">MIP image</el-button>
+                            </el-row>
                          </div>
-                         <div  align="center"  v-show="is_gc_mode" style="margin:3px;   border: 1px solid #ccc;">
-                            <h3>Gene Colocalization mode conf:</h3>
+                         <!-- ----------gene selection mode start--------------------------------------------------------------- -->
+                         <!-- ----------digital in situ mode start--------------------------------------------------------------- -->
+                         <div align="center"  v-show="is_gc_mode" style="margin:3px; border: 1px solid #ccc;">
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="8" >
+                                   <span  class='mspan'>Type:</span>
+                                </el-col>
+                                <el-col :span="16" >
+                                    <el-select  v-model="curr_genename_system" placeholder="curr_genename_system" @change="OnGeneNameSystemChange">
+                                      <el-option
+                                        v-for="item in genename_array"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                      </el-option>
+                                    </el-select>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="8" >
+                                   <span  class='mspan'>Normed:</span>
+                                </el-col>
+                                <el-col :span="16" >
+                                    <el-select  v-model="curr_norm" placeholder="curr_norm" @change="OnGeneNormChange">
+                                      <el-option
+                                        v-for="item in normed_array"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                      </el-option>
+                                    </el-select>
+                                </el-col>
+                            </el-row>
                             <hr class="dhr">
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="6" >
+                                   <span  class='mspan'>red:</span>
+                                </el-col>
+                                <el-col :span="12" >
+                                    <el-input  v-model="input_gene_red" placeholder=""></el-input>
+                                </el-col>
+                                <el-col :span="6" >
+                                    <el-button type="success" @click.native="ApplyRed">set</el-button>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="6" >
+                                   <span  class='mspan'>green:</span>
+                                </el-col>
+                                <el-col :span="12" >
+                                    <el-input  v-model="input_gene_green" placeholder=""></el-input>
+                                </el-col>
+                                <el-col :span="6" >
+                                    <el-button type="success" @click.native="ApplyGreen">set</el-button>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="6" >
+                                   <span  class='mspan'>blue:</span>
+                                </el-col>
+                                <el-col :span="12" >
+                                    <el-input  v-model="input_gene_blue" placeholder=""></el-input>
+                                </el-col>
+                                <el-col :span="6" >
+                                    <el-button type="success" @click.native="ApplyBlue">set</el-button>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="6" >
+                                   <span  class='mspan'>gray:</span>
+                                </el-col>
+                                <el-col :span="12" >
+                                    <el-input  v-model="input_gene_gray" placeholder=""></el-input>
+                                </el-col>
+                                <el-col :span="6" >
+                                    <el-button type="success" @click.native="ApplyGray">set</el-button>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="6" >
+                                   <span  class='mspan'>cyan:</span>
+                                </el-col>
+                                <el-col :span="12" >
+                                    <el-input  v-model="input_gene_cyan" placeholder=""></el-input>
+                                </el-col>
+                                <el-col :span="6" >
+                                    <el-button type="success" @click.native="ApplyCyan">set</el-button>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="6" >
+                                   <span  class='mspan'>magenta:</span>
+                                </el-col>
+                                <el-col :span="12" >
+                                    <el-input  v-model="input_gene_magenta" placeholder=""></el-input>
+                                </el-col>
+                                <el-col :span="6" >
+                                    <el-button type="success" @click.native="ApplyMagenta">set</el-button>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="6" >
+                                   <span  class='mspan'>yellow:</span>
+                                </el-col>
+                                <el-col :span="12" >
+                                    <el-input  v-model="input_gene_yellow" placeholder=""></el-input>
+                                </el-col>
+                                <el-col :span="6" >
+                                    <el-button type="success" @click.native="ApplyYellow">set</el-button>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="8" >
+                                    <span class='mspan'>Min Exp:</span>
+                                </el-col>
+                                <el-col :span="16" >
+                                    <el-slider  v-model="smallestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
+                                    </el-slider>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="8" >
+                                    <span class='mspan'>Max Exp:</span>
+                                </el-col>
+                                <el-col :span="16" >
+                                    <el-slider  v-model="largestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
+                                    </el-slider>
+                                </el-col>
+                            </el-row>
                          </div>
+                         <!-- ----------digital in situ mode end--------------------------------------------------------------- -->
                       <!-- ----------mode setting end --------------------------------------------------------------- -->
                       </el-collapse-item>
                       <el-collapse-item title="ROI details:" name="2">
@@ -228,7 +441,7 @@
                       </el-collapse-item>
                       <el-collapse-item title="Display details:" name="3">
                           <!-- ----------display setting begin --------------------------------------------------------------- -->
-                          <div  align="center"  style="margin:3px;  border: 3px solid #ccc;">
+                          <div align="center"  style="margin:3px;  border: 3px solid #ccc;">
                               <!-- switch background start -->
                               <el-row style="margin:3px;">
                                   <el-switch  active-text="Black theme" inactive-text="White theme"
@@ -256,7 +469,7 @@
                                   </el-switch>
                               </el-row>
                               <!-- Draw box end -->
-                              <!-- switch symbol size start-->
+                              <!-- switch symbol size start -->
                               <el-row style="margin:3px;" >
                                   <el-col :span="8" >
                                      <span  class='mspan'>SymbolSize</span>
@@ -326,6 +539,8 @@ var COLOR_ALL = require('../confs/discret_color.js');
 var celltype_legend = require('../confs/CellType.js');
 var COLOR_default = COLOR_ALL.default_colors;
 var COLOR_9 = COLOR_ALL.color_9;
+// cell type legend and the color conf --------------------------------
+var conf_gens = require('../confs/genes.js');
 
 export default {
 components: {
@@ -349,7 +564,7 @@ data() {
       all_modes: [
           'CellTypes',
           'GeneExpression',
-          'GeneColocalization',
+          'Digital_in_situ',
       ],
       curr_mode : 'CellTypes',
       // mode tags
@@ -388,6 +603,7 @@ data() {
       // test color 
       current_color_all: COLOR_default,
       COLOR_ALL2: COLOR_default,
+      COLOR_9 : COLOR_9,
       currentCellID: '',
       isShowColorPalette: false,
       color: '',
@@ -475,6 +691,24 @@ data() {
       max_cluster_number: 100,
       drawer:false,
       //------------cell type selection end------
+
+      //------------gene expression selection start------
+      genename_array : [
+         'SMED',
+         'SMESG'
+      ],
+      normed_array : [
+         'scaled',
+         'sct_transformed',
+      ],
+      curr_selected_gene:'',
+      genes : conf_gens,
+      curr_genename_system:'SMEGS',
+      curr_norm: 'scaled',
+      markerTags : ['test'],
+      inputIDTags: ['test'],
+      //------------gene expression selection end------
+
       //------------model data : mesh begin ------
       mesh_json:null,
       mesh_conf : { 
@@ -511,6 +745,47 @@ data() {
         }
     },
     // ------------------ resize page end----------------------
+ 
+    //----------- gene select functions start -------------//
+    handleMarkerTagClose(tag) {
+        this.markerTags.splice(this.markerTags.indexOf(tag), 1);
+    },
+    handleInputIDTagClose(tag) {
+        this.inputIDTags.splice(this.inputIDTags.indexOf(tag), 1);
+    },
+    selectMarkerGene(item){
+      this.refreshGene(item,false);
+    },
+    refreshGene(gname, force){
+      if(this.curr_name != null){
+        if(this.curr_gene != gname || force ){
+          this.umapdata = null;
+          this.raw_umapdata = null;
+          this.gene_xyz = null;
+          this.gene_xyz_raw = null;
+          this.$refs.myecharts.setOption(this.getOption(),true);
+
+          var self=this;
+          var used_url = this.GENE_NEW_URL+"/"+this.curr_name+"/"+gname+".json";
+          $.getJSON(used_url,function(_data) {
+            self.curr_gene = gname;
+            self.setGeneData(_data);
+            self.updateJsonData();
+            self.option = self.getOption();
+          });
+          // if umap panel is still open
+          if (!this.isUMAPHidden){
+            var used_url2 = this.GENE_UMAP_URL+"/"+this.curr_name+"/"+gname+".json";
+            $.getJSON(used_url2, function(_data){
+              self.curr_gene = item;
+              self.setUMAPJsonData(_data);
+              self.umap_option = self.getUMAPOption();
+            });
+          }
+        }
+      }
+    },
+    //----------- gene select functions end -------------//
 
     //----------- color palette start -------------//
     showColorPalette(){
@@ -558,22 +833,6 @@ data() {
     handleCurrentChange (currentpage){
       this.currentPage = currentpage;
     },
-    TopN(){
-      var topn = 1;
-      if(this.tmp_cluster_num < 1){
-        topn  = 1;
-      } else if( this.tmp_cluster_num > this.all_clusters) {
-        topn  =  this.all_clusters;
-      } else {
-        topn = this.tmp_cluster_num;
-      }
-      this.final_clusters=new Array(this.all_clusters).fill(0);
-      for(var i = 0; i<topn; i++){
-          this.final_clusters[i] = 1;
-      }
-      this.option=this.getOption();
-      this.isShowColorPalette = false;
-    },
     resetSelect(){
       if (this.curr_rs == "SA_anno"){
           this.COLOR_ALL2=require('../confs/discret_color.js').color_9;
@@ -588,7 +847,7 @@ data() {
       this.currentCellID = '';
       this.$refs.clusterTable.clearSelection();
     },
-    applyStatus(){
+    applyStatus() {
       var self = this;
       this.final_clusters=this.saved_clusters;
       this.update_option();
@@ -796,11 +1055,12 @@ data() {
       this.jsondata = null ;
       this.rawdata = null;
     },
-    
     resetAnno(){
       var used_url="";
+      this.COLOR_ALL2 = this.COLOR_default;
       if(this.curr_anno == "Single Cell WT lineage" ){
           this.curr_rs = "SA_anno";
+          this.COLOR_ALL2 = this.COLOR_9;
       } else if ( this.curr_anno == "Single Cell WT cluster"){
           this.curr_rs = "SA_cluster";
       } else if ( this.curr_anno == "Single Cell lineage"){
@@ -972,6 +1232,7 @@ data() {
       }
     },
     //-------------configure ROI end -------------------//
+
     //-------------configure display_setting begin -------------------//
     refresh(){
       this.update_option();
