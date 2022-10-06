@@ -1,196 +1,306 @@
 <template>
-<el-row>
-  <el-button  class="floatsetting" v-show="!display_setting" type="primary" icon="el-icon-setting"  @click="span_setting" >{{setting_title}}</el-button>
-  <!-- ----------The setting grid begin --------------------------------------------------------------- -->
-  <el-col :span="setting_w" style="height:100%">
-      <div class="grid-content bg-purple">
-          <el-button  type="primary" icon="el-icon-setting" width='100%' @click="span_setting" >{{setting_title}}</el-button>
-          <!-- ----------The setting panel begin --------------------------------------------------------------- -->
-          <transition name="el-zoom-in-center"  >
-            <div v-show="display_setting" class="transition-box" align='center' style="margin:3px; border: 3px solid #ffffff;"> 
-                 <div align="center"  style="margin:3px;  border: 3px solid #ccc;" > 
-                     <!-- ----------Choose mode begin --------------------------------------------------------------- -->
-                     <el-row>
-                         <el-col :span="8" >
-                            <span  class='mspan'>Mode:</span>
-                         </el-col>
-                         <el-col :span="16" >
-                             <el-select  v-model="curr_mode" placeholder="curr_mode" @change="OnChangeMode">
-                               <el-option
-                                 v-for="item in all_modes"
-                                 :key="item"
-                                 :label="item"
-                                 :value="item">
-                               </el-option>
-                             </el-select>
-                         </el-col>
-                     </el-row>
-                     <hr class="dhr">
-                     <el-row>
-                         <el-col :span="8" >
-                            <span  class='mspan'>Data:</span>
-                         </el-col>
-                         <el-col :span="16" >
-                             <el-select v-model="curr_sample" placeholder="curr_sample" @change="OnChangeSample">
-                               <el-option
-                                 v-for="item in all_sample"
-                                 :key="item"
-                                 :label="item"
-                                 :value="item">
-                               </el-option>
-                             </el-select>
-                         </el-col>
-                     </el-row>
-                     <!-- ----------Choose mode end --------------------------------------------------------------- -->
-                     <hr class="dhr">
-                 </div>
-                 <!-- ----------The Baisc settings end -------------------------------------------------------------- -->
-              <el-collapse v-model='collapseName'>
-                 <!-- ----------The Baisc settings begin --------------------------------------------------------------- -->
-                  <el-collapse-item :title="mode_title" name="1" >
-                     <!-- ----------mode setting begin --------------------------------------------------------------- -->
-                     <div  align="center"  v-show="is_ct_mode" style="margin:3px;   border: 1px solid #ccc;">
-                        <el-row>
-                            <el-col :span="8" >
-                               <span  class='mspan'>Annotation:</span>
-                            </el-col>
-                            <el-col :span="16" >
-                                <el-select  v-model="curr_anno" placeholder="curr_anno" @change="OnChangeAnno">
-                                  <el-option
-                                    v-for="item in anno_array"
-                                    :key="item"
-                                    :label="item"
-                                    :value="item">
-                                  </el-option>
-                                </el-select>
-                            </el-col>
-                        </el-row>
-                        <hr class="dhr">
-                        <el-row>
-                            <el-col :span="8" >
-                               <span  class='mspan'>Corrdinate:</span>
-                            </el-col>
-                            <el-col :span="16" >
-                                <el-select  v-model="curr_coord" placeholder="curr_coord" @change="OnChangeCoord">
-                                  <el-option
-                                    v-for="item in coord_array"
-                                    :key="item"
-                                    :label="item"
-                                    :value="item">
-                                  </el-option>
-                                </el-select>
-                            </el-col>
-                        </el-row>
-                     </div>
-                     <div  align="center"  v-show="is_ge_mode" style="margin:3px;   border: 1px solid #ccc;">
-                        <h3>Gene Expression mode conf:</h3>
-                        <hr class="dhr">
-                     </div>
-                     <div  align="center"  v-show="is_gc_mode" style="margin:3px;   border: 1px solid #ccc;">
-                        <h3>Gene Colocalization mode conf:</h3>
-                        <hr class="dhr">
-                     </div>
-                     <!-- ----------mode setting end --------------------------------------------------------------- -->
-                  </el-collapse-item>
-                  <el-collapse-item title="ROI details:" name="2">
-                     <!-- ----------roi setting begin --------------------------------------------------------------- -->
-                      <div align="center"   style="margin:3px;  border: 3px solid #ccc;">
-                          <p class='inline_item'>Z scale:</p>
-                          <el-input class='inline_item' style='width:80px;height:50px;'  v-model="tmp_z_scale" placeholder="1"></el-input>
-                          <el-button type="success" class='inline_item' @click.native="changeZScale">Apply</el-button>
-                          <hr class="dhr">
-                          <p class='inline_item'>X min:</p>
-                          <el-input class='inline_item' style='width:80px;height:50px;'  v-model="tmp_x_min" placeholder="0"></el-input>
-                          <el-button type="success" class='inline_item' @click.native="changeXMin">Apply</el-button>
-                          <br>
-                          <p class='inline_item'>Y min:</p>
-                          <el-input class='inline_item' style='width:80px;height:50px;'  v-model="tmp_y_min" placeholder="0"></el-input>
-                          <el-button type="success" class='inline_item' @click.native="changeYMin">Apply</el-button>
-                          <br>
-                          <p class='inline_item'>Z min:</p>
-                          <el-input class='inline_item' style='width:80px;height:50px;'  v-model="tmp_z_min" placeholder="0"></el-input>
-                          <el-button type="success" class='inline_item' @click.native="changeZMin">Apply</el-button>
-                          <br>
-                          <p class='inline_item'>X max:</p>
-                          <el-input class='inline_item' style='width:80px;height:50px;'  v-model="tmp_x_max" placeholder="300"></el-input>
-                          <el-button type="success" class='inline_item' @click.native="changeXMax">Apply</el-button>
-                          <br>
-                          <p class='inline_item'>Y max:</p>
-                          <el-input class='inline_item' style='width:80px;height:50px;'  v-model="tmp_y_max" placeholder="300"></el-input>
-                          <el-button type="success" class='inline_item' @click.native="changeYMax">Apply</el-button>
-                          <br>
-                          <p class='inline_item'>Z max:</p>
-                          <el-input class='inline_item' style='width:80px;height:50px;'  v-model="tmp_z_max" placeholder="300"></el-input>
-                          <el-button type="success" class='inline_item' @click.native="changeZMax">Apply</el-button>
-                          <hr class="dhr">
-                          <el-button type="warning" class='inline_item' @click.native="resetROI">Reset ROI</el-button>
-                          <hr class="dhr">
-                      </div>
-                     <!-- ----------roi setting end--------------------------------------------------------------- -->
-                  </el-collapse-item>
-                  <el-collapse-item title="Display details:" name="3">
-                      <!-- ----------display setting begin --------------------------------------------------------------- -->
-                      <div  align="center"  style="margin:3px;  border: 3px solid #ccc;">
-                          <!-- switch background start -->
-                          <el-switch  active-text="Black theme" inactive-text="White theme"
-                            v-model="black_background" @change="refresh" >
-                          </el-switch>
-                          <!-- switch background end -->
-                          <!-- Draw legend start -->
-                          <hr class="dhr">
-                          <el-switch  active-text="Draw legends" inactive-text="Ignore legends"
-                            v-model="draw_legends" @change="refresh" >
-                          </el-switch>
-                          <!-- Draw grid start -->
-                          <hr class="dhr">
-                          <el-switch  active-text="Draw grids" inactive-text="Ignore grids"
-                            v-model="draw_grids" @change="refresh" >
-                          </el-switch>
-                          <!-- Draw grid end -->
-                          <!-- Draw box start -->
-                          <hr class="dhr">
-                          <el-switch  align='center' active-text="Draw box" inactive-text="Ignore box"
-                            v-model="draw_box" @change="refresh" >
-                          </el-switch>
-                          <!-- Draw box end -->
-                          <!-- switch symbol size start-->
-                          <hr class="dhr">
-                          <div>
-                            <span class="demonstration" >SymbolSize:</span>
-                            <el-slider  v-model="symbolSize"
-                               :step="1" :min="2" :max="10" @change="refresh" show-stops>
-                             </el-slider>
-                          </div>
-                          <hr class="dhr">
-                          <div>
-                            <span  class="demonstration">SymbolAlpha:</span>
-                            <el-slider  v-model="symbolAlpha"
-                               :step="0.03" :min="0.01" :max="1" @change="refresh" show-stops>
-                             </el-slider>
-                          </div>
-                          <!-- switch symbol size end -->
-                      </div>
-                      <!-- ----------display setting end--------------------------------------------------------------- -->
-                  </el-collapse-item>
-              </el-collapse>
-            </div>
-          </transition>
-          <!-- ----------The setting panel end --------------------------------------------------------------- -->
-      </div>
-  </el-col>
-  <!-- ----------The setting grid end --------------------------------------------------------------- -->
-  <!-- ----------The 3D display grid begin --------------------------------------------------------------- -->
-  <el-col :span="display_w"  style="height:100%">
-    <!-- main window -->
-    <div ref="main"  style="border: 3px solid #eee;">
-      <!-- I. chart content -->
-      <v-chart v-show="model_only" class="chart" resizeable=true :width="chartWidth"  ref="myecharts_model" :option="option_mo" style="height:800px;" />
-      <v-chart v-show="data_valid" class="chart" resizeable=true :width="chartWidth"  ref="myecharts" :option="option" style="height:800px;" />
+<div>
+    <div  style="height=1px;">
+      <el-dialog title="Custom CellTypes Panel" style="width:800px;" :visible.sync="drawer" direction="ltr" :before-close="OnDrawerClose">
+          <div>
+              <div v-draggable style='width:220px;height:400px;z-index:999;position:absolute;background:white;' v-if="isShowColorPalette">
+                <sketch-picker align='center' v-model="color" @input="colorValueChange"></sketch-picker>
+                <el-button align='right' style='width:50%;' @click='applyColor'>ChangeColor</el-button>
+                <el-button align='right' style='width:50%;' @click='closeColor'>Close</el-button>
+              </div>
+              <!-- 1. cell table content -->
+              <el-table class="table" ref="clusterTable" style="width:100%;" :show-header='false'
+                :height='height' :row-key="getRowKey" :highlight-current-row='true'
+                :data="tableDataClusters.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                @selection-change="handleSelectionChange" @row-click="getRowCelltype">
+                  <el-table-column :reserve-selection="true" type="selection" ></el-table-column>
+                  <el-table-column property="Celltype" label="Cell Type" > </el-table-column>
+                  <el-table-column label="Display" >
+                    <el-button @click="showColorPalette">color palette</el-button>
+                    <!-- <template slot-scope="scope"> -->
+                      <!-- <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button> -->
+                    <!-- </template> -->
+                  </el-table-column>
+              </el-table>
+              <el-pagination layout="total,sizes, prev, jumper, next" 
+                :total="this.tableDataClusters.length" :current-page="currentPage" 
+                @current-change="handleCurrentChange" @size-change="handleSizeChange" 
+                :page-sizes="[10,20]" :page-size="pageSize" :current-page.sync="currentPage">
+              </el-pagination>
+              <!-- 1. cell table content end-->
+              <div>
+                <el-button @click="applyStatus">Highlight selected </el-button>
+                <el-button @click='clearSelect'>Clear selected</el-button>
+                <hr>
+              </div> <!-- end of buttons -->
+              <div>
+                <el-button class='inline_item' @click='resetSelect'>Reset all</el-button>
+                <el-button class='inline_item' @click.native='closeCTC'>Close Panel</el-button>
+                <hr>
+              </div> <!-- end of top N buttons -->
+          </div> <!-- end of top N buttons -->
+      </el-dialog>
+      <!-- start of color palette -->
+      <!-- end of color palette -->
     </div>
-    <!-- end of the main window -->
-  </el-col>
-  <!-- ----------The 3D display grid end --------------------------------------------------------------- -->
-</el-row>
+    <el-row>
+      <el-button  class="floatsetting" v-show="!display_setting" type="primary" icon="el-icon-setting"  @click="span_setting" >{{setting_title}}</el-button>
+      <!-- ----------The setting grid begin --------------------------------------------------------------- -->
+      <el-col :span="setting_w" style="height:100%">
+          <div class="grid-content bg-purple">
+              <el-button  type="primary" icon="el-icon-setting" width='100%' @click="span_setting" >{{setting_title}}</el-button>
+              <!-- ----------The setting panel begin --------------------------------------------------------------- -->
+              <transition name="el-zoom-in-center"  >
+                <div v-show="display_setting" class="transition-box" align='center' style="margin:3px; border: 3px solid #ffffff;"> 
+                     <div align="center"  style="margin:3px;  border: 3px solid #ccc;" > 
+                         <!-- ----------Choose mode begin --------------------------------------------------------------- -->
+                         <el-row style="margin-top:3px;margin-bottom:2px">
+                             <el-col :span="8" >
+                                <span  class='mspan'>Mode:</span>
+                             </el-col>
+                             <el-col :span="16" >
+                                 <el-select  v-model="curr_mode" placeholder="curr_mode" @change="OnChangeMode">
+                                   <el-option
+                                     v-for="item in all_modes"
+                                     :key="item"
+                                     :label="item"
+                                     :value="item">
+                                   </el-option>
+                                 </el-select>
+                             </el-col>
+                         </el-row>
+                         <el-row style="margin-top:3px;margin-bottom:2px">
+                             <el-col :span="8" >
+                                <span  class='mspan'>Data:</span>
+                             </el-col>
+                             <el-col :span="16" >
+                                 <el-select v-model="curr_sample" placeholder="curr_sample" @change="OnChangeSample">
+                                   <el-option
+                                     v-for="item in all_sample"
+                                     :key="item"
+                                     :label="item"
+                                     :value="item">
+                                   </el-option>
+                                 </el-select>
+                             </el-col>
+                         </el-row>
+                         <!-- ----------Choose mode end --------------------------------------------------------------- -->
+                     </div>
+                     <!-- ----------The Baisc settings end -------------------------------------------------------------- -->
+                  <el-collapse v-model='collapseName'>
+                     <!-- ----------The Baisc settings begin --------------------------------------------------------------- -->
+                      <el-collapse-item :title="mode_title" name="1" >
+                      <!-- ----------mode setting begin --------------------------------------------------------------- -->
+                         <!-- ----------cell type mode begin--------------------------------------------------------------- -->
+                         <div  align="center"  v-show="is_ct_mode" style="margin:3px;   border: 3px solid #ccc;">
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="8" >
+                                   <span  class='mspan'>Annotation:</span>
+                                </el-col>
+                                <el-col :span="16" >
+                                    <el-select  v-model="curr_anno" placeholder="curr_anno" @change="OnChangeAnno">
+                                      <el-option
+                                        v-for="item in anno_array"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                      </el-option>
+                                    </el-select>
+                                </el-col>
+                            </el-row>
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="8" >
+                                   <span  class='mspan'>Corrdinate:</span>
+                                </el-col>
+                                <el-col :span="16" >
+                                    <el-select  v-model="curr_coord" placeholder="curr_coord" @change="OnChangeCoord">
+                                      <el-option
+                                        v-for="item in coord_array"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                      </el-option>
+                                    </el-select>
+                                </el-col>
+                            </el-row>
+                            <!-- ----------cell type selection table begin --------------------------------------------------------------- -->
+                            <el-row style="margin-top:3px;margin-bottom:2px">
+                                <el-col :span="23" >
+                                  <el-button type='primary' @click.native="openCTC" >Custom CellTypes</el-button>
+                                </el-col>
+                            </el-row>
+                            <!-- ----------cell type selection table end--------------------------------------------------------------- -->
+                         </div>
+                         <!-- ----------cell type mode end--------------------------------------------------------------- -->
+                         <div  align="center"  v-show="is_ge_mode" style="margin:3px;   border: 1px solid #ccc;">
+                            <h3>Gene Expression mode conf:</h3>
+                            <hr class="dhr">
+                         </div>
+                         <div  align="center"  v-show="is_gc_mode" style="margin:3px;   border: 1px solid #ccc;">
+                            <h3>Gene Colocalization mode conf:</h3>
+                            <hr class="dhr">
+                         </div>
+                      <!-- ----------mode setting end --------------------------------------------------------------- -->
+                      </el-collapse-item>
+                      <el-collapse-item title="ROI details:" name="2">
+                         <!-- ----------roi setting begin --------------------------------------------------------------- -->
+                          <div align="center"   style="margin:3px;  border: 3px solid #ccc;">
+                              <el-row style="margin-top:3px;margin-bottom:2px">
+                                  <el-col :span="6" >
+                                     <span  class='mspan'>Z scale:</span>
+                                  </el-col>
+                                  <el-col :span="8" >
+                                      <el-input v-model="tmp_z_scale" placeholder="1"></el-input>
+                                  </el-col>
+                                  <el-col :span="10" >
+                                      <el-button type="success" @click.native="changeZScale">Apply</el-button>
+                                  </el-col>
+                              </el-row>
+                              <hr class="dhr">
+                              <el-row style="margin-top:3px;margin-bottom:2px">
+                                  <el-col :span="6" >
+                                     <span  class='mspan'>X min:</span>
+                                  </el-col>
+                                  <el-col :span="8" >
+                                      <el-input v-model="tmp_x_min" placeholder="0"></el-input>
+                                  </el-col>
+                                  <el-col :span="10" >
+                                      <el-button type="success" @click.native="changeXMin">Apply</el-button>
+                                  </el-col>
+                              </el-row>
+                              <el-row style="margin-top:3px;margin-bottom:2px">
+                                  <el-col :span="6" >
+                                     <span  class='mspan'>X max:</span>
+                                  </el-col>
+                                  <el-col :span="8" >
+                                      <el-input v-model="tmp_x_max" placeholder="0"></el-input>
+                                  </el-col>
+                                  <el-col :span="10" >
+                                      <el-button type="success" @click.native="changeXMax">Apply</el-button>
+                                  </el-col>
+                              </el-row>
+                              <el-row style="margin-top:3px;margin-bottom:2px">
+                                  <el-col :span="6" >
+                                     <span  class='mspan'>Y min:</span>
+                                  </el-col>
+                                  <el-col :span="8" >
+                                      <el-input v-model="tmp_y_min" placeholder="0"></el-input>
+                                  </el-col>
+                                  <el-col :span="10" >
+                                      <el-button type="success" @click.native="changeYMin">Apply</el-button>
+                                  </el-col>
+                              </el-row>
+                              <el-row style="margin-top:3px;margin-bottom:2px">
+                                  <el-col :span="6" >
+                                     <span  class='mspan'>Y max:</span>
+                                  </el-col>
+                                  <el-col :span="8" >
+                                      <el-input v-model="tmp_y_max" placeholder="0"></el-input>
+                                  </el-col>
+                                  <el-col :span="10" >
+                                      <el-button type="success" @click.native="changeYMax">Apply</el-button>
+                                  </el-col>
+                              </el-row>
+                              <el-row style="margin-top:3px;margin-bottom:2px">
+                                  <el-col :span="6" >
+                                     <span  class='mspan'>Z min:</span>
+                                  </el-col>
+                                  <el-col :span="8" >
+                                      <el-input v-model="tmp_z_min" placeholder="0"></el-input>
+                                  </el-col>
+                                  <el-col :span="10" >
+                                      <el-button type="success" @click.native="changeZMin">Apply</el-button>
+                                  </el-col>
+                              </el-row>
+                              <el-row style="margin-top:3px;margin-bottom:2px">
+                                  <el-col :span="6" >
+                                     <span  class='mspan'>Z max:</span>
+                                  </el-col>
+                                  <el-col :span="8" >
+                                      <el-input v-model="tmp_z_max" placeholder="0"></el-input>
+                                  </el-col>
+                                  <el-col :span="10" >
+                                      <el-button type="success" @click.native="changeZMax">Apply</el-button>
+                                  </el-col>
+                              </el-row>
+                          </div>
+                         <!-- ----------roi setting end--------------------------------------------------------------- -->
+                      </el-collapse-item>
+                      <el-collapse-item title="Display details:" name="3">
+                          <!-- ----------display setting begin --------------------------------------------------------------- -->
+                          <div  align="center"  style="margin:3px;  border: 3px solid #ccc;">
+                              <!-- switch background start -->
+                              <el-row style="margin:3px;">
+                                  <el-switch  active-text="Black theme" inactive-text="White theme"
+                                    v-model="black_background" @change="refresh" >
+                                  </el-switch>
+                              </el-row>
+                              <!-- switch background end -->
+                              <!-- Draw legend start -->
+                              <el-row style="margin:3px;">
+                                  <el-switch  active-text="Draw legends" inactive-text="Ignore legends"
+                                    v-model="draw_legends" @change="refresh" >
+                                  </el-switch>
+                              </el-row>
+                              <!-- Draw grid start -->
+                              <el-row style="margin:3px;">
+                                 <el-switch  active-text="Draw grids" inactive-text="Ignore grids"
+                                   v-model="draw_grids" @change="refresh" >
+                                 </el-switch>
+                              </el-row>
+                              <!-- Draw grid end -->
+                              <!-- Draw box start -->
+                              <el-row style="margin:3px;">
+                                  <el-switch  align='center' active-text="Draw box" inactive-text="Ignore box"
+                                    v-model="draw_box" @change="refresh" >
+                                  </el-switch>
+                              </el-row>
+                              <!-- Draw box end -->
+                              <!-- switch symbol size start-->
+                              <el-row style="margin:3px;" >
+                                  <el-col :span="8" >
+                                     <span  class='mspan'>SymbolSize</span>
+                                  </el-col>
+                                  <el-col :span="16" >
+                                      <el-slider  v-model="symbolSize"
+                                         :step="1" :min="1" :max="5" @change="refresh" show-stops>
+                                      </el-slider>
+                                  </el-col>
+                              </el-row>
+                              <el-row style="margin:3px;">
+                                  <el-col :span="8" >
+                                     <span  class='mspan'>SymbolAlpha</span>
+                                  </el-col>
+                                  <el-col :span="16" >
+                                      <el-slider  v-model="symbolAlpha"
+                                        :step="0.1" :min="0.0" :max="1" @change="refresh" show-stops>
+                                      </el-slider>
+                                  </el-col>
+                              </el-row>
+                              <!-- switch symbol size end -->
+                          </div>
+                          <!-- ----------display setting end--------------------------------------------------------------- -->
+                      </el-collapse-item>
+                  </el-collapse>
+                </div>
+              </transition>
+              <!-- ----------The setting panel end --------------------------------------------------------------- -->
+          </div>
+      </el-col>
+      <!-- ----------The setting grid end --------------------------------------------------------------- -->
+      <!-- ----------The 3D display grid begin --------------------------------------------------------------- -->
+      <el-col :span="display_w"  style="height:100%">
+        <!-- main window -->
+        <div ref="main"  style="border: 3px solid #eee;">
+          <!-- I. chart content -->
+          <v-chart v-show="model_only" class="chart" resizeable=true :width="chartWidth"  ref="myecharts_model" :option="option_mo" style="height:800px;" />
+          <v-chart v-show="data_valid" class="chart" resizeable=true :width="chartWidth"  ref="myecharts" :option="option" style="height:800px;" />
+        </div>
+        <!-- end of the main window -->
+      </el-col>
+      <!-- ----------The 3D display grid end --------------------------------------------------------------- -->
+    </el-row>
+</div>
 </template>
 
 <script>
@@ -199,6 +309,9 @@ import $ from 'jquery';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import VChart, { THEME_KEY } from "vue-echarts";
+import { Draggable } from 'draggable-vue-directive';
+import vdr from 'vue-draggable-resizable-gorkys'
+import { Sketch } from 'vue-color'
 // the dateset url -----------------------------------
 var CT_URL = "http://49.235.68.146/celltype/"
 var CTU_URL = "http://49.235.68.146/celltype_umap/"
@@ -217,6 +330,11 @@ var COLOR_9 = COLOR_ALL.color_9;
 export default {
 components: {
   VChart,
+  vdr,
+  'sketch-picker': Sketch
+},
+directives: {
+  Draggable,
 },
 data() {
     return {
@@ -276,11 +394,6 @@ data() {
       //------------color legends confs end------
       //------------drag element confs begin------
       // test drag
-      show: true,
-      width: 0,
-      height: 0,
-      x: 0,
-      y: 0,
       //------------drag element confs end------
       //------------roi confs begin------
       z_scale:1,
@@ -351,8 +464,17 @@ data() {
       anno_array : CT_CONFS.label_WT.anno,
       curr_anno : null,
       curr_coord : null,
-      
       //------------data selection for cell type end ------
+      //------------cell type selection begin ------
+      isCTCHidden:true,
+      tableDataClusters: [],
+      height:'250px',
+      pageSize:5,
+      currentPage:1,
+      min_cluster_number: 0,
+      max_cluster_number: 100,
+      drawer:false,
+      //------------cell type selection end------
       //------------model data : mesh begin ------
       mesh_json:null,
       mesh_conf : { 
@@ -389,6 +511,104 @@ data() {
         }
     },
     // ------------------ resize page end----------------------
+
+    //----------- color palette start -------------//
+    showColorPalette(){
+      if (this.isShowColorPalette){
+        this.isShowColorPalette = false;
+      }else{
+        this.isShowColorPalette = true;
+      }
+    },
+    colorValueChange (val) {
+     this.color = val.hex;
+     },
+    applyColor(){
+      // change color when click row
+      // only apply changes when click button
+      this.current_color_all[this.currentCellID] = this.color;
+      this.option=this.getOption()  ;
+    },
+    closeColor(){
+      this.isShowColorPalette = false;
+    },
+    //-------------color palette ends------------------//
+    // ------------------ functions for cell type table begin -----------------
+    OnDrawerClose(done){
+        this.drawer= false;
+        done();
+    },
+    openCTC(){
+        this.isCTCHidden = !this.isCTCHidden;
+        this.drawer = !this.drawer;
+        console.log(this.drawer);
+    },
+    getRowCelltype(row){
+      // 1. get row id when click on row (except for selection box)
+      this.currentCellID = row.ID;
+      console.log('getrow '+this.currentCellID);
+      return row.ID;
+    },
+    getRowKey (row) {
+      return row.Celltype
+    },
+    handleSizeChange (size) {
+      this.pageSize = size;
+    },
+    handleCurrentChange (currentpage){
+      this.currentPage = currentpage;
+    },
+    TopN(){
+      var topn = 1;
+      if(this.tmp_cluster_num < 1){
+        topn  = 1;
+      } else if( this.tmp_cluster_num > this.all_clusters) {
+        topn  =  this.all_clusters;
+      } else {
+        topn = this.tmp_cluster_num;
+      }
+      this.final_clusters=new Array(this.all_clusters).fill(0);
+      for(var i = 0; i<topn; i++){
+          this.final_clusters[i] = 1;
+      }
+      this.option=this.getOption();
+      this.isShowColorPalette = false;
+    },
+    resetSelect(){
+      if (this.curr_rs == "SA_anno"){
+          this.COLOR_ALL2=require('../confs/discret_color.js').color_9;
+      }
+      else {
+          this.COLOR_ALL2=require('../confs/discret_color.js').default_colors;
+      }
+      this.final_clusters=new Array(this.all_clusters).fill(1);
+      this.option=this.getOption();
+    },
+    clearSelect () {
+      this.currentCellID = '';
+      this.$refs.clusterTable.clearSelection();
+    },
+    applyStatus(){
+      var self = this;
+      this.final_clusters=this.saved_clusters;
+      this.update_option();
+      this.isShowColorPalette = false;
+    },
+    handleSelectionChange(val) {
+      // change color when check box
+      // 2. get row id when use click selection box
+      if (val.length > 0){
+        this.currentCellID = val[val.length -1].ID;
+      }
+      // save cluster highlight status in an array
+      var tmp_clusters= new Array(this.all_clusters).fill(0);
+      for( var i = 0 ; i < val.length ; i++) {
+          tmp_clusters[val[i].ID]=1;
+      }
+      this.saved_clusters=tmp_clusters;
+    },
+    // ------------------ functions for cell type table end -----------------
+
     // ------------------ functions for update echarts begin -----------------
     update_option(){
         if( this.data_valid == true)
@@ -776,6 +996,7 @@ data() {
           console.log('draw mesh');
           var legend_list = [];
           var series_list = [];
+          var legend_show = {};
           for(var i = 0; i<this.mesh_conf.names.length; i++){
             var curr_name = this.mesh_conf.names[i];
             var curr_legend_name = this.mesh_conf.legends[i];
@@ -785,6 +1006,11 @@ data() {
                 continue;
             //console.log('curr_legend_name');
             legend_list.push(curr_legend_name);
+            if ( i == 0 ){
+                legend_show[curr_legend_name]=false;
+            }else {
+                legend_show[curr_legend_name]=true;
+            }
             var one_series = {
                 name : curr_legend_name,
                 type : 'surface',
@@ -804,6 +1030,7 @@ data() {
           var ret = {
               series_list: series_list,
               legend_list : legend_list,
+              legend_show:legend_show,
           };
           return ret ;
         } else {
@@ -823,7 +1050,8 @@ data() {
         for( var i = 0 ; i<this.all_clusters; i++ )
         {
           var curr_legend_name = celltype_legend[this.curr_rs].Legends[i];
-          if(this.final_clusters[i] == 0){
+          var the_data = curr_draw_datas[i];
+          if(this.final_clusters[i] == 0 || the_data.length==0){
             legend_show[curr_legend_name] = false;
           } else {
             legend_show[curr_legend_name] = true;
@@ -831,7 +1059,6 @@ data() {
           legend_list.push(curr_legend_name);
           //curr_color = COLOR_ALL[i];
           curr_color = this.COLOR_ALL2[i];
-          var the_data = curr_draw_datas[i];
           var one_series = {
               name : legend_list[i],
               type : 'scatter3D',
@@ -939,6 +1166,7 @@ data() {
             }
             for(var i = 0;i< mesh_serie.legend_list.length; i++){
                 legend_list.push(mesh_serie.legend_list[i]);
+                legend_show[mesh_serie.legend_list[i]] = mesh_serie.legend_show[mesh_serie.legend_list[i]];
             }
         }
         // set 3D space 
@@ -967,7 +1195,6 @@ data() {
         //  used_zmin = -10; used_zmax = 10; 
         //  boxWidth = 60; boxHeight = 60; boxDepth = 60;
         //}
-        console.log(legend_list);
         var opt={
           backgroundColor:bk_color,
           title :{
@@ -1072,7 +1299,7 @@ data() {
 }
 .mspan{
   display: inline-block;
-  margin-top: 15px;
+  margin-top: 10px;
   vertical-align: middle;
   text-align:center;
 }
@@ -1083,5 +1310,14 @@ data() {
 }
 .chart {
   height: 800px;
+}
+.parent {
+  position: relative;
+}
+.child {
+  position: absolute;
+  z-index: 99999;
+  top: 0;
+  left: 0;
 }
 </style>
