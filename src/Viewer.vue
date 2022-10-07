@@ -18,7 +18,8 @@
                 </el-row>
               </div>
               <!-- end of color palette -->
-          </div> <!-- end of top N buttons -->
+          </div> 
+          <!-- end of dialog div -->
       </el-dialog>
     </div>
     <!---------------------------- All floating items end --------------------------------------------------- -->
@@ -193,13 +194,8 @@
                                         </el-select>
                                     </el-col>
                                 </el-row>
-                                <el-row style="margin-top:3px;margin-bottom:2px">
-                                    <el-tag :key="tag" v-for="tag in markerTags" closable :disable-transitions="false" @close="handleMarkerTagClose(tag)">
-                                      {{tag}}
-                                    </el-tag>
-                                </el-row>
                                 <el-row style="margin-top:1px;margin-bottom:1px">
-                                    <span class='mspan'>Or please type a {{curr_genename_system}} ID:</span>
+                                    <span class='mspan'>Or any {{curr_genename_system}} ID:</span>
                                 </el-row>
                                 <el-row style="margin-top:3px;margin-bottom:2px">
                                     <el-col :span="16" >
@@ -210,16 +206,11 @@
                                     </el-col>
                                 </el-row>
                                 <el-row style="margin-top:3px;margin-bottom:2px">
-                                    <el-tag :key="tag" v-for="tag in inputIDTags" closable :disable-transitions="false" @close="handleInputIDTagClose(tag)" >
-                                      {{tag}}
-                                    </el-tag>
-                                </el-row>
-                                <el-row style="margin-top:3px;margin-bottom:2px">
                                     <el-col :span="8" >
                                         <span class='mspan'>Min Exp:</span>
                                     </el-col>
                                     <el-col :span="15" >
-                                        <el-slider  v-model="smallestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
+                                        <el-slider  v-model="smallestExpression" :step="0.5" :min="0" :max="curr_max_exp" @change="changeExpression" show-stops>
                                         </el-slider>
                                     </el-col>
                                 </el-row>
@@ -228,7 +219,7 @@
                                         <span class='mspan'>Max Exp:</span>
                                     </el-col>
                                     <el-col :span="15" >
-                                        <el-slider  v-model="largestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
+                                        <el-slider  v-model="largestExpression" :step="0.5" :min="0" :max="curr_max_exp" @change="changeExpression" show-stops>
                                         </el-slider>
                                     </el-col>
                                 </el-row>
@@ -557,6 +548,8 @@ var COLOR_default = COLOR_ALL.default_colors;
 var COLOR_9 = COLOR_ALL.color_9;
 // cell type legend and the color conf --------------------------------
 var conf_gens = require('../confs/genes.js');
+// URL manager
+var url_manager = require('../confs/urls.js');
 
 export default {
 components: {
@@ -679,10 +672,6 @@ data() {
             },
         }
       },
-      // main 3D data begin------------------------------------
-      rawdata:null,
-      jsondata : null,
-      // main 3D data end--------------------------------------
       //------------data selection for cell type begin ------
       // curr selection
       curr_name : null,
@@ -696,6 +685,8 @@ data() {
       anno_array : CT_CONFS.label_WT.anno,
       curr_anno : null,
       curr_coord : null,
+      rawdata:null,
+      jsondata : null,
       //------------data selection for cell type end ------
       //------------cell type selection begin ------
       isCTCHidden:true,
@@ -717,14 +708,29 @@ data() {
          'scaled',
          'sct_transformed',
       ],
-      curr_selected_gene:'',
+      curr_selected_gene : '',
+      input_gene_id : 'SMED30007704',
+      curr_gene : "",
       genes : conf_gens,
-      curr_genename_system:'SMEGS',
-      curr_norm: 'scaled',
-      markerTags : ['test'],
-      inputIDTags: ['test'],
+      curr_genename_system : 'SMED',
+      curr_norm : 'scaled',
+      curr_gene_url : url_manager.GENE_URL.SMED.scaled,
+      gene_json_raw : null,
+      gene_json_data : null,
+      smallestExpression:0,
+      largestExpression:10,
+      curr_max_exp:6,
       //------------gene expression selection end------
 
+      //------------channel selection start------
+      input_gene_yellow: '',
+      input_gene_red: '',
+      input_gene_green: '',
+      input_gene_blue: '',
+      input_gene_gray: '',
+      input_gene_magenta: '',
+      input_gene_cyan: '',
+      //------------channel selection end------
       //------------model data : mesh begin ------
       mesh_json:null,
       mesh_conf : { 
@@ -763,43 +769,68 @@ data() {
     // ------------------ resize page end----------------------
  
     //----------- gene select functions start -------------//
-    handleMarkerTagClose(tag) {
-        this.markerTags.splice(this.markerTags.indexOf(tag), 1);
+    update_gene_url(){
+        this.curr_gene_url = url_manager.GENE_URL[this.curr_genename_system][this.curr_norm];
     },
-    handleInputIDTagClose(tag) {
-        this.inputIDTags.splice(this.inputIDTags.indexOf(tag), 1);
+    OnGeneNameSystemChange(){
+        this.update_gene_url();
+        this.refreshGene(this.curr_gene,true);
+    },
+    resetGene(){
+        this.gene_json_raw = null;
+        this.gene_json_data = null;
+
+        if(this.curr_selected_gene != "") {
+            this.curr_gene = this.curr_selected_gene;
+        } else if (this.input_gene_id != "") {
+            this.curr_gene = this.input_gene_id;
+        }
+        this.update_gene_url();
+        this.refreshGene(this.curr_gene,true);
+    },
+    OnGeneNormChange(){
+        this.update_gene_url();
+        this.refreshGene(this.curr_gene,true);
     },
     selectMarkerGene(item){
-      this.refreshGene(item,false);
+        this.input_gene_id = "" ;
+        this.refreshGene(item,false);
+    },
+    UseGeneID(){
+        this.curr_selected_gene = "";
+        this.refreshGene(this.input_gene_id,false);
     },
     refreshGene(gname, force){
-      if(this.curr_name != null){
-        if(this.curr_gene != gname || force ){
-          this.umapdata = null;
-          this.raw_umapdata = null;
-          this.gene_xyz = null;
-          this.gene_xyz_raw = null;
-          this.$refs.myecharts.setOption(this.getOption(),true);
-
-          var self=this;
-          var used_url = this.GENE_NEW_URL+"/"+this.curr_name+"/"+gname+".json";
-          $.getJSON(used_url,function(_data) {
-            self.curr_gene = gname;
-            self.setGeneData(_data);
-            self.updateJsonData();
-            self.option = self.getOption();
-          });
-          // if umap panel is still open
-          if (!this.isUMAPHidden){
-            var used_url2 = this.GENE_UMAP_URL+"/"+this.curr_name+"/"+gname+".json";
-            $.getJSON(used_url2, function(_data){
-              self.curr_gene = item;
-              self.setUMAPJsonData(_data);
-              self.umap_option = self.getUMAPOption();
+        if ( gname == null || gname == "" ) return; 
+        if (this.curr_gene != gname || force ) {
+            this.gene_json_raw = null;
+            this.gene_json_data = null;
+            this.update_option_deep();
+            var self = this;
+            this.curr_gene = gname;
+            var used_url = this.curr_gene_url+"/"+this.curr_name+"/"+this.curr_gene+".json";
+            $.getJSON(used_url,function(_data) {
+              self.setGeneData(_data);
+              self.update_option_deep();
             });
-          }
         }
+    },
+    setGeneData(_data) {
+      console.log('get gene json loaded');
+      var gene_xyz= [];
+      for(var j=0 ; j< _data.length; j++)
+      {
+          var curr_item = _data[j];
+          if( parseInt(curr_item[3])+1>  this.curr_max_exp)
+              this.curr_max_exp = parseInt(curr_item[3])+1;
+          gene_xyz.push( [curr_item[0],curr_item[1],curr_item[2],curr_item[3]]);
       }
+      this.smallestExpression = this.curr_max_exp/5*3 ;
+      this.largestExpression = this.curr_max_exp;
+      console.log(this.curr_max_exp);
+      this.gene_json_raw= gene_xyz;
+      this.updateJsonData();
+      //this.gene_json_data = gene_xyz ;
     },
     //----------- gene select functions end -------------//
 
@@ -914,6 +945,7 @@ data() {
             this.is_gc_mode = true;
             this.is_ge_mode = false;
         }
+        this.OnChangeSample();
     },
     setCoordTag(){
         if(this.curr_coord == "Raw posture" || this.curr_coord == "Adjusted posture" ) {
@@ -941,6 +973,8 @@ data() {
         this.resetMesh();
         if(this.curr_mode == "CellTypes"){
             this.resetAnno();
+        } else if (this.curr_mode == "GeneExpression"){
+            this.resetGene();
         }
     },
     // ------------------ basic conf functions end----------------------
@@ -1056,7 +1090,7 @@ data() {
         }
     },
     //-------------mesh managerment end -------------------//
-    //-------------data managerment start -------------------//
+    //-------------cell type data managerment start -------------------//
     cleanBuffer(){
       this.jsondata = null ;
       this.rawdata = null;
@@ -1124,6 +1158,7 @@ data() {
       this.rawdata = curr_draw_datas;
       this.jsondata = curr_draw_datas;
     },
+    //-------------cell type data managerment end-------------------//
     //-------------configure ROI start -------------------//
     changeZScale(){
       this.z_scale = this.tmp_z_scale;
@@ -1145,12 +1180,47 @@ data() {
       this.tmp_y_max = this.y_max;
       this.tmp_z_max = this.z_max;
     },
+    reset_channel_jsons(){
+
+    },
     resetROI(){
       this.resetROIdata();
-      this.jsondata = this.rawdata;
+      if(this.curr_mode == "CellTypes")
+          this.jsondata = this.rawdata;
+      else if (this.curr_mode == "GeneExpression")
+          this.gene_json_data = this.gene_json_raw;
+      else
+          this.reset_channel_jsons();
       this.update_option();
     },
     updateJsonData(){
+      if(this.curr_mode == "CellTypes")
+          this.updateAnnoJsonData();
+      else if (this.curr_mode == "GeneExpression")
+          this.updateGeneJsonData();
+      else 
+          this.updateChannelJsons();
+    },
+    updateChannelJsons(){
+
+    },
+    updateGeneJsonData(){
+      var curr_draw_datas = [];
+      for(var i =0;i<this.gene_json_raw.length; i++){
+         var info = this.gene_json_raw[i]
+         if( info[0]<this.x_min) continue;
+         if( info[1]<this.y_min) continue;
+         if( info[2]<this.z_min) continue;
+         if( info[0]>this.x_max) continue;
+         if( info[1]>this.y_max) continue;
+         if( info[2]>this.z_max) continue;
+         if( info[3]<this.smallestExpression)continue;
+         if( info[3]>this.largestExpression)continue;
+         curr_draw_datas.push(info)
+      }
+      this.gene_json_data = curr_draw_datas;
+    },
+    updateAnnoJsonData(){
       var curr_draw_datas = [];
       for(var i =0;i<this.all_clusters;i++)
           curr_draw_datas.push([['x','y','z']]);
@@ -1304,6 +1374,49 @@ data() {
           return null;
         }
     },
+    changeExpression(){
+        this.updateJsonData();
+        this.update_option();
+    },
+    getGeneExpSerie(){
+        if(this.gene_json_data == null)
+            return null;
+        var legend_name = this.curr_gene;
+        var one_series = {
+            name : this.curr_gene,
+            type : 'scatter3D',
+            dimensions: [ 'AP','ML','DV' ,'exp'],
+            data: this.gene_json_data,
+            symbolSize: this.symbolSize,
+            symbolAlpha: this.symbolAlpha,
+            itemStyle: {
+              borderWidth: 0,
+            },
+        };
+        var visualMap= [
+            {
+               type: 'continuous',
+               min: 0,
+               max: this.curr_max_exp,
+               dimension: 3, // the fourth dimension of series.data (i.e. value[3]) is mapped
+               seriesIndex: 0, // The first series is mapped.
+               orient: 'vertical',
+               right: 5,
+               top: 'center',
+               inRange: {
+                  color: ['blue', 'white', 'red'], // A list of colors that defines the graph color mapping
+               },
+               textStyle: {
+                  color: '#cccccc'
+               },
+        }];
+        var ret = {
+            legend_name : legend_name,
+            one_series : one_series,
+            visualMap:visualMap,
+        };
+        return ret ;
+    },
     getScatterSeries(){
         if(this.jsondata == null)
             return null;
@@ -1372,10 +1485,10 @@ data() {
                     [used_xmax, used_ymin, used_zmin],
                     [used_xmax, used_ymax, used_zmin],
                     [used_xmax, used_ymax, used_zmax], 
-                    [used_xmax, used_ymin, used_zmax],// rect 03
+                    [used_xmax, used_ymin, used_zmax], // rect 03
                     [used_xmin, used_ymin, used_zmax],
                     [used_xmin, used_ymax, used_zmax],
-                    [used_xmax, used_ymax, used_zmax],// rect 04
+                    [used_xmax, used_ymax, used_zmax], // rect 04
                     [used_xmax, used_ymax, used_zmin],
                     [used_xmin, used_ymax, used_zmin],
                     [used_xmin, used_ymax, used_zmax],
@@ -1385,6 +1498,9 @@ data() {
         } else {
             return null;
         }
+    },
+    getChannelSeries(){
+        return null;
     },
     getOption(){
       // set colors 
@@ -1396,10 +1512,17 @@ data() {
       }
       var mesh_serie = null;
       var scatter_series = null ;
+      var gene_exp_serie = null;
+      var channel_series = null;
       mesh_serie = this.getMeshSerie();
-      scatter_series = this.getScatterSeries();
+      if( this.curr_mode == "CellTypes" ) 
+          scatter_series = this.getScatterSeries();
+      else if ( this.curr_mode == "GeneExpression" )
+          gene_exp_serie = this.getGeneExpSerie();
+      else 
+          channel_series = this.getChannelSeries();
       // Draw loading if necessary
-      if ( mesh_serie == null && scatter_series ==null ) {
+      if ( mesh_serie == null && scatter_series == null && gene_exp_serie == null && channel_series == null ) {
           this.data_valid = false;
           this.model_only = true;
           return this.getLoadingOption(bk_color,ft_color);
@@ -1410,23 +1533,38 @@ data() {
         var legend_show = {};
         //Draw scatters
         var tips = '';
-        if( scatter_series != null ){
-             for(var i = 0; i < scatter_series.series_list.length; i++){
-                 series_list.push(scatter_series.series_list[i])
-             }
-             for(var i = 0; i < scatter_series.legend_list.length; i++){
-                 legend_list.push(scatter_series.legend_list[i]);
-             }
-             legend_show = scatter_series.legend_show;
-             this.data_valid = true;
-             this.model_only = false;
-        } else {
-             this.data_valid = false;
-             this.model_only = true;
-             tips = 'Model done, still loading scatters ...';
-        }
-        console.log('end series');
-        // Draw mesh
+        if( this.curr_mode == "CellTypes" ) {
+            if( scatter_series != null ){
+                 for(var i = 0; i < scatter_series.series_list.length; i++){
+                     series_list.push(scatter_series.series_list[i])
+                 }
+                 for(var i = 0; i < scatter_series.legend_list.length; i++){
+                     legend_list.push(scatter_series.legend_list[i]);
+                 }
+                 legend_show = scatter_series.legend_show;
+                 this.data_valid = true;
+                 this.model_only = false;
+            } else {
+                 this.data_valid = false;
+                 this.model_only = true;
+                 tips = 'Model done, still loading scatters ...';
+            }
+         } else if ( this.curr_mode == "GeneExpression" ){
+            if( gene_exp_serie != null){
+                 this.data_valid = true;
+                 this.model_only = false;
+                 series_list.push(gene_exp_serie.one_series);
+                 legend_list.push(gene_exp_serie.legend_name);
+                 legend_show[gene_exp_serie.legend_name] = true;
+            } else {
+                 this.data_valid = false;
+                 this.model_only = true;
+                 tips = 'Model done, still loading gene data ...';
+            }
+         } else {
+
+         }
+          // Draw mesh
         if(mesh_serie != null){
             for(var i = 0;i< mesh_serie.series_list.length; i++){
                 series_list.push(mesh_serie.series_list[i]);
@@ -1542,6 +1680,9 @@ data() {
           },
           series: series_list
         }; // end of var opt
+        if ( this.curr_mode == "GeneExpression" && gene_exp_serie != null ){
+            opt.visualMap = gene_exp_serie.visualMap;
+        }
         console.log('reset option');
         return opt;
       } // end of else.
