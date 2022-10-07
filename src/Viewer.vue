@@ -1,48 +1,28 @@
 <template>
 <div>
+    <!---------------------------- All floating items begin --------------------------------------------------- -->
     <div  style="height=1px;">
-      <el-dialog title="Custom CellTypes Panel" style="width:800px;" :visible.sync="drawer" direction="ltr" :before-close="OnDrawerClose">
+      <el-dialog title="Color picker" style="width:500px;" :visible.sync="drawer" direction="ltr" :before-close="OnDrawerClose">
           <div>
-              <div v-draggable style='width:220px;height:400px;z-index:999;position:absolute;background:white;' v-if="isShowColorPalette">
+              <hr>
+              <!-- start of color palette -->
+              <div style='width:100%;height:400px;'>
                 <sketch-picker align='center' v-model="color" @input="colorValueChange"></sketch-picker>
-                <el-button align='right' style='width:50%;' @click='applyColor'>ChangeColor</el-button>
-                <el-button align='right' style='width:50%;' @click='closeColor'>Close</el-button>
+                <el-row style="margin-top:3px;margin-bottom:2px">
+                    <el-col :span="12" >
+                        <el-button type='success' @click='applyColor'>Apply</el-button>
+                    </el-col>
+                    <el-col :span="12" >
+                        <el-button type='info' @click='closeColor'>Close</el-button>
+                    </el-col>
+                </el-row>
               </div>
-              <!-- 1. cell table content -->
-              <el-table class="table" ref="clusterTable" style="width:100%;" :show-header='false'
-                :height='height' :row-key="getRowKey" :highlight-current-row='true'
-                :data="tableDataClusters.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-                @selection-change="handleSelectionChange" @row-click="getRowCelltype">
-                  <el-table-column :reserve-selection="true" type="selection" ></el-table-column>
-                  <el-table-column property="Celltype" label="Cell Type" > </el-table-column>
-                  <el-table-column label="Display" >
-                    <el-button @click="showColorPalette">color palette</el-button>
-                    <!-- <template slot-scope="scope"> -->
-                      <!-- <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button> -->
-                    <!-- </template> -->
-                  </el-table-column>
-              </el-table>
-              <el-pagination layout="total,sizes, prev, jumper, next" 
-                :total="this.tableDataClusters.length" :current-page="currentPage" 
-                @current-change="handleCurrentChange" @size-change="handleSizeChange" 
-                :page-sizes="[10,20]" :page-size="pageSize" :current-page.sync="currentPage">
-              </el-pagination>
-              <!-- 1. cell table content end-->
-              <div>
-                <el-button @click="applyStatus">Highlight selected </el-button>
-                <el-button @click='clearSelect'>Clear selected</el-button>
-                <hr>
-              </div> <!-- end of buttons -->
-              <div>
-                <el-button class='inline_item' @click='resetSelect'>Reset all</el-button>
-                <el-button class='inline_item' @click.native='closeCTC'>Close Panel</el-button>
-                <hr>
-              </div> <!-- end of top N buttons -->
+              <!-- end of color palette -->
           </div> <!-- end of top N buttons -->
       </el-dialog>
-      <!-- start of color palette -->
-      <!-- end of color palette -->
     </div>
+    <!---------------------------- All floating items end --------------------------------------------------- -->
+    <!---------------------------- Main windown begin --------------------------------------------------- -->
     <el-row>
       <el-button class="floatsetting" v-show="!display_setting" type="primary" icon="el-icon-setting"  @click="span_setting" >{{setting_title}}</el-button>
       <!-- ----------The setting grid begin --------------------------------------------------------------- -->
@@ -125,10 +105,45 @@
                             </el-row>
                             <!-- ----------cell type selection table begin --------------------------------------------------------------- -->
                             <el-row style="margin-top:3px;margin-bottom:2px">
-                                <el-col :span="23" >
-                                  <el-button type='primary' @click.native="openCTC" >Custom CellTypes</el-button>
-                                </el-col>
+                                <!-- 1. cell table content -->
+                                <el-table class="table" ref="clusterTable" style="width:100%;" :show-header='false'
+                                  :height='height' :row-key="getRowKey" :highlight-current-row='true'
+                                  :data="tableDataClusters.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                                  @selection-change="handleSelectionChange" @row-click="getRowCelltype">
+                                    <el-table-column :reserve-selection="true" type="selection" ></el-table-column>
+                                    <el-table-column property="Celltype" label="Cell Type" > </el-table-column>
+                                    <el-table-column label="Display" >
+                                      <el-button @click="showColorPalette">color</el-button>
+                                      <!-- <template slot-scope="scope"> -->
+                                        <!-- <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button> -->
+                                      <!-- </template> -->
+                                    </el-table-column>
+                                </el-table>
+                                <el-pagination layout="total,sizes" 
+                                  :total="this.tableDataClusters.length" :current-page="currentPage" 
+                                  @current-change="handleCurrentChange" @size-change="handleSizeChange" >
+                                </el-pagination>
+                                <el-pagination layout="prev, jumper, next" 
+                                  :page-sizes="[10,20]" :page-size="pageSize" :current-page.sync="currentPage">
+                                </el-pagination>
                             </el-row>
+                            <!-- 1. cell table content end-->
+                            <div>
+                               <!-- start of buttons -->
+                               <hr class='dhr'>
+                               <el-row style="margin-top:3px;margin-bottom:2px">
+                                  <el-col :span="8" >
+                                      <el-button type='success' @click="applyStatus">Apply</el-button>
+                                  </el-col>
+                                  <el-col :span="8" >
+                                      <el-button type='warning' @click='clearSelect'>Clear</el-button>
+                                  </el-col>
+                                  <el-col :span="8" >
+                                      <el-button type='primary' @click='resetSelect'>Reset</el-button>
+                                  </el-col>
+                               </el-row>
+                               <!-- end of buttons -->
+                            </div>
                             <!-- ----------cell type selection table end--------------------------------------------------------------- -->
                          </div>
                          <!-- ----------cell type mode end--------------------------------------------------------------- -->
@@ -203,7 +218,7 @@
                                     <el-col :span="8" >
                                         <span class='mspan'>Min Exp:</span>
                                     </el-col>
-                                    <el-col :span="16" >
+                                    <el-col :span="15" >
                                         <el-slider  v-model="smallestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
                                         </el-slider>
                                     </el-col>
@@ -212,7 +227,7 @@
                                     <el-col :span="8" >
                                         <span class='mspan'>Max Exp:</span>
                                     </el-col>
-                                    <el-col :span="16" >
+                                    <el-col :span="15" >
                                         <el-slider  v-model="largestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
                                         </el-slider>
                                     </el-col>
@@ -224,7 +239,7 @@
                          </div>
                          <!-- ----------gene selection mode start--------------------------------------------------------------- -->
                          <!-- ----------digital in situ mode start--------------------------------------------------------------- -->
-                         <div align="center"  v-show="is_gc_mode" style="margin:3px; border: 1px solid #ccc;">
+                         <div align="center"  v-show="is_gc_mode" style="margin:3px; border: 3px solid #ccc;">
                             <el-row style="margin-top:3px;margin-bottom:2px">
                                 <el-col :span="8" >
                                    <span  class='mspan'>Type:</span>
@@ -337,7 +352,7 @@
                                 <el-col :span="8" >
                                     <span class='mspan'>Min Exp:</span>
                                 </el-col>
-                                <el-col :span="16" >
+                                <el-col :span="15" >
                                     <el-slider  v-model="smallestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
                                     </el-slider>
                                 </el-col>
@@ -346,7 +361,7 @@
                                 <el-col :span="8" >
                                     <span class='mspan'>Max Exp:</span>
                                 </el-col>
-                                <el-col :span="16" >
+                                <el-col :span="15" >
                                     <el-slider  v-model="largestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
                                     </el-slider>
                                 </el-col>
@@ -474,7 +489,7 @@
                                   <el-col :span="8" >
                                      <span  class='mspan'>SymbolSize</span>
                                   </el-col>
-                                  <el-col :span="16" >
+                                  <el-col :span="15" >
                                       <el-slider  v-model="symbolSize"
                                          :step="1" :min="1" :max="5" @change="refresh" show-stops>
                                       </el-slider>
@@ -484,7 +499,7 @@
                                   <el-col :span="8" >
                                      <span  class='mspan'>SymbolAlpha</span>
                                   </el-col>
-                                  <el-col :span="16" >
+                                  <el-col :span="15" >
                                       <el-slider  v-model="symbolAlpha"
                                         :step="0.1" :min="0.0" :max="1" @change="refresh" show-stops>
                                       </el-slider>
@@ -513,6 +528,7 @@
       </el-col>
       <!-- ----------The 3D display grid end --------------------------------------------------------------- -->
     </el-row>
+    <!---------------------------- Main windown end--------------------------------------------------- -->
 </div>
 </template>
 
@@ -601,11 +617,11 @@ data() {
       
       //------------color legends confs begin------
       // test color 
-      current_color_all: COLOR_default,
-      COLOR_ALL2: COLOR_default,
       COLOR_9 : COLOR_9,
+      COLOR_default :COLOR_default,
+      COLOR_ALL2: COLOR_default,
+      current_color_all: null,
       currentCellID: '',
-      isShowColorPalette: false,
       color: '',
       //------------color legends confs end------
       //------------drag element confs begin------
@@ -789,11 +805,7 @@ data() {
 
     //----------- color palette start -------------//
     showColorPalette(){
-      if (this.isShowColorPalette){
-        this.isShowColorPalette = false;
-      }else{
-        this.isShowColorPalette = true;
-      }
+      this.drawer = true; 
     },
     colorValueChange (val) {
      this.color = val.hex;
@@ -801,11 +813,12 @@ data() {
     applyColor(){
       // change color when click row
       // only apply changes when click button
+      this.current_color_all = this.COLOR_ALL2;
       this.current_color_all[this.currentCellID] = this.color;
       this.option=this.getOption()  ;
     },
     closeColor(){
-      this.isShowColorPalette = false;
+      this.drawer = false;
     },
     //-------------color palette ends------------------//
     // ------------------ functions for cell type table begin -----------------
@@ -834,12 +847,6 @@ data() {
       this.currentPage = currentpage;
     },
     resetSelect(){
-      if (this.curr_rs == "SA_anno"){
-          this.COLOR_ALL2=require('../confs/discret_color.js').color_9;
-      }
-      else {
-          this.COLOR_ALL2=require('../confs/discret_color.js').default_colors;
-      }
       this.final_clusters=new Array(this.all_clusters).fill(1);
       this.option=this.getOption();
     },
@@ -851,7 +858,6 @@ data() {
       var self = this;
       this.final_clusters=this.saved_clusters;
       this.update_option();
-      this.isShowColorPalette = false;
     },
     handleSelectionChange(val) {
       // change color when check box
