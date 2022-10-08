@@ -21,6 +21,9 @@
           </div> 
           <!-- end of dialog div -->
       </el-dialog>
+      <el-dialog title="MIP image" width="95%"  style="width:1000px;" :visible.sync="mip_drawer" direction="ltr">
+          <img :src=fish_url >
+      </el-dialog>
     </div>
     <!---------------------------- All floating items end --------------------------------------------------- -->
     <!---------------------------- Main windown begin --------------------------------------------------- -->
@@ -80,6 +83,19 @@
                                  </el-select>
                              </el-col>
                          </el-row>
+                         <!--
+                         <el-row style="margin-top:3px;margin-bottom:2px">
+                             <el-col :span="8" >
+                                <span  class='mspan'>blendMode:</span>
+                             </el-col>
+                             <el-col :span="16" >
+                                 <el-select  v-model="curr_blender" placeholder="curr_blender" @change="OnChangeBlender">
+                                   <el-option key="source-over" label="alpha" value="source-over"></el-option>
+                                   <el-option key="lighter" label="lighter" value="lighter"></el-option>
+                                 </el-select>
+                             </el-col>
+                         </el-row>
+                         -->
                          <!-- ----------Choose mode end --------------------------------------------------------------- -->
                      </div>
                      <!-- ----------The Baisc settings end -------------------------------------------------------------- -->
@@ -205,6 +221,7 @@
                                         <el-button type="success" @click.native="UseGeneID">Display</el-button>
                                     </el-col>
                                 </el-row>
+                                <!--
                                 <el-row style="margin-top:3px;margin-bottom:2px">
                                     <el-col :span="8" >
                                         <span class='mspan'>Min Exp:</span>
@@ -223,6 +240,7 @@
                                         </el-slider>
                                     </el-col>
                                 </el-row>
+                                -->
                             </div>
                             <el-row style="margin-top:2px;margin-bottom:3px">
                                 <el-button type="success"  @click.native="OnOpenFISH">MIP image</el-button>
@@ -267,7 +285,7 @@
                                    <span  class='mspan'>red:</span>
                                 </el-col>
                                 <el-col :span="12" >
-                                    <el-input  v-model="input_gene_red" placeholder=""></el-input>
+                                    <el-input  v-model="input_gene_red" :placeholder="input_gene_red"></el-input>
                                 </el-col>
                                 <el-col :span="6" >
                                     <el-button type="success" @click.native="ApplyRed">set</el-button>
@@ -278,7 +296,7 @@
                                    <span  class='mspan'>green:</span>
                                 </el-col>
                                 <el-col :span="12" >
-                                    <el-input  v-model="input_gene_green" placeholder=""></el-input>
+                                    <el-input  v-model="input_gene_green" :placeholder="input_gene_green"></el-input>
                                 </el-col>
                                 <el-col :span="6" >
                                     <el-button type="success" @click.native="ApplyGreen">set</el-button>
@@ -289,7 +307,7 @@
                                    <span  class='mspan'>blue:</span>
                                 </el-col>
                                 <el-col :span="12" >
-                                    <el-input  v-model="input_gene_blue" placeholder=""></el-input>
+                                    <el-input  v-model="input_gene_blue" :placeholder="input_gene_blue"></el-input>
                                 </el-col>
                                 <el-col :span="6" >
                                     <el-button type="success" @click.native="ApplyBlue">set</el-button>
@@ -300,7 +318,7 @@
                                    <span  class='mspan'>gray:</span>
                                 </el-col>
                                 <el-col :span="12" >
-                                    <el-input  v-model="input_gene_gray" placeholder=""></el-input>
+                                    <el-input  v-model="input_gene_gray" :placeholder="input_gene_gray"></el-input>
                                 </el-col>
                                 <el-col :span="6" >
                                     <el-button type="success" @click.native="ApplyGray">set</el-button>
@@ -311,7 +329,7 @@
                                    <span  class='mspan'>cyan:</span>
                                 </el-col>
                                 <el-col :span="12" >
-                                    <el-input  v-model="input_gene_cyan" placeholder=""></el-input>
+                                    <el-input  v-model="input_gene_cyan" :placeholder="input_gene_cyan"></el-input>
                                 </el-col>
                                 <el-col :span="6" >
                                     <el-button type="success" @click.native="ApplyCyan">set</el-button>
@@ -322,7 +340,7 @@
                                    <span  class='mspan'>magenta:</span>
                                 </el-col>
                                 <el-col :span="12" >
-                                    <el-input  v-model="input_gene_magenta" placeholder=""></el-input>
+                                    <el-input  v-model="input_gene_magenta" :placeholder="input_gene_magenta"></el-input>
                                 </el-col>
                                 <el-col :span="6" >
                                     <el-button type="success" @click.native="ApplyMagenta">set</el-button>
@@ -333,7 +351,7 @@
                                    <span  class='mspan'>yellow:</span>
                                 </el-col>
                                 <el-col :span="12" >
-                                    <el-input  v-model="input_gene_yellow" placeholder=""></el-input>
+                                    <el-input  v-model="input_gene_yellow" :placeholder="input_gene_yellow"></el-input>
                                 </el-col>
                                 <el-col :span="6" >
                                     <el-button type="success" @click.native="ApplyYellow">set</el-button>
@@ -341,19 +359,10 @@
                             </el-row>
                             <el-row style="margin-top:3px;margin-bottom:2px">
                                 <el-col :span="8" >
-                                    <span class='mspan'>Min Exp:</span>
+                                    <span class='mspan'>Min CutOff:</span>
                                 </el-col>
                                 <el-col :span="15" >
-                                    <el-slider  v-model="smallestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
-                                    </el-slider>
-                                </el-col>
-                            </el-row>
-                            <el-row style="margin-top:3px;margin-bottom:2px">
-                                <el-col :span="8" >
-                                    <span class='mspan'>Max Exp:</span>
-                                </el-col>
-                                <el-col :span="15" >
-                                    <el-slider  v-model="largestExpression" :step="0.5" :min="0" :max="6" @change="changeExpression" show-stops>
+                                    <el-slider  v-model="min_cutoff" :step="0.5" :min="0" :max="6" @change="changeMinCutoff" show-stops>
                                     </el-slider>
                                 </el-col>
                             </el-row>
@@ -643,7 +652,7 @@ data() {
       draw_grids:false,
       draw_box :true,
       adjusted_posture:true,
-      symbolSize:1,
+      symbolSize:2,
       symbolAlpha:1.0,
       // drawing details conf end----------
       // echarts option begin -------------
@@ -685,6 +694,7 @@ data() {
       anno_array : CT_CONFS.label_WT.anno,
       curr_anno : null,
       curr_coord : null,
+      curr_blender: "source-over",
       rawdata:null,
       jsondata : null,
       //------------data selection for cell type end ------
@@ -717,19 +727,52 @@ data() {
       curr_gene_url : url_manager.GENE_URL.SMED.scaled,
       gene_json_raw : null,
       gene_json_data : null,
-      smallestExpression:0,
-      largestExpression:10,
+      //smallestExpression:0,
+      //largestExpression:10,
       curr_max_exp:6,
+      fish_url:null,
+      mip_drawer:false,
       //------------gene expression selection end------
 
       //------------channel selection start------
-      input_gene_yellow: '',
-      input_gene_red: '',
-      input_gene_green: '',
-      input_gene_blue: '',
-      input_gene_gray: '',
+      input_gene_red:     'SMED30007406',
+      input_gene_green:   'SMED30019471',
+      input_gene_blue:    'SMED30030379',
+      input_gene_gray:    '',
+      input_gene_cyan:    '',
       input_gene_magenta: '',
-      input_gene_cyan: '',
+      input_gene_yellow:  '',
+      channel_json_raw : {
+          red : null,
+          green : null,
+          blue : null,
+          gray : null,
+          cyan : null,
+          magenta : null,
+          yellow: null,
+          cyan : null,
+      },
+      channel_json_data: {
+          red : null,
+          green : null,
+          blue : null,
+          gray : null,
+          cyan : null,
+          magenta : null,
+          yellow: null,
+          cyan : null,
+      },
+      channel_keys : ["red",    "green",   "blue",   "gray",   "cyan",   "magenta", "yellow"],
+      channel_colors : {
+          red:"#ff0000",
+          green:"#00ff00",
+          blue:"#0000ff",
+          gray:"#888888",
+          cyan:"#00ffff",
+          magenta:"#ff00fff",
+          yellow:"#ffff00"
+      },
+      min_cutoff : 3,
       //------------channel selection end------
       //------------model data : mesh begin ------
       mesh_json:null,
@@ -745,13 +788,13 @@ data() {
   },
   methods: {
     // ------------------ resize page begin ----------------------
-    resize_option(){
+    resize_option() {
        this.$nextTick(() => {
            this.$refs.myecharts.resize();
            this.$refs.myecharts_model.resize();
        });
     },
-    span_setting(){
+    span_setting() {
         if( this.display_setting == true ) {
             this.display_setting = false;
             this.setting_w = 0;
@@ -769,14 +812,23 @@ data() {
     // ------------------ resize page end----------------------
  
     //----------- gene select functions start -------------//
-    update_gene_url(){
+    update_gene_url() {
         this.curr_gene_url = url_manager.GENE_URL[this.curr_genename_system][this.curr_norm];
     },
-    OnGeneNameSystemChange(){
+    OnGeneNameSystemChange() {
         this.update_gene_url();
-        this.refreshGene(this.curr_gene,true);
+        if( this.curr_mode == "GeneExpression" ) {
+            this.resetDefaultGene();
+            this.resetGene();
+        } else {
+            this.resetDefaultChannelGene();
+            this.resetChannel();
+        }
     },
-    resetGene(){
+    resetDefaultGene() {
+
+    },
+    resetGene() {
         this.gene_json_raw = null;
         this.gene_json_data = null;
 
@@ -785,22 +837,37 @@ data() {
         } else if (this.input_gene_id != "") {
             this.curr_gene = this.input_gene_id;
         }
-        this.update_gene_url();
         this.refreshGene(this.curr_gene,true);
     },
-    OnGeneNormChange(){
+    OnGeneNormChange() {
         this.update_gene_url();
-        this.refreshGene(this.curr_gene,true);
+        if( this.curr_mode == "GeneExpression" ) {
+            this.resetGene();
+        } else {
+            this.resetChannel();
+        }
     },
-    selectMarkerGene(item){
+    selectMarkerGene(item) {
         this.input_gene_id = "" ;
         this.refreshGene(item,false);
     },
-    UseGeneID(){
+    UseGeneID() {
         this.curr_selected_gene = "";
         this.refreshGene(this.input_gene_id,false);
     },
-    refreshGene(gname, force){
+    get_curr_gene_url(gene_name) {
+        return this.curr_gene_url+"/"+this.curr_name+"/"+gene_name+".json";
+    },
+    changeExpression(){
+        this.updateJsonData();
+        this.update_option();
+    },
+    OnOpenFISH(){
+        var base_url =  url_manager.PSEUDO_FISH_URL[this.curr_genename_system];
+        this.fish_url = base_url + '/' + this.curr_name+'/'+this.curr_name+'_'+this.curr_gene+".green.MIR.png";
+        this.mip_drawer = true;
+    },
+    refreshGene(gname, force) {
         if ( gname == null || gname == "" ) return; 
         if (this.curr_gene != gname || force ) {
             this.gene_json_raw = null;
@@ -808,7 +875,8 @@ data() {
             this.update_option_deep();
             var self = this;
             this.curr_gene = gname;
-            var used_url = this.curr_gene_url+"/"+this.curr_name+"/"+this.curr_gene+".json";
+            var used_url = this.get_curr_gene_url(this.curr_gene);
+            //var used_url = this.curr_gene_url+"/"+this.curr_name+"/"+this.curr_gene+".json";
             $.getJSON(used_url,function(_data) {
               self.setGeneData(_data);
               self.update_option_deep();
@@ -816,21 +884,21 @@ data() {
         }
     },
     setGeneData(_data) {
-      console.log('get gene json loaded');
-      var gene_xyz= [];
-      for(var j=0 ; j< _data.length; j++)
-      {
-          var curr_item = _data[j];
-          if( parseInt(curr_item[3])+1>  this.curr_max_exp)
-              this.curr_max_exp = parseInt(curr_item[3])+1;
-          gene_xyz.push( [curr_item[0],curr_item[1],curr_item[2],curr_item[3]]);
-      }
-      this.smallestExpression = this.curr_max_exp/5*3 ;
-      this.largestExpression = this.curr_max_exp;
-      console.log(this.curr_max_exp);
-      this.gene_json_raw= gene_xyz;
-      this.updateJsonData();
-      //this.gene_json_data = gene_xyz ;
+        console.log('get gene json loaded');
+        var gene_xyz= [];
+        for(var j=0 ; j< _data.length; j++)
+        {
+            var curr_item = _data[j];
+            if( parseInt(curr_item[3])+1>  this.curr_max_exp)
+                this.curr_max_exp = parseInt(curr_item[3])+1;
+            gene_xyz.push( [curr_item[0],curr_item[1],curr_item[2],curr_item[3]]);
+        }
+        //this.smallestExpression = this.curr_max_exp/5*3 ;
+        //this.largestExpression = this.curr_max_exp;
+        console.log(this.curr_max_exp);
+        this.gene_json_raw= gene_xyz;
+        this.updateJsonData();
+        //this.gene_json_data = gene_xyz ;
     },
     //----------- gene select functions end -------------//
 
@@ -840,7 +908,7 @@ data() {
     },
     colorValueChange (val) {
      this.color = val.hex;
-     },
+    },
     applyColor(){
       // change color when click row
       // only apply changes when click button
@@ -975,6 +1043,8 @@ data() {
             this.resetAnno();
         } else if (this.curr_mode == "GeneExpression"){
             this.resetGene();
+        } else {
+            this.resetChannel();
         }
     },
     // ------------------ basic conf functions end----------------------
@@ -989,6 +1059,9 @@ data() {
         this.cleanBuffer();
         this.resetAnno();
         this.update_option_deep();
+    },
+    OnChangeBlender(){
+        this.update_option();
     },
     OnChangeCoord(){
         //deep clean buffer
@@ -1051,11 +1124,112 @@ data() {
       return this.getYMax()-this.getYMin()+2;
     },
     //-------------3d box conf end -------------------//
+
+    //------------function of channel selection start------
+    ApplyRed() {
+        this.loadOneChannelGene(this.input_gene_red,"red")
+    },
+    ApplyGreen() {
+        this.loadOneChannelGene(this.input_gene_green,"green")
+    },
+    ApplyBlue() {
+        this.loadOneChannelGene(this.input_gene_blue,"blue")
+    },
+    ApplyGray() {
+        this.loadOneChannelGene(this.input_gene_gray,"gray")
+    },
+    ApplyCyan() {
+        this.loadOneChannelGene(this.input_gene_cyan,"cyan")
+    },
+    ApplyMagenta() {
+        this.loadOneChannelGene(this.input_gene_magenta,"magenta")
+    },
+    ApplyYellow() {
+        this.loadOneChannelGene(this.input_gene_yellow,"yellow")
+    },
+    loadOneChannelGene(input_gene, key) {
+        if ( this.channel_json_raw[key] != null ) {
+            this.channel_json_raw[key] = null;
+            this.channel_json_data[key] = null;
+            this.update_option_deep()
+        }
+        if ( input_gene != "" ) {
+            var used_url = this.get_curr_gene_url(input_gene);
+            var self = this;
+            var kkey = key;
+            $.getJSON(used_url,function(_data) {
+              self.setChannelGeneData(_data,kkey);
+              self.update_option_deep();
+            });
+        }
+    },
+    changeMinCutoff() {
+        this.updateJsonData();
+        this.update_option();
+    },
+    resetDefaultChannelGene() {
+
+    },
+    getChannelName(key){
+        if(key == "red") return this.input_gene_red;
+        if(key == "green") return this.input_gene_green;
+        if(key == "blue") return this.input_gene_blue;
+        if(key == "gray") return this.input_gene_gray;
+        if(key == "cyan") return this.input_gene_cyan;
+        if(key == "magenta") return this.input_gene_magenta;
+        if(key == "yellow") return this.input_gene_yellow;
+        return "";
+    },
+    resetChannel() {
+        for( var i=0;i<this.channel_keys.length; i++ ) {
+            var key = this.channel_keys[i];
+            this.channel_json_raw[key] = null;
+            this.channel_json_data[key] = null;
+        }
+        this.ApplyRed();
+        this.ApplyGreen();
+        this.ApplyBlue();
+        this.ApplyGray();
+        this.ApplyCyan();
+        this.ApplyMagenta();
+        this.ApplyYellow();
+        this.update_option_deep();
+    },
+    setChannelGeneData(_data,key) {
+        var gene_xyz = [];
+        for(var j=0 ; j< _data.length; j++) {
+            var curr_item = _data[j];
+            gene_xyz.push( [curr_item[0],curr_item[1],curr_item[2],curr_item[3]]);
+        }
+        this.channel_json_raw[key] = gene_xyz;
+        this.update_onechannel_gene(key);
+    },
+    update_onechannel_gene(key) {
+        this.channel_json_data[key] = null;
+        if(this.channel_json_raw[key] != null) {
+            var curr_draw_datas = [];
+            var infoarry = this.channel_json_raw[key]
+            for(var i =0;i<infoarry.length; i++) {
+               var info = infoarry[i];
+               if( info[0]<this.x_min) continue;
+               if( info[1]<this.y_min) continue;
+               if( info[2]<this.z_min) continue;
+               if( info[0]>this.x_max) continue;
+               if( info[1]>this.y_max) continue;
+               if( info[2]>this.z_max) continue;
+               if( info[3]<this.min_cutoff)continue;
+               curr_draw_datas.push(info)
+            }
+            this.channel_json_data[key] = curr_draw_datas;
+        }
+    },
+    //------------function of channel selection end------
+
     //-------------mesh managerment start -------------------//
-    cleanMesh(){
+    cleanMesh() {
       this.mesh_json = null;
     },
-    resetMesh(){
+    resetMesh() {
       this.cleanMesh();
       // loading new mesh
       var self = this;
@@ -1202,7 +1376,9 @@ data() {
           this.updateChannelJsons();
     },
     updateChannelJsons(){
-
+        for(var i = 0; i < this.channel_keys.length; i++){
+            this.update_onechannel_gene(this.channel_keys[i])
+        }
     },
     updateGeneJsonData(){
       var curr_draw_datas = [];
@@ -1214,8 +1390,8 @@ data() {
          if( info[0]>this.x_max) continue;
          if( info[1]>this.y_max) continue;
          if( info[2]>this.z_max) continue;
-         if( info[3]<this.smallestExpression)continue;
-         if( info[3]>this.largestExpression)continue;
+         //if( info[3]<this.smallestExpression)continue;
+         //if( info[3]>this.largestExpression)continue;
          curr_draw_datas.push(info)
       }
       this.gene_json_data = curr_draw_datas;
@@ -1374,10 +1550,6 @@ data() {
           return null;
         }
     },
-    changeExpression(){
-        this.updateJsonData();
-        this.update_option();
-    },
     getGeneExpSerie(){
         if(this.gene_json_data == null)
             return null;
@@ -1403,6 +1575,7 @@ data() {
                orient: 'vertical',
                right: 5,
                top: 'center',
+               calculable: true,
                inRange: {
                   color: ['blue', 'white', 'red'], // A list of colors that defines the graph color mapping
                },
@@ -1416,6 +1589,44 @@ data() {
             visualMap:visualMap,
         };
         return ret ;
+    },
+    getChannelSeries(){
+        var series_list = [];
+        var legend_list = [];
+        var curr_color ;
+        for( var i = 0 ; i<this.channel_keys.length; i++ )
+        {
+            var key = this.channel_keys[i];
+            var curr_draw_datas = this.channel_json_data[key];
+            if ( curr_draw_datas == null )
+                continue;
+            var curr_legend_name = this.getChannelName(key);
+            if( curr_legend_name == "" ) 
+                continue;
+            legend_list.push(curr_legend_name);
+            curr_color = this.channel_colors[key];
+            var one_series = {
+                name : curr_legend_name,
+                type : 'scatter3D',
+                data:  curr_draw_datas,
+                symbol:'circle',
+                symbolSize: this.symbolSize,
+                itemStyle: {
+                  borderWidth: 0,
+                  color: curr_color,
+                  opacity: this.symbolAlpha,
+                },
+                blendMode:this.curr_blender,
+                silent : true,
+            };
+            series_list.push(one_series);
+        } // end of for final_clusters.length
+        var ret = {
+            series_list : series_list,
+            legend_list : legend_list,
+        };
+        if(series_list.length <1 ) return null;
+        return ret;
     },
     getScatterSeries(){
         if(this.jsondata == null)
@@ -1452,7 +1663,7 @@ data() {
                 color: curr_color,
                 opacity: this.symbolAlpha,
               },
-              //blendMode:'lighter',
+              blendMode:this.curr_blender,
               silent : true,
           };
           series_list.push(one_series);
@@ -1498,9 +1709,6 @@ data() {
         } else {
             return null;
         }
-    },
-    getChannelSeries(){
-        return null;
     },
     getOption(){
       // set colors 
@@ -1562,7 +1770,19 @@ data() {
                  tips = 'Model done, still loading gene data ...';
             }
          } else {
-
+            if( channel_series!=null){
+                for(var i = 0; i < channel_series.series_list.length; i++){
+                    series_list.push(channel_series.series_list[i])
+                }
+                for(var i = 0; i < channel_series.legend_list.length; i++){
+                    legend_list.push(channel_series.legend_list[i]);
+                }
+                this.data_valid = true;
+                this.model_only = false;
+            } else {
+                 this.data_valid = false;
+                 this.model_only = true;
+            }
          }
           // Draw mesh
         if(mesh_serie != null){
