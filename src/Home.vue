@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img style="width:1339px; height:752px;" src="./assets/WT.png" >
+    <img style="width:100%; height:100%;" src="./assets/WT.png" >
   </div>
 </template>
 

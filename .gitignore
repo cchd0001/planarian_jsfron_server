@@ -4,3 +4,4 @@ dist/
 npm-debug.log
 .idea
 webpack.config.js
+package-lock.json
