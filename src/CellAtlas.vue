@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- individual and resolution selecting menu start ... -->
-    <div style="margin-left:0%;" align="center">
+    <div style="margin-left:0%;text-align:center;">
       <el-menu  class="el-menu-demo" mode="horizontal" active-text-color="#409eff">
         <el-menu-item index="1"  @click.native="show_WT"      >WT     </el-menu-item>
         <el-menu-item index="2"  @click.native="show_0hpa1"   >0hpa1  </el-menu-item>

@@ -1,10 +1,10 @@
 <template>
   <div id="app">
     <header>
-      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" active-text-color="#409eff">
+      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" active-text-color="#409eff" style="margin: 0px;">
         <el-menu-item index="1">Home</el-menu-item>
         <el-submenu index="2" active-text-color="#409eff">
-          <template slot="title">3D Atlas Visuliazation</template>
+          <template slot="title">3D Atlas Visuliazationabc</template>
             <el-menu-item index="2-1">Cell Type Atlas</el-menu-item>
             <el-menu-item index="2-2">Gene Expression Atlas</el-menu-item>
             <el-menu-item index="2-3">Single-cell-label-transfered Cell Atlas</el-menu-item>
@@ -96,5 +96,12 @@ export default {
 #app {
   font-family: Helvetica, sans-serif;
   text-align: center;
+  margin-top: -8px;
 }
+header{
+    position: sticky;
+    z-index: 999;
+    top: 0;
+    margin-bottom: 8px;
+    }
 </style>
