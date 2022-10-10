@@ -202,18 +202,6 @@
                                     <span class='mspan'>Please choose an DEG:</span>
                                 </el-row>
                                 <el-row style="margin-top:3px;margin-bottom:2px">
-                                    <el-col :span="24" >
-                                        <el-select v-model="curr_selected_gene" filterable placeholder="" @change="selectMarkerGene" >
-                                          <el-option v-for="item in genes" :key="item.value" 
-                                             :label="item.label" :value="item.value">
-                                          </el-option>
-                                        </el-select>
-                                    </el-col>
-                                </el-row>
-                                <el-row style="margin-top:1px;margin-bottom:1px">
-                                    <span class='mspan'>Or any {{curr_genename_system}} ID:</span>
-                                </el-row>
-                                <el-row style="margin-top:3px;margin-bottom:2px">
                                     <el-col :span="16" >
                                         <el-input  v-model="input_gene_id" placeholder=""></el-input>
                                     </el-col>
@@ -221,6 +209,31 @@
                                         <el-button type="success" @click.native="UseGeneID">Display</el-button>
                                     </el-col>
                                 </el-row>
+                                <el-row style="margin-top:3px;margin-bottom:2px">
+                                    <el-col :span="24" >
+                                        <!-- 2022-10-10 add gene table -->
+                                        <el-table ref="geneTable" 
+                                        :show-header='true' class="table"
+                                        :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                                        :highlight-current-row='true'
+                                        stripe
+                                        @row-dblclick='handleRow'>
+                                            <el-table-column prop='smesg' label='SMESG'></el-table-column>
+                                            <el-table-column prop='smed' label='SMED'></el-table-column>
+                                            <el-table-column prop='gene_name' label='Name'></el-table-column>
+                                        </el-table>
+                                        <!-- gene table end-->
+                                    </el-col>
+                                </el-row>
+                                <el-row style="margin-top:3px;margin-bottom:2px">
+                                        <el-pagination layout="prev,next,jumper"
+                                        :total="this.tableData.length"
+                                        :current-page="currentPage"
+                                        @current-change="handleCurrentChange" @size-change="handleSizeChange"
+                                        :page-sizes="[3,5,10]" :page-size="pageSize" :current-page.sync="currentPage">
+                                        </el-pagination>
+                                </el-row>
+
                                 <!--
                                 <el-row style="margin-top:3px;margin-bottom:2px">
                                     <el-col :span="8" >
@@ -559,6 +572,8 @@ var COLOR_9 = COLOR_ALL.color_9;
 var conf_gens = require('../confs/genes.js');
 // URL manager
 var url_manager = require('../confs/urls.js');
+// Gene ID Mapping table
+var gene_id_url = "http://49.235.68.146/newgenes/id_mapping_web.json"
 
 export default {
 components: {
@@ -718,8 +733,14 @@ data() {
          'scaled',
          'sct_transformed',
       ],
+      // 2022-10-10, gene table data
+      tableData: [],
+      allTableData: [],
+      pageSize:5,
+      currentPage:1,
+      // end
       curr_selected_gene : '',
-      input_gene_id : 'SMED30007704',
+      input_gene_id : '',
       curr_gene : "",
       genes : conf_gens,
       curr_genename_system : 'SMED',
@@ -847,13 +868,56 @@ data() {
             this.resetChannel();
         }
     },
-    selectMarkerGene(item) {
-        this.input_gene_id = "" ;
-        this.refreshGene(item,false);
+    loadGeneTable(){
+        // 2022-10-10 liyao: load gene id mapping table
+        var self = this;
+        $.getJSON(gene_id_url, function(_data){
+            self.tableData = _data;
+            console.log('getOption');
+            console.log('loadGeneIDTable');
+            console.log(self.tableData);
+            self.allTableData = _data;
+            //self.selectSample(self.currentSpecies);
+        });
+    },
+    updataTable(){
+        // 2022-10-10 search gene
+        console.log('updataTable');
+        var new_tableData = [];
+        var arrayLength = this.allTableData.length;
+        if (this.curr_genename_system == 'SMESG'){
+            for (var i = 0; i < arrayLength; i++) {
+                if (this.allTableData[i]['smesg'].includes(this.input_gene_id)){
+                    new_tableData.push(this.allTableData[i]);
+                }
+            }
+        }else if (this.curr_genename_system == 'SMED') {
+            for (var i = 0; i < arrayLength; i++) {
+                if (this.allTableData[i]['smed'].includes(this.input_gene_id)){
+                    new_tableData.push(this.allTableData[i]);
+                }
+            }
+        }
+        this.tableData = new_tableData;
+    },
+    handleRow(row,event,column){
+        if (this.curr_genename_system == 'SMESG'){
+            this.input_gene_id = row.smesg;
+            //this.curr_selected_gene = row.smesg;
+        }else if (this.curr_genename_system == 'SMED') {
+            this.input_gene_id = row.smed;
+            //this.curr_selected_gene = row.smed;
+        }
+        console.log(this.input_gene_id);
+        this.updataTable();
+        this.refreshGene(this.input_gene_id,false);
     },
     UseGeneID() {
         this.curr_selected_gene = "";
         this.refreshGene(this.input_gene_id,false);
+        console.log('UseGeneID');
+        console.log(this.input_gene_id);
+        this.updataTable();
     },
     get_curr_gene_url(gene_name) {
         return this.curr_gene_url+"/"+this.curr_name+"/"+gene_name+".json";
@@ -881,6 +945,10 @@ data() {
               self.setGeneData(_data);
               self.update_option_deep();
             });
+        }
+        console.log(this.input_gene_id);
+        if (this.input_gene_id != ''){
+
         }
     },
     setGeneData(_data) {
@@ -1008,6 +1076,7 @@ data() {
             this.is_ct_mode = false;
             this.is_gc_mode = false;
             this.is_ge_mode = true;
+            this.loadGeneTable();
         } else {
             this.is_ct_mode = false;
             this.is_gc_mode = true;
