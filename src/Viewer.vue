@@ -166,6 +166,7 @@
                          <!-- ----------cell type mode end--------------------------------------------------------------- -->
                          <!-- ----------gene selection mode start--------------------------------------------------------------- -->
                          <div align="center"  v-show="is_ge_mode" style="margin:3px;   border: 3px solid #ccc;">
+                           <!--
                             <el-row style="margin-top:3px;margin-bottom:2px">
                                 <el-col :span="8" >
                                    <span  class='mspan'>Type:</span>
@@ -197,6 +198,7 @@
                                 </el-col>
                             </el-row>
                             <hr class="dhr">
+                           -->
                             <div align="left" style="margin-left:10px;">
                                 <el-row style="margin-top:1px;margin-bottom:1px">
                                     <span class='mspan'>Please choose an DEG:</span>
@@ -206,7 +208,7 @@
                                         <el-input  v-model="input_gene_id" placeholder=""></el-input>
                                     </el-col>
                                     <el-col :span="8" >
-                                        <el-button type="success" @click.native="UseGeneID">Display</el-button>
+                                        <el-button type="success" @click.native="updataTable">Search</el-button>
                                     </el-col>
                                 </el-row>
                                 <el-row style="margin-top:3px;margin-bottom:2px">
@@ -262,6 +264,7 @@
                          <!-- ----------gene selection mode start--------------------------------------------------------------- -->
                          <!-- ----------digital in situ mode start--------------------------------------------------------------- -->
                          <div align="center"  v-show="is_gc_mode" style="margin:3px; border: 3px solid #ccc;">
+                            <!--
                             <el-row style="margin-top:3px;margin-bottom:2px">
                                 <el-col :span="8" >
                                    <span  class='mspan'>Type:</span>
@@ -293,6 +296,7 @@
                                 </el-col>
                             </el-row>
                             <hr class="dhr">
+                            -->
                             <el-row style="margin-top:3px;margin-bottom:2px">
                                 <el-col :span="6" >
                                    <span  class='mspan'>red:</span>
@@ -534,8 +538,8 @@
         <!-- main window -->
         <div ref="main"  style="border: 3px solid #eee;">
           <!-- I. chart content -->
-          <v-chart v-show="model_only" class="chart" resizeable=true :width="chartWidth"  ref="myecharts_model" :option="option_mo" style="height:800px;" />
-          <v-chart v-show="data_valid" class="chart" resizeable=true :width="chartWidth"  ref="myecharts" :option="option" style="height:800px;" />
+          <v-chart v-show="model_only" class="chart" resizeable=true :width="chartWidth"  ref="myecharts_model" :option="option_mo" style="height:900px;" />
+          <v-chart v-show="data_valid" class="chart" resizeable=true :width="chartWidth"  ref="myecharts" :option="option" style="height:900px;" />
         </div>
         <!-- end of the main window -->
       </el-col>
@@ -554,10 +558,6 @@ import VChart, { THEME_KEY } from "vue-echarts";
 import { Draggable } from 'draggable-vue-directive';
 import vdr from 'vue-draggable-resizable-gorkys'
 import { Sketch } from 'vue-color'
-// the dateset url -----------------------------------
-var CT_URL = "http://49.235.68.146/celltype/"
-var CTU_URL = "http://49.235.68.146/celltype_umap/"
-var CP_URL = "http://49.235.68.146/cell_center/"
 // axis limitation conf --------------------------------
 var idvd_conf_corrected = require('../confs/individual_corrected.js');
 var idvd_conf_rotate = require('../confs/individual_rotated.js');
@@ -569,11 +569,12 @@ var celltype_legend = require('../confs/CellType.js');
 var COLOR_default = COLOR_ALL.default_colors;
 var COLOR_9 = COLOR_ALL.color_9;
 // cell type legend and the color conf --------------------------------
-var conf_gens = require('../confs/genes.js');
 // URL manager
 var url_manager = require('../confs/urls.js');
+var CT_URL = url_manager.ANNO_URL;
+var CP_URL = url_manager.MESH_URL;
 // Gene ID Mapping table
-var gene_id_url = "http://49.235.68.146/newgenes/id_mapping_web.json"
+var gene_id_url = url_manager.GENETABLE_URL;
 
 export default {
 components: {
@@ -705,7 +706,10 @@ data() {
       all_clusters: 0,
       saved_clusters:[], // the selection cache
       selected_rs_index:"0",
-      coord_array : CT_CONFS.label_WT.pos,
+      coord_array : [
+            'Raw posture',
+            'Adjusted posture',
+      ],
       anno_array : CT_CONFS.label_WT.anno,
       curr_anno : null,
       curr_coord : null,
@@ -742,10 +746,9 @@ data() {
       curr_selected_gene : '',
       input_gene_id : '',
       curr_gene : "",
-      genes : conf_gens,
-      curr_genename_system : 'SMED',
-      curr_norm : 'scaled',
-      curr_gene_url : url_manager.GENE_URL.SMED.scaled,
+      curr_genename_system : 'SMESG',
+      curr_norm : 'sct_transformed',
+      curr_gene_url : url_manager.GENE_URL.SMESG.sct_transformed,
       gene_json_raw : null,
       gene_json_data : null,
       //smallestExpression:0,
@@ -756,10 +759,10 @@ data() {
       //------------gene expression selection end------
 
       //------------channel selection start------
-      input_gene_red:     'SMED30007406',
-      input_gene_green:   'SMED30019471',
-      input_gene_blue:    'SMED30030379',
-      input_gene_gray:    '',
+      input_gene_red:     'SMESG000066416.1',
+      input_gene_green:   'SMESG000008070.1',
+      input_gene_blue:    'SMESG000068721.1',
+      input_gene_gray:    'SMESG000033795.1',
       input_gene_cyan:    '',
       input_gene_magenta: '',
       input_gene_yellow:  '',
@@ -869,16 +872,18 @@ data() {
         }
     },
     loadGeneTable(){
-        // 2022-10-10 liyao: load gene id mapping table
-        var self = this;
-        $.getJSON(gene_id_url, function(_data){
-            self.tableData = _data;
-            console.log('getOption');
-            console.log('loadGeneIDTable');
-            console.log(self.tableData);
-            self.allTableData = _data;
-            //self.selectSample(self.currentSpecies);
-        });
+        if ( this.allTableData.length <1 ) {
+            // 2022-10-10 liyao: load gene id mapping table
+            var self = this;
+            $.getJSON(gene_id_url, function(_data){
+                self.tableData = _data;
+                console.log('getOption');
+                console.log('loadGeneIDTable');
+                console.log(self.tableData);
+                self.allTableData = _data;
+                //self.selectSample(self.currentSpecies);
+            });
+        }
     },
     updataTable(){
         // 2022-10-10 search gene
@@ -910,13 +915,9 @@ data() {
         }
         console.log(this.input_gene_id);
         this.updataTable();
-        this.refreshGene(this.input_gene_id,false);
+        this.refreshGene(this.input_gene_id,true);
     },
     UseGeneID() {
-        this.curr_selected_gene = "";
-        this.refreshGene(this.input_gene_id,false);
-        console.log('UseGeneID');
-        console.log(this.input_gene_id);
         this.updataTable();
     },
     get_curr_gene_url(gene_name) {
@@ -1072,15 +1073,26 @@ data() {
             this.is_ct_mode = true;
             this.is_gc_mode = false;
             this.is_ge_mode = false;
+            this.coord_array = [
+                'Raw posture',
+                'Adjusted posture',
+            ];
         }else if ( this.curr_mode == "GeneExpression" ) {
             this.is_ct_mode = false;
             this.is_gc_mode = false;
             this.is_ge_mode = true;
+            this.coord_array = [
+                'Adjusted posture',
+            ];
             this.loadGeneTable();
         } else {
             this.is_ct_mode = false;
             this.is_gc_mode = true;
             this.is_ge_mode = false;
+            this.coord_array = [
+                'Adjusted posture',
+            ];
+            this.loadGeneTable();
         }
         this.OnChangeSample();
     },
@@ -1120,7 +1132,6 @@ data() {
     // --------------cell type detail confs begin ----------------------------
     resetCellTypeSampleConf(){
         this.anno_array = CT_CONFS["label_"+this.curr_sample].anno;
-        this.coord_array = CT_CONFS["label_"+this.curr_sample].pos;
         this.curr_anno = this.anno_array[0];
         this.curr_coord = this.coord_array[0];
     },
@@ -2006,7 +2017,7 @@ data() {
   vertical-align: middle;
 }
 .chart {
-  height: 800px;
+  height: 900px;
 }
 .parent {
   position: relative;

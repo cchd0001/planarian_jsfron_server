@@ -1,16 +1,15 @@
 module.exports = {
   GENE_URL : {
     SMED : {
-        scaled : 'http://49.235.68.146/newgenes/',
-        sct_transformed : 'http://49.235.68.146/newgenes/v20220221/',
     },
     SMESG : {
-        scaled : 'http://49.235.68.146/newgenes/SMEGS_scaled/',
-        sct_transformed : 'http://49.235.68.146/newgenes/SMESG_sct/',
+        sct_transformed : 'http://49.235.68.146/planarian_statics/json/gene_expression/SMESG/adjusted/',
     },
   },
   PSEUDO_FISH_URL : {
-    SMED : 'http://49.235.68.146/pseudo_fish/',
-    SMEGS : 'http://49.235.68.146/pseudo_fish/',
+    SMEGS : 'http://49.235.68.146/planarian_statics/imgs/gene_expression/SMESG/adjusted/',
   },
+  ANNO_URL: 'http://49.235.68.146/planarian_statics/json/annotation/',
+  MESH_URL: 'http://49.235.68.146/planarian_statics/json/mesh/',
+  GENETABLE_URL : 'http://49.235.68.146/planarian_statics/json/confs/id_mapping_web.json',
 };
