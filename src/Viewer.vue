@@ -208,7 +208,7 @@
                                         <el-input  v-model="input_gene_id" placeholder=""></el-input>
                                     </el-col>
                                     <el-col :span="8" >
-                                        <el-button type="success" @click.native="updataTable">Search</el-button>
+                                        <el-button type="success" @click.native="updateTable">Search</el-button>
                                     </el-col>
                                 </el-row>
                                 <el-row style="margin-top:3px;margin-bottom:2px">
@@ -228,7 +228,7 @@
                                     </el-col>
                                 </el-row>
                                 <el-row style="margin-top:3px;margin-bottom:2px">
-                                        <el-pagination layout="prev,next,jumper"
+                                        <el-pagination layout="total,prev,next,jumper"
                                         :total="this.tableData.length"
                                         :current-page="currentPage"
                                         @current-change="handleCurrentChange" @size-change="handleSizeChange"
@@ -885,14 +885,18 @@ data() {
             });
         }
     },
-    updataTable(){
+    updateTable(){
         // 2022-10-10 search gene
-        console.log('updataTable');
+        console.log('updateTable');
         var new_tableData = [];
         var arrayLength = this.allTableData.length;
         if (this.curr_genename_system == 'SMESG'){
             for (var i = 0; i < arrayLength; i++) {
                 if (this.allTableData[i]['smesg'].includes(this.input_gene_id)){
+                    new_tableData.push(this.allTableData[i]);
+                }else if (this.allTableData[i]['smed'].includes(this.input_gene_id)){
+                    new_tableData.push(this.allTableData[i]);
+                }else if (this.allTableData[i]['gene_name'].includes(this.input_gene_id)){
                     new_tableData.push(this.allTableData[i]);
                 }
             }
@@ -914,11 +918,11 @@ data() {
             //this.curr_selected_gene = row.smed;
         }
         console.log(this.input_gene_id);
-        this.updataTable();
+        this.updateTable();
         this.refreshGene(this.input_gene_id,true);
     },
     UseGeneID() {
-        this.updataTable();
+        this.updateTable();
     },
     get_curr_gene_url(gene_name) {
         return this.curr_gene_url+"/"+this.curr_name+"/"+gene_name+".json";
