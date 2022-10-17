@@ -2,8 +2,8 @@ module.exports = {
   label_0hpa1 : {
     xmin : -132,
     xmax : 1565,
-    ymax : -739,
-    ymin : 507,
+    ymin : -739,
+    ymax : 507,
     zmin : -75,
     zmax : 284
   },
