@@ -7,7 +7,7 @@ module.exports = {
     },
   },
   PSEUDO_FISH_URL : {
-    SMEGS : 'http://49.235.68.146/planarian_statics/imgs/gene_expression/SMESG/adjusted/',
+    SMESG : 'http://49.235.68.146/planarian_statics/imgs/pseudofish/SMESG/adjusted/',
   },
   ANNO_URL: 'http://49.235.68.146/planarian_statics/json/annotation/',
   MESH_URL: 'http://49.235.68.146/planarian_statics/json/mesh/',

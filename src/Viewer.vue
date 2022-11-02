@@ -538,8 +538,8 @@
         <!-- main window -->
         <div ref="main"  style="border: 3px solid #eee;">
           <!-- I. chart content -->
-          <v-chart v-show="model_only" class="chart" resizeable=true :width="chartWidth"  ref="myecharts_model" :option="option_mo" style="height:900px;" />
-          <v-chart v-show="data_valid" class="chart" resizeable=true :width="chartWidth"  ref="myecharts" :option="option" style="height:900px;" />
+          <v-chart v-show="model_only" class="chart" resizeable=true :width="chartWidth"  ref="myecharts_model" :option="option_mo" />
+          <v-chart v-show="data_valid" class="chart" resizeable=true :width="chartWidth"  ref="myecharts" :option="option"  />
         </div>
         <!-- end of the main window -->
       </el-col>
@@ -934,6 +934,7 @@ data() {
     OnOpenFISH(){
         var base_url =  url_manager.PSEUDO_FISH_URL[this.curr_genename_system];
         this.fish_url = base_url + '/' + this.curr_name+'/'+this.curr_name+'_'+this.curr_gene+".green.MIR.png";
+        console.log(this.fish_url)
         this.mip_drawer = true;
     },
     refreshGene(gname, force) {
@@ -1920,6 +1921,7 @@ data() {
             selected: legend_show,
             textStyle: {
               color:ft_color,
+              fontSize:24,
             }
           },
           toolbox: {
@@ -2021,7 +2023,7 @@ data() {
   vertical-align: middle;
 }
 .chart {
-  height: 900px;
+  height: 800px;
 }
 .parent {
   position: relative;
