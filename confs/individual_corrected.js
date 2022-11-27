@@ -1,4 +1,12 @@
 module.exports = {
+  label_All17 : {
+    xmin : 0,
+    xmax : 5247,
+    ymin : -3103,
+    ymax : 0,
+    zmin : 0,
+    zmax : 155
+  },
   label_0hpa1 : {
     xmin : -132,
     xmax : 1565,

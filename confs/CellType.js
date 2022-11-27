@@ -44,6 +44,20 @@ module.exports = {
            "protonephridia",
          ],
     },
+    nc_lineage : {
+        LegendsNum :9,
+        Legends : [
+            'cathepsin+',
+            'epidermal',
+            'NB2',
+            'neural',
+            'muscle',
+            'intestine',
+            'parenchymal',
+            'pharynx',
+            'protonephridia',
+        ],
+    },
     nc_cluster36 : {
         LegendsNum :36,
         Legends : [

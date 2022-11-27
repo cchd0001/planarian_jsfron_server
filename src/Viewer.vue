@@ -468,6 +468,11 @@
                                       <el-button type="success" @click.native="changeZMax">Apply</el-button>
                                   </el-col>
                               </el-row>
+                              <el-row style="margin-top:3px;margin-bottom:2px">
+                                  <el-col :span="24" >
+                                      <el-button type="primary" @click.native="resetROI">ResetROI</el-button>
+                                  </el-col>
+                              </el-row>
                           </div>
                          <!-- ----------roi setting end--------------------------------------------------------------- -->
                       </el-collapse-item>
@@ -519,6 +524,16 @@
                                   <el-col :span="15" >
                                       <el-slider  v-model="symbolAlpha"
                                         :step="0.1" :min="0.0" :max="1" @change="refresh" show-stops>
+                                      </el-slider>
+                                  </el-col>
+                              </el-row>
+                              <el-row style="margin:3px;">
+                                  <el-col :span="8" >
+                                     <span  class='mspan'>LineWidth</span>
+                                  </el-col>
+                                  <el-col :span="15" >
+                                      <el-slider  v-model="LineWidth"
+                                        :step="1" :min="3" :max="10" @change="refresh" show-stops>
                                       </el-slider>
                                   </el-col>
                               </el-row>
@@ -607,7 +622,7 @@ data() {
       is_gc_mode: false,
       // valid samples:
       all_sample: [
-           'All17Sample',
+           'All17',
            'WT',
            '0hpa1',
            '0hpa2',
@@ -670,6 +685,7 @@ data() {
       adjusted_posture:true,
       symbolSize:2,
       symbolAlpha:1.0,
+      LineWidth:3,
       // drawing details conf end----------
       // echarts option begin -------------
       chartWidth:'100%',
@@ -1368,8 +1384,10 @@ data() {
           this.curr_rs = "major_celltype";
       } else if ( this.curr_anno == "Single Cell sub cluster"){
           this.curr_rs = "sc_subcluster";
-      } else if ( this.curr_anno == "SPC lineage"){
+      } else if ( this.curr_anno == "SPC cluster"){
           this.curr_rs = "nc_cluster36";
+      } else if ( this.curr_anno == "SPC lineage"){
+          this.curr_rs = "nc_lineage";
       }
       if(this.curr_coord == "Raw posture" || this.curr_coord == "Adjusted posture" ) {
           used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+"."+this.coord_tag+".json";
@@ -1765,7 +1783,7 @@ data() {
             var box_series = {
                 type: 'line3D',
                 lineStyle: {
-                    width: 3,
+                    width: this.LineWidth,
                     color: '#aaaaaa',
                 },
                 data: [
@@ -1794,6 +1812,20 @@ data() {
         } else {
             return null;
         }
+    },
+    getBarSeries(used_xmax,used_ymin,used_zmax) {
+        var box_series = {
+            type: 'line3D',
+            lineStyle: {
+                width: this.LineWidth,
+                color: '#eeeeee',
+            },
+            data: [
+                [used_xmax-10 , used_ymin+10, used_zmax-3],
+                [used_xmax-10 , used_ymin+60, used_zmax-3],
+            ]
+        };
+        return box_series;
     },
     getOption(){
       // set colors 
@@ -1899,18 +1931,18 @@ data() {
         if(box_series!= null){
             series_list.push(box_series)
         }
-        //if( max10 == true ){
-        //  used_xmin = -10; used_xmax = 10; 
-        //  used_ymin = -10; used_ymax = 10; 
-        //  used_zmin = -10; used_zmax = 10; 
-        //  boxWidth = 60; boxHeight = 60; boxDepth = 60;
-        //}
+        var line_series = this.getBarSeries(used_xmax,used_ymin,used_zmax);
+        series_list.push(line_series);
+        if( tips == "" && this.curr_name == "All17" ){
+            tips = "sample name :  \n           0hpa1 0hpa2        12hpa1 12hpa2    36hpa1 36hpa2\n WT    3dpa1 3dpa2        5dpa1 5dpa2        7dpa1 7dpa2\n           10dpa1 10dpa2    14dpa1 14dpa2"
+        }
         var opt={
           backgroundColor:bk_color,
           title :{
             text : tips,
             left: "center",
             top : "bottom",
+            textAlign : "left",
             textStyle: {
                color: ft_color
             },
@@ -1921,14 +1953,24 @@ data() {
             selected: legend_show,
             textStyle: {
               color:ft_color,
-              fontSize:24,
+              fontSize:14,
             }
           },
           toolbox: {
             show: true,
             feature: {
+              restore : {},
+              //dataZoom : {show:true},
+              //brush : {
+              //    type: ['rect','polygon','lineX','lineY','clear'],
+              //},
               saveAsImage: {},
-            }
+            },
+            iconStyle:{
+              //color : '#888',
+              borderColor: '#fff',
+              borderWidth : 2,
+            },
           },
           tooltip: {},
           xAxis3D: {

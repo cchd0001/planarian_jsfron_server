@@ -14,6 +14,8 @@
       <hr>
       <p>Any page issue or bug resport, please contact: guolidong@genomics.cn; liyao1@genomics.cn; wangrui2@genomics.cn </p>
       <p>Web server version v0.1. Powered by Element.js framework and Echarts.js library.</p>
+      <p> -------------------------------------------------------------------------</p>
+      <a style="color: #dddddd " href = 'https://beian.miit.gov.cn' >鲁ICP备2022034375号</a>
     </footer>
   </div>
 </template>
