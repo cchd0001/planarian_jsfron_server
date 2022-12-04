@@ -583,6 +583,7 @@ var COLOR_ALL = require('../confs/discret_color.js');
 var celltype_legend = require('../confs/CellType.js');
 var COLOR_default = COLOR_ALL.default_colors;
 var COLOR_9 = COLOR_ALL.color_9;
+var COLOR_spc = COLOR_ALL.color_spc;
 // cell type legend and the color conf --------------------------------
 // URL manager
 var url_manager = require('../confs/urls.js');
@@ -653,6 +654,7 @@ data() {
       COLOR_9 : COLOR_9,
       COLOR_default :COLOR_default,
       COLOR_ALL2: COLOR_default,
+      COLOR_spc : COLOR_spc,
       current_color_all: null,
       currentCellID: '',
       color: '',
@@ -680,12 +682,12 @@ data() {
       // drawing details conf start ----------
       black_background:true,
       draw_legends:true,
-      draw_grids:false,
+      draw_grids:true,
       draw_box :true,
       adjusted_posture:true,
       symbolSize:2,
       symbolAlpha:1.0,
-      LineWidth:3,
+      LineWidth:4,
       // drawing details conf end----------
       // echarts option begin -------------
       chartWidth:'100%',
@@ -1385,9 +1387,14 @@ data() {
       } else if ( this.curr_anno == "Single Cell sub cluster"){
           this.curr_rs = "sc_subcluster";
       } else if ( this.curr_anno == "SPC cluster"){
+          this.curr_rs = "spc_cluster36";
+          this.COLOR_ALL2 = this.COLOR_spc  ;
+      } else if ( this.curr_anno == "SPC2SC cluster"){
           this.curr_rs = "nc_cluster36";
-      } else if ( this.curr_anno == "SPC lineage"){
+          this.COLOR_ALL2 = this.COLOR_spc  ;
+      } else if ( this.curr_anno == "SPC2SC lineage"){
           this.curr_rs = "nc_lineage";
+          this.COLOR_ALL2 = this.COLOR_spc  ;
       }
       if(this.curr_coord == "Raw posture" || this.curr_coord == "Adjusted posture" ) {
           used_url = CT_URL+"/"+this.curr_name+"/"+this.curr_rs+"."+this.coord_tag+".json";
@@ -1974,31 +1981,31 @@ data() {
           },
           tooltip: {},
           xAxis3D: {
-            name: 'AP',
+            name: '',
             scale:1,
             type: 'value',
-            min: used_xmin,
-            max: used_xmax,
+            min: used_xmin-2,
+            max: used_xmax+2,
           },
           yAxis3D: {
-            name: 'ML',
+            name: '',
             scale:1,
             type: 'value',
-            min: used_ymin,
-            max: used_ymax,
+            min: used_ymin-2,
+            max: used_ymax+2,
           },
           zAxis3D: {
-            name: 'DV',
+            name: '',
             scale:1,
             type: 'value',
-            min: used_zmin,
-            max: used_zmax,
+            min: used_zmin-2,
+            max: used_zmax+2,
           },
           grid3D: {
             show: this.draw_grids,
-            boxWidth: boxWidth,
-            boxHeight: boxHeight ,
-            boxDepth: boxDepth , 
+            boxWidth: boxWidth+4,
+            boxHeight: boxHeight+4 ,
+            boxDepth: boxDepth+4 , 
             light: {
               main: {
                  shadow: false,
@@ -2011,11 +2018,23 @@ data() {
               },
             },
             axisLine: {
+              //show:false,
               lineStyle: {
-                color:ft_color,
+                color: '#00000000',
               }
             },
+            axisLabel:{
+               show:false,
+            },
+            splitLine:{
+               show:true,
+               lineStyle: {
+                 color: '#666' ,
+                 width: 2,
+               }
+            },
             axisPointer: {
+              show:false,
               lineStyle: {
                 color: ft_color
               }

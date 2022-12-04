@@ -5,7 +5,7 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
-            'SPC cluster',
+            'SPC2SC cluster',
         ],
     },
     label_WT :  {
@@ -14,13 +14,14 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell WT lineage',
             'Single Cell WT cluster',
             'Single Cell lineage',
             'Single Cell cluster',
             'Single Cell sub cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_0hpa1 : {
@@ -29,11 +30,12 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
             'Single Cell sub cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_0hpa2 : {
@@ -42,10 +44,11 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_12hpa1 : {
@@ -54,10 +57,11 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_12hpa2 : {
@@ -66,11 +70,12 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
             'Single Cell sub cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_36hpa1 : {
@@ -79,10 +84,11 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_36hpa2 : {
@@ -91,11 +97,12 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
             'Single Cell sub cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_3dpa1 : {
@@ -104,10 +111,11 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_3dpa2 : {
@@ -116,11 +124,12 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
             'Single Cell sub cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_5dpa1 : {
@@ -129,11 +138,12 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
             'Single Cell sub cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_5dpa2 : {
@@ -142,10 +152,11 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_7dpa1 : {
@@ -154,10 +165,11 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_7dpa2 : {
@@ -166,11 +178,12 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
             'Single Cell sub cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_10dpa1: {
@@ -179,11 +192,12 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
             'Single Cell sub cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_10dpa2: {
@@ -192,10 +206,11 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ],
     },
     label_14dpa1: {
@@ -204,11 +219,12 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
             'Single Cell sub cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ]
     },
     label_14dpa2: {
@@ -217,10 +233,11 @@ module.exports = {
             'Adjusted posture',
         ],
         anno :[
+            'SPC cluster',
             'Single Cell lineage',
             'Single Cell cluster',
-            'SPC cluster',
-            'SPC lineage',
+            'SPC2SC cluster',
+            'SPC2SC lineage',
         ]
     }
 };
