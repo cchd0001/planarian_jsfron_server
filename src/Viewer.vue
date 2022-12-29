@@ -83,19 +83,6 @@
                                  </el-select>
                              </el-col>
                          </el-row>
-                         <!--
-                         <el-row style="margin-top:3px;margin-bottom:2px">
-                             <el-col :span="8" >
-                                <span  class='mspan'>blendMode:</span>
-                             </el-col>
-                             <el-col :span="16" >
-                                 <el-select  v-model="curr_blender" placeholder="curr_blender" @change="OnChangeBlender">
-                                   <el-option key="source-over" label="alpha" value="source-over"></el-option>
-                                   <el-option key="lighter" label="lighter" value="lighter"></el-option>
-                                 </el-select>
-                             </el-col>
-                         </el-row>
-                         -->
                          <!-- ----------Choose mode end --------------------------------------------------------------- -->
                      </div>
                      <!-- ----------The Baisc settings end -------------------------------------------------------------- -->
@@ -126,22 +113,24 @@
                                 <el-table class="table" ref="clusterTable" style="width:100%;" :show-header='false'
                                   :height='height' :row-key="getRowKey" :highlight-current-row='true'
                                   :data="tableDataClusters.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-                                  @selection-change="handleSelectionChange" @row-click="getRowCelltype">
+                                  @selection-change="handleSelectionChange" 
+                                  @row-click="getRowCelltype">
                                     <el-table-column :reserve-selection="true" type="selection" ></el-table-column>
                                     <el-table-column property="Celltype" label="Cell Type" > </el-table-column>
                                     <el-table-column label="Display" >
                                       <el-button @click="showColorPalette">color</el-button>
-                                      <!-- <template slot-scope="scope"> -->
-                                        <!-- <el-button size="mini" type="primary" plain @click ="changeColor">color</el-button> -->
-                                      <!-- </template> -->
                                     </el-table-column>
                                 </el-table>
                                 <el-pagination layout="total,sizes" 
-                                  :total="this.tableDataClusters.length" :current-page="currentPage" 
-                                  @current-change="handleCurrentChange" @size-change="handleSizeChange" >
+                                  :total="this.tableDataClusters.length" 
+                                  :page-size="pageSize"
+                                  :page-sizes="[5,10,20,30]"
+                                  @size-change="handleSizeChange" >
                                 </el-pagination>
-                                <el-pagination layout="prev, jumper, next" 
-                                  :page-sizes="[10,20]" :page-size="pageSize" :current-page.sync="currentPage">
+                                <el-pagination layout="prev,jumper,next"
+                                  :total="this.tableDataClusters.length"
+                                  :page-size="pageSize"
+                                  :current-page.sync="currentPage">
                                 </el-pagination>
                             </el-row>
                             <!-- 1. cell table content end-->
@@ -166,39 +155,6 @@
                          <!-- ----------cell type mode end--------------------------------------------------------------- -->
                          <!-- ----------gene selection mode start--------------------------------------------------------------- -->
                          <div align="center"  v-show="is_ge_mode" style="margin:3px;   border: 3px solid #ccc;">
-                           <!--
-                            <el-row style="margin-top:3px;margin-bottom:2px">
-                                <el-col :span="8" >
-                                   <span  class='mspan'>Type:</span>
-                                </el-col>
-                                <el-col :span="16" >
-                                    <el-select  v-model="curr_genename_system" placeholder="curr_genename_system" @change="OnGeneNameSystemChange">
-                                      <el-option
-                                        v-for="item in genename_array"
-                                        :key="item"
-                                        :label="item"
-                                        :value="item">
-                                      </el-option>
-                                    </el-select>
-                                </el-col>
-                            </el-row>
-                            <el-row style="margin-top:3px;margin-bottom:2px">
-                                <el-col :span="8" >
-                                   <span  class='mspan'>Normed:</span>
-                                </el-col>
-                                <el-col :span="16" >
-                                    <el-select  v-model="curr_norm" placeholder="curr_norm" @change="OnGeneNormChange">
-                                      <el-option
-                                        v-for="item in normed_array"
-                                        :key="item"
-                                        :label="item"
-                                        :value="item">
-                                      </el-option>
-                                    </el-select>
-                                </el-col>
-                            </el-row>
-                            <hr class="dhr">
-                           -->
                             <div align="left" style="margin-left:10px;">
                                 <el-row style="margin-top:1px;margin-bottom:1px">
                                     <span class='mspan'>Please choose an DEG:</span>
@@ -216,7 +172,7 @@
                                         <!-- 2022-10-10 add gene table -->
                                         <el-table ref="geneTable" 
                                         :show-header='true' class="table"
-                                        :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                                        :data="tableData.slice((gene_currentPage-1)*gene_pageSize,gene_currentPage*gene_pageSize)"
                                         :highlight-current-row='true'
                                         stripe
                                         @row-dblclick='handleRow'>
@@ -230,9 +186,11 @@
                                 <el-row style="margin-top:3px;margin-bottom:2px">
                                         <el-pagination layout="total,prev,next,jumper"
                                         :total="this.tableData.length"
-                                        :current-page="currentPage"
-                                        @current-change="handleCurrentChange" @size-change="handleSizeChange"
-                                        :page-sizes="[3,5,10]" :page-size="pageSize" :current-page.sync="currentPage">
+                                        :current-page="gene_currentPage"
+                                        @current-change="handleCurrentGeneChange"
+                                        @size-change="handleSizeChange"
+                                        :page-size="pageSize" 
+                                        :current-page.sync="gene_currentPage">
                                         </el-pagination>
                                 </el-row>
 
@@ -758,8 +716,8 @@ data() {
       // 2022-10-10, gene table data
       tableData: [],
       allTableData: [],
-      pageSize:5,
-      currentPage:1,
+      gene_pageSize:5,
+      gene_currentPage:1,
       // end
       curr_selected_gene : '',
       input_gene_id : '',
@@ -1033,6 +991,9 @@ data() {
     },
     handleSizeChange (size) {
       this.pageSize = size;
+    },
+    handleCurrentGeneChange (currentpage){
+      this.gene_currentPage = currentpage;
     },
     handleCurrentChange (currentpage){
       this.currentPage = currentpage;
