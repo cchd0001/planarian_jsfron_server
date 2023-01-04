@@ -222,39 +222,6 @@
                          <!-- ----------gene selection mode start--------------------------------------------------------------- -->
                          <!-- ----------digital in situ mode start--------------------------------------------------------------- -->
                          <div align="center"  v-show="is_gc_mode" style="margin:3px; border: 3px solid #ccc;">
-                            <!--
-                            <el-row style="margin-top:3px;margin-bottom:2px">
-                                <el-col :span="8" >
-                                   <span  class='mspan'>Type:</span>
-                                </el-col>
-                                <el-col :span="16" >
-                                    <el-select  v-model="curr_genename_system" placeholder="curr_genename_system" @change="OnGeneNameSystemChange">
-                                      <el-option
-                                        v-for="item in genename_array"
-                                        :key="item"
-                                        :label="item"
-                                        :value="item">
-                                      </el-option>
-                                    </el-select>
-                                </el-col>
-                            </el-row>
-                            <el-row style="margin-top:3px;margin-bottom:2px">
-                                <el-col :span="8" >
-                                   <span  class='mspan'>Normed:</span>
-                                </el-col>
-                                <el-col :span="16" >
-                                    <el-select  v-model="curr_norm" placeholder="curr_norm" @change="OnGeneNormChange">
-                                      <el-option
-                                        v-for="item in normed_array"
-                                        :key="item"
-                                        :label="item"
-                                        :value="item">
-                                      </el-option>
-                                    </el-select>
-                                </el-col>
-                            </el-row>
-                            <hr class="dhr">
-                            -->
                             <el-row style="margin-top:3px;margin-bottom:2px">
                                 <el-col :span="6" >
                                    <span  class='mspan'>red:</span>
@@ -769,7 +736,7 @@ data() {
           blue:"#0000ff",
           gray:"#888888",
           cyan:"#00ffff",
-          magenta:"#ff00fff",
+          magenta:"#ff00ff",
           yellow:"#ffff00"
       },
       min_cutoff : 3,
