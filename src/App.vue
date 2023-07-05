@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <header>
+   <!--  <header>
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" active-text-color="#409eff" style="margin: 0px;">
-        <el-menu-item index="1">Planarian atlas 3D viewer</el-menu-item>
-        <el-menu-item index="2">Planarian atlas home</el-menu-item>
-        <el-menu-item index="3" disabled >About us</el-menu-item>
-      </el-menu>
-    </header>
+         <el-menu-item index="1">Planarian atlas 3D viewer</el-menu-item>
+         <el-menu-item index="2">Planarian atlas home</el-menu-item>
+         <el-menu-item index="3" disabled >About us</el-menu-item>
+       </el-menu> 
+    </header>-->
     <article>
         <component v-bind:is="selected"></component>
     </article>
